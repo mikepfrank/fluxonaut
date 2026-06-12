@@ -1,0 +1,263 @@
+{
+  "w1l1": { "wires": [[["L_in","A"],["D_out","A"]]] },
+
+  "w1l2": {
+    "place": [{ "id": "refl", "type": "REFLECTOR", "x": 10, "y": 4, "rot": 3 }],
+    "wires": [
+      [["L_in","A"],["rot1","A"]],
+      [["rot1","B"],["refl","A"]],
+      [["rot1","C"],["D_out","A"]]
+    ]
+  },
+
+  "w1l3": {
+    "dropPrewires": [1],
+    "moveFixed": { "refl": { "x": 8, "y": 4, "rot": 3 } },
+    "wires": [[["rot1","B"],["refl","A"]]]
+  },
+
+  "w1l4": {
+    "place": [
+      { "id": "rotA", "type": "ROTARY", "x": 8, "y": 6 },
+      { "id": "fd1", "type": "FD", "x": 8, "y": 4, "rot": 3 }
+    ],
+    "wires": [
+      [["L_in","A"],["rotA","A"]],
+      [["rotA","B"],["fd1","A"]],
+      [["fd1","B"],["D_pass","A"]],
+      [["rotA","C"],["D_bounce","A"]]
+    ]
+  },
+
+  "w1l5": {
+    "place": [
+      { "id": "rotA", "type": "ROTARY", "x": 6, "y": 6 },
+      { "id": "fd1", "type": "FD", "x": 6, "y": 4, "rot": 3 },
+      { "id": "rotB", "type": "ROTARY", "x": 10, "y": 6 },
+      { "id": "fd2", "type": "FD", "x": 10, "y": 4, "rot": 3 }
+    ],
+    "wires": [
+      [["L_in","A"],["rotA","A"]],
+      [["rotA","B"],["fd1","A"]],
+      [["fd1","B"],["D1","A"]],
+      [["rotA","C"],["rotB","A"]],
+      [["rotB","B"],["fd2","A"]],
+      [["fd2","B"],["D2","A"]],
+      [["rotB","C"],["D3","A"]]
+    ]
+  },
+
+  "w2l1": {
+    "place": [
+      { "id": "tcb", "type": "TCB", "x": 12, "y": 6 },
+      { "id": "rotC", "type": "ROTARY", "x": 12, "y": 5, "cfg": { "ccw": true } },
+      { "id": "rotD", "type": "ROTARY", "x": 10, "y": 6, "cfg": { "ccw": true } }
+    ],
+    "wires": [
+      [["L_C","A"],["rotC","A"]],
+      [["rotC","C"],["tcb","C"]],
+      [["rotC","B"],["D_ctl","A"]],
+      [["L_D","A"],["rotD","A"]],
+      [["rotD","C"],["tcb","A"]],
+      [["tcb","B"],["D_pass","A"]],
+      [["rotD","B"],["D_refl","A"],[{ "x": 8.5, "y": 12.5 }]]
+    ]
+  },
+
+  "w2l2": {
+    "place": [{ "id": "tsg", "type": "TSG", "x": 10, "y": 4 }],
+    "wires": [
+      [["L_ctl","A"],["tsg","Ci"]],
+      [["tsg","Co"],["D_co","A"],[{ "x": 10.5, "y": 12.5 }]],
+      [["L_dat","A"],["tsg","I"]],
+      [["tsg","U"],["D_up","A"]],
+      [["tsg","D"],["D_dn","A"]]
+    ]
+  },
+
+  "w2l3": {
+    "place": [{ "id": "tsg", "type": "TSG", "x": 10, "y": 4, "rot": 2 }],
+    "wires": [
+      [["L_u","A"],["tsg","U"]],
+      [["L_d","A"],["tsg","D"],[{ "x": 8.5, "y": 8.5 }]],
+      [["L_ctl","A"],["tsg","Ci"]],
+      [["tsg","Co"],["D_co","A"],[{ "x": 11.5, "y": 1.5 }, { "x": 18, "y": 1.5 }, { "x": 18, "y": 12.5 }]],
+      [["tsg","I"],["D_out","A"]]
+    ]
+  },
+
+  "w2l4": {
+    "wires": [
+      [["L_X","A"],["tsgB","U"]],
+      [["tsgA","D"],["tsgB","D"]],
+      [["tsgB","I"],["tsgA","Ci"]],
+      [["L_1","A"],["tsgA","I"]],
+      [["tsgA","U"],["D_notx","A"]],
+      [["tsgA","Co"],["D_out","A"]],
+      [["L_M","A"],["tsgB","Ci"]],
+      [["tsgB","Co"],["D_mrec","A"],[{ "x": 19.5, "y": 1.5 }]]
+    ]
+  },
+
+  "w2l5": {
+    "place": [{ "id": "tsg", "type": "TSG", "x": 10, "y": 5 }],
+    "wires": [
+      [["L_A","A"],["tsg","Ci"]],
+      [["tsg","Co"],["D_a","A"],[{ "x": 10.5, "y": 12 }, { "x": 18.5, "y": 12 }, { "x": 18.5, "y": 2.5 }]],
+      [["L_B","A"],["tsg","I"]],
+      [["tsg","D"],["D_and","A"]],
+      [["tsg","U"],["D_nab","A"],[{ "x": 13, "y": 11.5 }, { "x": 19, "y": 11.5 }]]
+    ]
+  },
+
+  "w3l1": {
+    "place": [{ "id": "not", "type": "NOT", "x": 10, "y": 6 }],
+    "wires": [
+      [["L_in","A"],["not","A"]],
+      [["not","B"],["D_out","A"]]
+    ]
+  },
+
+  "w3l2": {
+    "place": [
+      { "id": "rot", "type": "ROTARY", "x": 8, "y": 6, "cfg": { "ccw": true } },
+      { "id": "rm", "type": "RM1", "x": 10, "y": 6, "state": -1 }
+    ],
+    "wires": [
+      [["L_in","A"],["rot","A"]],
+      [["rot","C"],["rm","A"]],
+      [["rot","B"],["D_out","A"]]
+    ]
+  },
+
+  "w3l3": {
+    "wires": [
+      [["L_in","A"],["sr1","A"]],
+      [["sr1","B"],["sr2","A"]],
+      [["sr2","B"],["sr3","A"]],
+      [["sr3","B"],["D_out","A"]]
+    ]
+  },
+
+  "w3l4": {
+    "place": [{ "id": "ps", "type": "PS", "x": 10, "y": 6 }],
+    "wires": [
+      [["L_in","A"],["ps","S"]],
+      [["ps","P"],["D_p","A"]],
+      [["ps","M"],["D_m","A"],[{ "x": 18, "y": 10.5 }]]
+    ]
+  },
+
+  "w3l5": {
+    "place": [{ "id": "pr", "type": "PR3", "x": 10, "y": 6 }],
+    "wires": [
+      [["L_in","A"],["pr","A"]],
+      [["pr","B"],["D_p","A"]],
+      [["pr","C"],["D_m","A"],[{ "x": 18, "y": 10.5 }]]
+    ]
+  },
+
+  "w3l6": {
+    "place": [
+      { "id": "rotX", "type": "ROTARY", "x": 8, "y": 4, "cfg": { "ccw": true } },
+      { "id": "rotP", "type": "ROTARY", "x": 13, "y": 4 },
+      { "id": "pr", "type": "PR3", "x": 16, "y": 1 }
+    ],
+    "wires": [
+      [["L_X","A"],["rotX","A"]],
+      [["rotX","C"],["rm","A"]],
+      [["rotX","B"],["D_rec","A"]],
+      [["L_P","A"],["rotP","C"],[{ "x": 14.5, "y": 10.5 }]],
+      [["rotP","A"],["rm","B"]],
+      [["rotP","B"],["pr","A"]],
+      [["pr","B"],["D_same","A"]],
+      [["pr","C"],["D_diff","A"]]
+    ]
+  },
+
+  "w3l7": {
+    "place": [{ "id": "pr", "type": "PR3", "x": 10, "y": 6 }],
+    "wires": [
+      [["L_in","A"],["pr","A"]],
+      [["pr","B"],["D_out","A"]],
+      [["pr","C"],["D_ret","A"],[{ "x": 18, "y": 12.5 }]]
+    ]
+  },
+
+  "w4l1": {
+    "place": [
+      { "id": "rotC", "type": "ROTARY", "x": 8, "y": 5, "cfg": { "ccw": true } },
+      { "id": "prd", "type": "PR3", "x": 8, "y": 8 }
+    ],
+    "wires": [
+      [["L_C","A"],["rotC","A"]],
+      [["rotC","C"],["cb","K1"]],
+      [["rotC","B"],["D_tok","A"]],
+      [["L_D","A"],["prd","A"]],
+      [["prd","B"],["cb","D1"]],
+      [["prd","C"],["D_refl","A"]],
+      [["cb","D2"],["D_pass","A"]]
+    ]
+  },
+
+  "w4l2": {
+    "place": [
+      { "id": "psL", "type": "PS", "x": 7, "y": 6, "rot": 2 },
+      { "id": "psR", "type": "PS", "x": 16, "y": 6 }
+    ],
+    "wires": [
+      [["L_C","A"],["psL","P"]],
+      [["psL","S"],["cb","K1"]],
+      [["psL","M"],["psR","M"],[{ "x": 6.5, "y": 2 }, { "x": 17.5, "y": 2 }]],
+      [["psR","S"],["cb","K2"]],
+      [["psR","P"],["D_cout","A"]]
+    ]
+  },
+
+  "w4l3": {
+    "place": [
+      { "id": "psL", "type": "PS", "x": 7, "y": 6, "rot": 2 },
+      { "id": "psR", "type": "PS", "x": 16, "y": 6 },
+      { "id": "circ", "type": "CIRC", "x": 8, "y": 10 }
+    ],
+    "wires": [
+      [["L_C","A"],["psL","P"]],
+      [["psL","S"],["cb","K1"]],
+      [["psL","M"],["psR","M"],[{ "x": 6.5, "y": 2 }, { "x": 17.5, "y": 2 }]],
+      [["psR","S"],["cb","K2"]],
+      [["psR","P"],["D_cout","A"]],
+      [["L_D","A"],["circ","A"]],
+      [["circ","B"],["cb","D1"]],
+      [["circ","C"],["D_ncd","A"]],
+      [["cb","D2"],["D_cd","A"]]
+    ]
+  },
+
+  "w4l4": {
+    "place": [
+      { "id": "psL", "type": "RPS", "x": 7, "y": 6, "rot": 2 },
+      { "id": "psR", "type": "RPS", "x": 16, "y": 6 },
+      { "id": "prd", "type": "PR3", "x": 8, "y": 10 }
+    ],
+    "wires": [
+      [["L_C","A"],["psL","P"]],
+      [["psL","S"],["cb","K1"]],
+      [["psL","M"],["psR","M"],[{ "x": 6.5, "y": 2 }, { "x": 17.5, "y": 2 }]],
+      [["psR","S"],["cb","K2"]],
+      [["psR","P"],["D_cout","A"]],
+      [["L_D","A"],["prd","A"]],
+      [["prd","B"],["cb","D1"]],
+      [["prd","C"],["D_ncd","A"]],
+      [["cb","D2"],["D_cd","A"]]
+    ]
+  },
+
+  "w4l5": {
+    "place": [{ "id": "circ", "type": "CIRC", "x": 4, "y": 6 }],
+    "wires": [
+      [["L_C","A"],["circ","A"]],
+      [["circ","B"],["pr","B"]],
+      [["circ","C"],["D_tok","A"],[{ "x": 18, "y": 11.5 }]]
+    ]
+  }
+}

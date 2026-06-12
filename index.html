@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLUXONAUT — a ballistic reversible computing puzzle</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='30' fill='%233fd4ff'/><circle cx='50' cy='50' r='12' fill='white'/></svg>">
+</head>
+<body>
+
+<!-- ════════ TITLE ════════ -->
+<div id="screen-title" class="screen">
+  <div class="title-box">
+    <div class="title-art">
+      <span class="orbit-dot plus"></span><span class="orbit-dot minus"></span>
+    </div>
+    <h1>FLUXONAUT</h1>
+    <p class="subtitle">a puzzle game about <b>ballistic asynchronous reversible computing</b><br>
+    in superconductors — played on the actual physics</p>
+    <button id="btn-start" class="big primary">Enter the cryostat</button>
+    <button id="btn-notebook-title" class="big">📓 Lab Notebook</button>
+    <p class="credits">
+      Based on the BARCS research program (Sandia National Laboratories, 2016–2026):<br>
+      M.&thinsp;P. Frank, R.&thinsp;M. Lewis, S.&thinsp;B. Kaplan, K.&thinsp;D. Osborn, W.&thinsp;Wustmann, E.&thinsp;P. DeBenedictis,
+      N.&thinsp;A. Missert, M.&thinsp;D. Henry, M.&thinsp;A. Wolak, and colleagues.<br>
+      Game design &amp; code: Claude (Anthropic). Fluxons may be smaller than they appear.
+    </p>
+  </div>
+</div>
+
+<!-- ════════ LEVEL SELECT ════════ -->
+<div id="screen-levels" class="screen hidden">
+  <div class="levels-box">
+    <h1 class="small-title">FLUXONAUT</h1>
+    <div id="level-grid"></div>
+  </div>
+</div>
+
+<!-- ════════ GAME ════════ -->
+<div id="screen-game" class="screen hidden">
+  <div id="hud">
+    <button id="btn-levels" title="level select">≡</button>
+    <span id="hud-title"></span>
+    <span class="hud-spacer"></span>
+    <span id="hud-parts" title="elements placed"></span>
+    <span id="hud-heat" title="waste heat this run"></span>
+    <button id="btn-story" title="re-read the briefing">📖</button>
+    <button id="btn-hint" title="hint">💡</button>
+    <button id="btn-notebook" title="lab notebook">📓</button>
+    <button id="btn-export" title="copy circuit JSON">⇪</button>
+    <button id="btn-mute" title="sound">🔊</button>
+  </div>
+
+  <div id="game-main">
+    <div id="palette"></div>
+    <div id="board-wrap">
+      <div id="case-tabs" class="hidden"></div>
+      <canvas id="board" width="968" height="572"></canvas>
+      <div id="controls">
+        <button id="btn-run" class="primary">▶ Run</button>
+        <button id="btn-reset">⟲ Reset</button>
+        <button id="btn-certify" class="gold">✓ CERTIFY</button>
+        <label class="speed-wrap">speed
+          <input id="speed" type="range" min="0.5" max="6" step="0.5" value="1">
+          <span id="speed-label">1×</span>
+        </label>
+        <span class="ctl-tip">click ports to wire · right-click deletes · R rotates · Space runs</span>
+      </div>
+      <div id="inspector" class="hidden"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ MODAL ════════ -->
+<div id="modal" class="hidden"><div id="modal-box"></div></div>
+
+<script src="js/elements.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/levels.js"></script>
+<script src="js/render.js"></script>
+<script src="js/ui.js"></script>
+</body>
+</html>
