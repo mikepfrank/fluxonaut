@@ -843,30 +843,15 @@
   }
 
   function drawBanner() {
-    if (!app.banner) return;
-    const lv = app.level;
-    const W = lv.size.w * CELL;
-    const colors = { fault: 'rgba(120,28,38,0.92)', fail: 'rgba(120,70,28,0.92)', ok: 'rgba(22,90,64,0.92)' };
-    ctx.fillStyle = colors[app.banner.kind] || colors.ok;
-    const lines = wrapText(app.banner.text, W - 60);
-    const hgt = 26 + lines.length * 17;
-    ctx.fillRect(20, 16, W - 40, hgt);
-    ctx.strokeStyle = 'rgba(255,255,255,0.25)'; ctx.strokeRect(20, 16, W - 40, hgt);
-    ctx.fillStyle = '#fff'; ctx.font = '600 12.5px system-ui, sans-serif'; ctx.textAlign = 'left';
-    lines.forEach((ln, i) => ctx.fillText(ln, 34, 38 + i * 17));
-    ctx.textAlign = 'center';
-  }
-  function wrapText(text, maxW) {
-    const words = String(text).split(' ');
-    const lines = []; let cur = '';
-    ctx.font = '600 12.5px system-ui, sans-serif';
-    for (const w of words) {
-      const trial = cur ? cur + ' ' + w : w;
-      if (ctx.measureText(trial).width > maxW - 24 && cur) { lines.push(cur); cur = w; }
-      else cur = trial;
-    }
-    if (cur) lines.push(cur);
-    return lines;
+    const el = $('#banner');
+    if (!el) return;                       // (stubbed DOM in tests has no banner node)
+    const b = app.banner;
+    const sig = b ? b.kind + '|' + b.text : '';
+    if (sig === app._bannerSig) return;    // only touch the DOM when it actually changes
+    app._bannerSig = sig;
+    if (!b) { el.classList.add('hidden'); el.textContent = ''; return; }
+    el.className = 'game-banner ' + (b.kind || 'ok');   // shown below the board, never over it
+    el.textContent = b.text;
   }
 
   // ───────────────────────── input events ─────────────────────────
