@@ -34,15 +34,25 @@
   }
 
   // ───────────────────────── wires ─────────────────────────
+  // Trace a wire as a rounded path (quarter arcs at each 90° bend).
+  function traceWire(ctx, pts) {
+    const rp = F.roundedPath(pts, F.CORNER_R);
+    ctx.beginPath();
+    if (!rp.segs.length) return;
+    ctx.moveTo(rp.segs[0].a.x * CELL, rp.segs[0].a.y * CELL);
+    for (const s of rp.segs) {
+      if (s.kind === 'line') ctx.lineTo(s.b.x * CELL, s.b.y * CELL);
+      else ctx.arc(s.c.x * CELL, s.c.y * CELL, s.r * CELL, s.a0, s.a0 + s.delta, s.delta < 0);
+    }
+  }
   function drawWire(ctx, pts, opts) {
     opts = opts || {};
     ctx.lineJoin = 'round'; ctx.lineCap = 'round';
-    ctx.beginPath();
-    ctx.moveTo(pts[0].x * CELL, pts[0].y * CELL);
-    for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x * CELL, pts[i].y * CELL);
+    traceWire(ctx, pts);
     ctx.strokeStyle = opts.selected ? 'rgba(127,180,232,0.32)' : 'rgba(60,100,150,0.28)';
     ctx.lineWidth = 7;
     ctx.stroke();
+    traceWire(ctx, pts);
     ctx.strokeStyle = opts.preview ? 'rgba(127,180,232,0.8)' : (opts.selected ? COL.wireSel : COL.wireCore);
     ctx.lineWidth = 2;
     if (opts.preview) ctx.setLineDash([6, 5]);

@@ -365,10 +365,37 @@
     return !app.wires.some(w => (w.a.el === elId && w.a.port === portName) || (w.b.el === elId && w.b.port === portName));
   }
 
+  // Detect a 180° reversal (a fold / self-overlap) in an orthogonalized polyline.
+  function polylineHasReversal(pts) {
+    const dirs = [];
+    for (let i = 1; i < pts.length; i++) {
+      const dx = pts[i].x - pts[i - 1].x, dy = pts[i].y - pts[i - 1].y;
+      if (Math.abs(dx) < 1e-9 && Math.abs(dy) < 1e-9) continue;
+      dirs.push({ x: Math.sign(dx), y: Math.sign(dy) });
+    }
+    for (let i = 1; i < dirs.length; i++) {
+      if (dirs[i].x === -dirs[i - 1].x && dirs[i].y === -dirs[i - 1].y) return true;
+    }
+    return false;
+  }
+  // Orthogonalized polyline for an in-progress wire (start + waypoints), H-first elbows.
+  function orthoFromVias(startPos, vias) {
+    const pts = [{ x: startPos.x, y: startPos.y }];
+    let cur = pts[0];
+    for (const v of vias) {
+      if (v.x !== cur.x && v.y !== cur.y) pts.push({ x: v.x, y: cur.y });
+      pts.push({ x: v.x, y: v.y });
+      cur = v;
+    }
+    return pts;
+  }
+
   function finishWire(to) {
     const from = app.wiring.from;
     if (from.el === to.el && from.port === to.port) return;
     if (!portFree(to.el, to.port)) return;
+    const pts = E.wirePath({ elements: app.elements }, { a: { el: from.el, port: from.port }, b: { el: to.el, port: to.port }, via: app.wiring.via.slice() });
+    if (polylineHasReversal(pts)) { SFX.fault(); return; }   // refuse wires that double back on themselves
     app.wires.push({
       id: 'w' + (app.nextId++),
       a: { el: from.el, port: from.port }, b: { el: to.el, port: to.port },
@@ -877,7 +904,10 @@
     const port = portAt(m.x, m.y);
     if (app.mode === 'wiring') {
       if (port) { finishWire({ el: port.el, port: port.port }); }
-      else { app.wiring.via.push({ x: Math.round(m.x * 2) / 2, y: Math.round(m.y * 2) / 2 }); }
+      else {
+        const nv = { x: Math.round(m.x * 2) / 2, y: Math.round(m.y * 2) / 2 };
+        if (!polylineHasReversal(orthoFromVias(app.wiring.fromPos, app.wiring.via.concat([nv])))) app.wiring.via.push(nv);
+      }
       return;
     }
     if (port && portFree(port.el, port.port)) {

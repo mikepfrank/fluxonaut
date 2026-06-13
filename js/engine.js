@@ -62,21 +62,60 @@
     return out;
   }
 
+  // Rounded wire bends: each 90° corner becomes a quarter arc of radius CORNER_R
+  // (clamped to half of each adjoining segment). A curvy LJJ is slightly shorter
+  // than a square-cornered one, so this also feeds pathLength (timing) below.
+  const CORNER_R = 0.25; // grid cells
+
+  function roundedPath(pts, r) {
+    const P = [];
+    for (const q of pts) { const l = P[P.length - 1]; if (!l || Math.abs(q.x - l.x) > 1e-9 || Math.abs(q.y - l.y) > 1e-9) P.push({ x: q.x, y: q.y }); }
+    const segs = [];
+    if (P.length < 2) return { segs, len: 0 };
+    let cur = P[0];
+    for (let i = 1; i < P.length - 1; i++) {
+      const v = P[i], nxt = P[i + 1];
+      const ix = v.x - cur.x, iy = v.y - cur.y, ox = nxt.x - v.x, oy = nxt.y - v.y;
+      const li = Math.hypot(ix, iy), lo = Math.hypot(ox, oy);
+      if (li < 1e-9) continue;
+      const idx = ix / li, idy = iy / li, odx = ox / lo, ody = oy / lo;
+      const perpendicular = lo > 1e-9 && Math.abs(idx * odx + idy * ody) < 1e-6;
+      const rr = Math.min(r, li / 2, lo / 2);
+      if (!perpendicular || rr < 1e-6) { segs.push({ kind: 'line', a: cur, b: { x: v.x, y: v.y } }); cur = v; continue; }
+      const p1 = { x: v.x - idx * rr, y: v.y - idy * rr };
+      const p2 = { x: v.x + odx * rr, y: v.y + ody * rr };
+      const c = { x: p1.x + odx * rr, y: p1.y + ody * rr };
+      const a0 = Math.atan2(p1.y - c.y, p1.x - c.x);
+      let delta = Math.atan2(p2.y - c.y, p2.x - c.x) - a0;
+      while (delta > Math.PI) delta -= 2 * Math.PI;
+      while (delta < -Math.PI) delta += 2 * Math.PI;
+      segs.push({ kind: 'line', a: cur, b: p1 });
+      segs.push({ kind: 'arc', c, r: rr, a0, delta });
+      cur = p2;
+    }
+    segs.push({ kind: 'line', a: cur, b: P[P.length - 1] });
+    let len = 0;
+    for (const s of segs) { s.len = s.kind === 'line' ? Math.hypot(s.b.x - s.a.x, s.b.y - s.a.y) : s.r * Math.abs(s.delta); len += s.len; }
+    return { segs, len };
+  }
+
   function pathLength(pts) {
-    let L = 0;
-    for (let i = 1; i < pts.length; i++) L += Math.abs(pts[i].x - pts[i - 1].x) + Math.abs(pts[i].y - pts[i - 1].y);
-    return Math.max(L, 0.25);
+    return Math.max(roundedPath(pts, CORNER_R).len, 0.25);
   }
 
   function pointAlong(pts, d) {
-    let rem = d;
-    for (let i = 1; i < pts.length; i++) {
-      const seg = Math.abs(pts[i].x - pts[i - 1].x) + Math.abs(pts[i].y - pts[i - 1].y);
-      if (rem <= seg || i === pts.length - 1) {
-        const f = seg === 0 ? 0 : Math.min(1, Math.max(0, rem / seg));
-        return { x: pts[i - 1].x + (pts[i].x - pts[i - 1].x) * f, y: pts[i - 1].y + (pts[i].y - pts[i - 1].y) * f };
+    const rp = roundedPath(pts, CORNER_R);
+    if (rp.len < 1e-9) return pts[pts.length - 1];
+    let rem = Math.max(0, d);
+    for (let i = 0; i < rp.segs.length; i++) {
+      const s = rp.segs[i];
+      if (rem <= s.len || i === rp.segs.length - 1) {
+        const f = s.len <= 1e-9 ? 0 : Math.min(1, Math.max(0, rem / s.len));
+        if (s.kind === 'line') return { x: s.a.x + (s.b.x - s.a.x) * f, y: s.a.y + (s.b.y - s.a.y) * f };
+        const ang = s.a0 + s.delta * f;
+        return { x: s.c.x + s.r * Math.cos(ang), y: s.c.y + s.r * Math.sin(ang) };
       }
-      rem -= seg;
+      rem -= s.len;
     }
     return pts[pts.length - 1];
   }
@@ -385,5 +424,6 @@
     return { pass, heatMax, perCase };
   }
 
-  F.engine = { SPEED, MIN_GAP, GAP, PS_PER_SEC, portWorld, wirePath, pathLength, pointAlong, validate, simulate, buildInputs, runCase, certify, polSym };
+  F.engine = { SPEED, MIN_GAP, GAP, PS_PER_SEC, CORNER_R, portWorld, wirePath, pathLength, pointAlong, roundedPath, validate, simulate, buildInputs, runCase, certify, polSym };
+  F.roundedPath = roundedPath; F.CORNER_R = CORNER_R;
 })();
