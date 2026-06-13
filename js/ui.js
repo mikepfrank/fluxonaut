@@ -50,7 +50,7 @@
     nextId: 1,
     selection: null,          // {kind:'el'|'wire', id}
     mode: 'idle',             // idle | placing | wiring | dragging
-    placing: null,            // {type, rot}
+    placing: null,            // {type, rot, mir}
     wiring: null,             // {from:{el,port}, via:[], mouse:{x,y}}
     hoverPort: null,
     mouse: { x: 0, y: 0 },
@@ -243,6 +243,7 @@
     box.append(h('span', { class: 'insp-name' }, t.name + (el.locked ? ' 🔒' : '')));
     if (!el.locked) {
       box.append(h('button', { class: 'mini', title: 'rotate (R)', onclick: () => rotateSelection() }, '⟳ rotate'));
+      box.append(h('button', { class: 'mini', title: 'mirror (F)', onclick: () => { flipSelection(); renderInspector(); } }, '⇄ flip'));
     }
     if (t.id === 'ROTARY' && !el.locked) {
       box.append(h('button', {
@@ -284,7 +285,7 @@
     if (app.paletteLeft[typeId] <= 0) return;
     stopPlayback();
     app.mode = 'placing';
-    app.placing = { type: typeId, rot: 0 };
+    app.placing = { type: typeId, rot: 0, mir: false };
     app.selection = null;
     renderInspector();
   }
@@ -297,6 +298,7 @@
     if (overlapsAny(gx, gy, sz, null)) return;
     const el = {
       id: 'p' + (app.nextId++), type: app.placing.type, x: gx, y: gy, rot: app.placing.rot,
+      mir: app.placing.mir,
       state: tdef.states ? tdef.defaultState : null,
       cfg: tdef.config ? { ...tdef.config } : undefined,
       locked: false, stateLocked: false, placed: true,
@@ -325,6 +327,16 @@
     const el = app.elements.find(e => e.id === sel.id);
     if (!el || el.locked) return;
     el.rot = ((el.rot || 0) + 1) % 4;
+    SFX.place();
+  }
+
+  function flipSelection() {
+    if (app.mode === 'placing') { app.placing.mir = !app.placing.mir; return; }
+    const sel = app.selection;
+    if (!sel || sel.kind !== 'el') return;
+    const el = app.elements.find(e => e.id === sel.id);
+    if (!el || el.locked) return;
+    el.mir = !el.mir;
     SFX.place();
   }
 
@@ -382,7 +394,7 @@
     for (const el of app.elements) {
       const t = F.TYPES[el.type];
       for (const p of t.ports) {
-        const rp = F.rotatedPort(t, p, el.rot || 0);
+        const rp = F.rotatedPort(t, p, el.rot || 0, el.mir);
         const px = el.x + rp.x, py = el.y + rp.y;
         if (Math.hypot(px - x, py - y) < 0.34) return { el: el.id, port: p.name, x: px, y: py };
       }
@@ -716,7 +728,7 @@
       const t = F.TYPES[app.placing.type];
       const sz = F.rotatedSize(t, app.placing.rot);
       const gx = Math.round(app.mouse.x - sz.w / 2), gy = Math.round(app.mouse.y - sz.h / 2);
-      const ghost = { id: 'ghost', type: app.placing.type, x: gx, y: gy, rot: app.placing.rot, cfg: t.config ? { ...t.config } : undefined };
+      const ghost = { id: 'ghost', type: app.placing.type, x: gx, y: gy, rot: app.placing.rot, mir: app.placing.mir, cfg: t.config ? { ...t.config } : undefined };
       R.drawElement(ctx, ghost, t.states ? t.defaultState : null, { ghost: true, time: ts / 1000 });
     }
 
@@ -926,6 +938,7 @@
     if (app.screen !== 'game') return;
     if (ev.target && /INPUT|TEXTAREA/.test(ev.target.tagName)) return;
     if (ev.key === 'r' || ev.key === 'R') rotateSelection();
+    else if (ev.key === 'f' || ev.key === 'F') flipSelection();
     else if (ev.key === 'Escape') {
       if (app.mode === 'placing') { app.mode = 'idle'; app.placing = null; }
       else if (app.mode === 'wiring') { app.mode = 'idle'; app.wiring = null; }

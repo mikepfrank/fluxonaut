@@ -290,9 +290,10 @@
 
   // --- geometry helpers ------------------------------------------------------
   // Rotate a local port (cell units) about the element's box of size (w,h), r×90° CW.
-  function rotatedPort(type, port, rot) {
+  function rotatedPort(type, port, rot, mir) {
     let { x, y, ox, oy } = port;
     let w = type.w, h = type.h;
+    if (mir) { x = w - x; ox = -ox; }   // horizontal mirror in local (unrotated) space, before rotation
     for (let i = 0; i < (rot % 4 + 4) % 4; i++) {
       const nx = h - y, ny = x;          // 90° CW rotation maps (x,y) -> (h - y, x)
       const nox = -oy, noy = ox;

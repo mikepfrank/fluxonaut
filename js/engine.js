@@ -2,7 +2,7 @@
  * Event-driven simulation of an abstract BARC network.
  *
  * Circuit data model:
- *   element: { id, type, x, y, rot, state, cfg, locked, stateLocked }
+ *   element: { id, type, x, y, rot, mir, state, cfg, locked, stateLocked }
  *   wire:    { id, a:{el,port}, b:{el,port}, via:[{x,y},...] }   (via = waypoints, half-grid units)
  *
  * The simulator runs a full deterministic trace up-front; the UI plays it back.
@@ -28,7 +28,7 @@
   // --- geometry --------------------------------------------------------------
   function portWorld(el, type, portName) {
     const port = type.ports.find(q => q.name === portName);
-    const rp = F.rotatedPort(type, port, el.rot || 0);
+    const rp = F.rotatedPort(type, port, el.rot || 0, el.mir);
     return { x: el.x + rp.x, y: el.y + rp.y, ox: rp.ox, oy: rp.oy };
   }
 

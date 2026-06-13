@@ -83,6 +83,14 @@
     ctx.restore();
   }
 
+  // Apply an element's orientation (rotation + optional mirror) to the context.
+  // Directional artwork drawn afterward reflects the mirror; text that must stay
+  // readable is drawn outside this block (or counter-mirrored).
+  function orient(ctx, el) {
+    ctx.rotate((el.rot || 0) * Math.PI / 2);
+    if (el.mir) ctx.scale(-1, 1);
+  }
+
   function roundRect(ctx, x, y, w, h, r) {
     ctx.beginPath();
     ctx.moveTo(x + r, y);
@@ -107,7 +115,7 @@
 
   function drawPorts(ctx, el, type, hoverPort, wiredPorts) {
     for (const p of type.ports) {
-      const rp = F.rotatedPort(type, p, el.rot || 0);
+      const rp = F.rotatedPort(type, p, el.rot || 0, el.mir);
       const px = (el.x + rp.x) * CELL, py = (el.y + rp.y) * CELL;
       const wired = wiredPorts && wiredPorts.has(el.id + ':' + p.name);
       const hov = hoverPort && hoverPort.el === el.id && hoverPort.port === p.name;
@@ -162,7 +170,7 @@
       switch (type.id) {
         case 'LAUNCHER': {
           bodyRect(ctx, sz, { fill: '#16283f', selected: opts.selected });
-          ctx.save(); ctx.rotate((el.rot || 0) * Math.PI / 2);
+          ctx.save(); orient(ctx, el);
           ctx.beginPath();
           ctx.moveTo(-5, -8); ctx.lineTo(8, 0); ctx.lineTo(-5, 8); ctx.closePath();
           ctx.fillStyle = '#9fe0ff'; ctx.fill();
@@ -179,7 +187,7 @@
         }
         case 'REFLECTOR': case 'IREFLECTOR': {
           bodyRect(ctx, sz, { fill: '#19293f', selected: opts.selected });
-          ctx.save(); ctx.rotate((el.rot || 0) * Math.PI / 2);
+          ctx.save(); orient(ctx, el);
           ctx.beginPath();
           ctx.moveTo(2, -9); ctx.lineTo(-8, 0); ctx.lineTo(2, 9);
           ctx.lineTo(8, 9); ctx.lineTo(8, -9); ctx.closePath();
@@ -196,7 +204,7 @@
         }
         case 'NOT': {
           bodyRect(ctx, sz, { selected: opts.selected });
-          ctx.save(); ctx.rotate((el.rot || 0) * Math.PI / 2);
+          ctx.save(); orient(ctx, el);
           ctx.strokeStyle = '#9fd2ff'; ctx.lineWidth = 1.8;
           ctx.beginPath(); ctx.moveTo(-11, -5); ctx.bezierCurveTo(-2, -5, 2, 5, 11, 5); ctx.stroke();
           ctx.beginPath(); ctx.moveTo(-11, 5); ctx.bezierCurveTo(-2, 5, 2, -5, 11, -5); ctx.stroke();
@@ -206,19 +214,23 @@
         case 'ROTARY': case 'CIRC': {
           bodyRect(ctx, sz, { selected: opts.selected });
           const ccw = !!(el.cfg && el.cfg.ccw);
+          ctx.save(); if (el.mir) ctx.scale(-1, 1);
           arrowArc(ctx, 9, type.id === 'ROTARY' ? ccw : false, '#9fd2ff', t);
+          ctx.restore();
           if (type.id === 'CIRC') glyphText(ctx, '⚡', 9, '#ffd16e', 0, 12);
           break;
         }
         case 'PR3': {
           bodyRect(ctx, sz, { selected: opts.selected });
+          ctx.save(); if (el.mir) ctx.scale(-1, 1);
           arrowArc(ctx, 10.5, false, COL.plus, t);
           arrowArc(ctx, 6, true, COL.minus, t);
+          ctx.restore();
           break;
         }
         case 'FD': {
           bodyRect(ctx, sz, { selected: opts.selected });
-          ctx.save(); ctx.rotate((el.rot || 0) * Math.PI / 2);
+          ctx.save(); orient(ctx, el);
           const fwd = state === 'fwd';
           ctx.save(); if (!fwd) ctx.scale(-1, 1);
           ctx.beginPath();
@@ -231,7 +243,7 @@
         }
         case 'TCB': {
           bodyRect(ctx, sz, { selected: opts.selected });
-          ctx.save(); ctx.rotate((el.rot || 0) * Math.PI / 2);
+          ctx.save(); orient(ctx, el);
           const open = state === 'open';
           ctx.strokeStyle = '#6f93bb'; ctx.lineWidth = 2;
           ctx.beginPath(); ctx.moveTo(-14, 0); ctx.lineTo(-6, 0); ctx.moveTo(6, 0); ctx.lineTo(14, 0); ctx.stroke();
@@ -249,7 +261,7 @@
           bodyRect(ctx, sz, { selected: opts.selected });
           const up = state === 'up';
           glyphText(ctx, 'SG', 13, '#9fd2ff', 0, -12);
-          ctx.save(); ctx.rotate((el.rot || 0) * Math.PI / 2);
+          ctx.save(); orient(ctx, el);
           ctx.strokeStyle = up ? COL.plus : '#ffd16e'; ctx.lineWidth = 2.4;
           ctx.beginPath(); ctx.moveTo(-16, 8);
           ctx.lineTo(0, 8); ctx.lineTo(16, up ? -4 : 16); ctx.stroke();
@@ -284,7 +296,7 @@
         case 'PS': case 'RPS': {
           const conj = type.id === 'RPS';
           bodyRect(ctx, sz, { edge: conj ? COL.conj : '#7c6440', conj, selected: opts.selected });
-          ctx.save(); ctx.rotate((el.rot || 0) * Math.PI / 2);
+          ctx.save(); orient(ctx, el);
           ctx.strokeStyle = '#6f93bb'; ctx.lineWidth = 1.8;
           ctx.beginPath(); ctx.moveTo(-14, 0); ctx.lineTo(0, 0); ctx.stroke();
           ctx.strokeStyle = COL.plus;
@@ -298,7 +310,7 @@
         }
         case 'CB': {
           bodyRect(ctx, sz, { edge: '#4f7ec2', selected: opts.selected });
-          ctx.save(); ctx.rotate((el.rot || 0) * Math.PI / 2);
+          ctx.save(); orient(ctx, el);
           // control rail (top): RM2 loop with stored fluxon
           ctx.strokeStyle = '#6f93bb'; ctx.lineWidth = 1.6;
           ctx.beginPath(); ctx.moveTo(-36, -22); ctx.lineTo(-13, -22); ctx.moveTo(13, -22); ctx.lineTo(36, -22); ctx.stroke();
@@ -316,7 +328,9 @@
           ctx.beginPath(); ctx.moveTo(-36, 22); ctx.lineTo(-7, 22); ctx.moveTo(7, 22); ctx.lineTo(36, 22); ctx.stroke();
           ctx.strokeStyle = polColor(state); ctx.lineWidth = 2.6;
           ctx.beginPath(); ctx.moveTo(-7, 22); ctx.lineTo(7, 22); ctx.stroke();
+          ctx.save(); if (el.mir) ctx.scale(-1, 1);
           glyphText(ctx, state === 1 ? '+ passes' : '− passes', 8.5, COL.dim, 0, 33);
+          ctx.restore();
           ctx.restore();
           glyphText(ctx, 'CB', 11, '#9fd2ff', 0, 1);
           break;
