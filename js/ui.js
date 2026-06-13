@@ -118,6 +118,27 @@
     card.addEventListener('click', () => loadLevel(F.SANDBOX));
     row.append(card);
     wrap.append(row);
+
+    // test utility: wipe all saved progress
+    wrap.append(h('div', { class: 'reset-wrap' },
+      h('button', { class: 'mini warn', onclick: confirmReset }, '⟲ Clear all progress (test)')));
+  }
+
+  function confirmReset() {
+    const m = $('#modal'); m.classList.remove('hidden');
+    const box = $('#modal-box'); box.innerHTML = '';
+    box.append(h('h2', { class: 'bad' }, 'Clear all progress?'));
+    box.append(h('p', { class: 'story', html: 'This resets every level’s stars and re-locks all Lab Notebook entries. For testing only — it can’t be undone.' }));
+    box.append(h('div', { class: 'modal-btns' },
+      h('button', { class: 'big', onclick: closeModal }, 'Cancel'),
+      h('button', { class: 'big primary', onclick: () => { clearProgress(); closeModal(); } }, 'Clear everything')));
+  }
+
+  function clearProgress() {
+    progress.levels = {};
+    progress.notebook = [];
+    store.save(progress);
+    buildLevelSelect();
   }
 
   // ───────────────────────── level load / editor circuit ─────────────────────────
