@@ -959,9 +959,9 @@
     $('#btn-export').addEventListener('click', exportDesign);
     $('#btn-mute').addEventListener('click', () => {
       progress.muted = !progress.muted; store.save(progress);
-      $('#btn-mute').textContent = progress.muted ? '\U0001F507' : '\U0001F50A';
+      $('#btn-mute').textContent = progress.muted ? '🔇' : '🔊';
     });
-    $('#btn-mute').textContent = progress.muted ? '\U0001F507' : '\U0001F50A';
+    $('#btn-mute').textContent = progress.muted ? '🔇' : '🔊';
     $('#speed').addEventListener('input', ev => { app.speed = Number(ev.target.value); $('#speed-label').textContent = app.speed + '\u00d7'; });
     $('#modal').addEventListener('click', ev => { if (ev.target.id === 'modal') closeModal(); });
 
