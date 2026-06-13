@@ -1,6 +1,6 @@
 # FLUXONAUT — session handoff notes
 
-For future Claude sessions (or humans) continuing this project. State as of 2026-06-11.
+For future Claude sessions (or humans) continuing this project. State as of 2026-06-13.
 
 ## Status
 
@@ -26,12 +26,23 @@ For future Claude sessions (or humans) continuing this project. State as of 2026
 
 ## Environment quirks worth knowing
 
-- **File-sync truncation:** in Cowork, large Write/Edit operations to files in the
-  mounted folder sometimes leave the sandbox-side mirror tail-truncated or NUL-padded
-  (the canonical Windows file is usually fine — verify with the Read tool before
-  "fixing" anything). Remedy: `python3 test/clean.py` strips NUL padding; for truncated
-  tails, read the canonical tail via the Read tool and graft it onto the mounted copy
-  via a bash heredoc. Always `node --check js/*.js` before running tests.
+- **File-sync truncation / stale mirror:** in Cowork, Write/Edit (and git's own
+  internal writes) to files in the mounted folder sometimes leave the sandbox-side
+  mirror tail-truncated or NUL-padded — and sometimes the *reverse*, where the sandbox
+  sees a stale old copy while the canonical Windows file is correct. The Read tool always
+  reads the canonical file; trust it over `cat`/bash when they disagree. Most reliable
+  remedy: make the edit on a sandbox-disk copy (`git show HEAD:path > /tmp/x`, or work in
+  a fresh clone under /tmp), verify there, then `cp` the clean file back onto the mount —
+  a plain `cp` round-trips reliably, unlike the Write/Edit tools on larger files.
+  `python3 test/clean.py` strips trailing NUL padding. Always `node --check js/*.js`
+  before running tests.
+- **Mount blocks deletion:** `rm`/`rmdir` on the mounted folder fail with "Operation not
+  permitted" until you call the Cowork `allow_cowork_file_delete` tool (asks Michael once,
+  then `rm` works for the rest of the session). Related trap: `git config <set>` rewrites
+  `.git/config` via a temp-file rename the mount mishandles — it once blanked and then
+  deleted the config outright. Don't run `git config` on this repo; instead write
+  `.git/config` from a sandbox-staged copy with `cp`, and keep the `[user]` identity
+  baked into that file.
 - **Claude in Chrome:** this conversation acquired a permanently cached navigation
   denial (from a 180 s permission timeout while the extension was wedged). Fresh
   sessions work fine. The extension allows action only on the account-level
@@ -67,17 +78,28 @@ Friction worth considering:
 - At 1× speed long boards take 10-15 s per run; fine for watching physics, but a
   "skip to result" affordance would help when iterating.
 
-## Source control (added 2026-06-12)
+## Source control (added 2026-06-12; corrected 2026-06-13)
 
-- Code is now on GitHub: **https://github.com/mikepfrank/fluxonaut** (public).
-- NOTE: this local folder is NOT a git clone — the v1 push was staged from a
-  sandbox copy. To publish future changes, either re-stage (copy files into a
-  fresh clone and push) or convert this folder into a clone. The `docs/` PDFs
-  at the BARCS root must never be pushed (not publicly distributable).
-- GitHub auth: Michael has the GitHub connector authorized (tools should appear
-  in fresh sessions); GitHub's device-login flow via curl also works from the
-  sandbox. `api.github.com` is NOT on the sandbox network allowlist — only
-  `github.com` — so use git-over-HTTPS, not the REST API, from the shell.
+- Code is on GitHub: **https://github.com/mikepfrank/fluxonaut** (public).
+- This local folder IS now a real git clone tracking `origin/main` (restored
+  2026-06-13). The previous `.git` here was corrupt — `config` was all NUL bytes and the
+  `objects/` directory was missing; the v1 "push" had only uploaded raw files, so there
+  was never any real local history. It was rebuilt by cloning origin into /tmp, exploding
+  the packfile into small loose objects (to dodge large-write truncation), setting
+  `core.filemode = false` (the mount reports odd perm bits), and copying the clean `.git`
+  onto the mount. Current history is just: v1 → README warning → clear-progress button →
+  this HANDOFF update. No older history exists to recover (checked the sandbox, the BARCS
+  folder, and Google Drive).
+- The `docs/` PDFs at the BARCS root must NEVER be pushed (not publicly distributable).
+  `.gitignore` covers `*.zip`, `node_modules/`, and `.DS_Store`.
+- GitHub auth — **the connector does NOT work in Cowork.** The `plugin:engineering:github`
+  MCP server (`api.githubcopilot.com/mcp`) needs OAuth with dynamic client registration,
+  which the app's flow can't perform, and there is no `/mcp` command in Cowork (that's
+  Claude Code only). The sandbox shell also has no stored git credentials, so it cannot
+  push. **Working loop:** Claude edits + commits locally on this repo and verifies
+  (`node --check` + both test suites); Michael pushes via GitHub Desktop or VS Code, where
+  he's already authenticated. Read-only clone/fetch over HTTPS works from the sandbox
+  without auth since the repo is public.
 
 ## Sensible next steps
 
