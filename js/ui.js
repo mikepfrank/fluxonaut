@@ -622,26 +622,52 @@
   }
 
   // ───────────────────────── certify ─────────────────────────
+  // Build-quality: which placed/pre-placed devices were actually used by a fluxon,
+  // and whether all supplied components were placed.
+  function buildQuality(res) {
+    const lv = app.level;
+    const used = new Set(res.usedEls || []);
+    const devices = app.elements.filter(e => !F.TYPES[e.type].io);   // non-I/O components
+    const unused = devices.filter(e => !used.has(e.id));
+    const supplied = isFinite(lv.parElements) ? lv.parElements : 0;
+    const placed = placedCount();
+    const placedAll = placed >= supplied;
+    return { unused, placedAll, placed, supplied, properBuild: placedAll && unused.length === 0 };
+  }
+  function summarizeTypes(els) {
+    const counts = {};
+    for (const e of els) { const n = F.TYPES[e.type].name; counts[n] = (counts[n] || 0) + 1; }
+    return Object.entries(counts).map(([n, c]) => c > 1 ? `${n} ×${c}` : n).join(', ');
+  }
+  function buildWarning(build) {
+    if (!build || build.properBuild) return null;
+    const parts = [];
+    if (!build.placedAll) parts.push(`only ${build.placed} of ${build.supplied} supplied component${build.supplied === 1 ? '' : 's'} placed`);
+    if (build.unused.length) parts.push(`unused — no fluxon reaches ${build.unused.length === 1 ? 'it' : 'them'} in any case: ${summarizeTypes(build.unused)}`);
+    return h('p', { class: 'cert-warn', html: '⚠ ' + parts.join('; ') + '. A clean solution places and uses every component.' });
+  }
+
   function certify() {
     const lv = app.level;
     if (lv.sandbox) { runSandbox(); return; }
     stopPlayback();
     const res = E.certify(circuit(), lv.cases, [0, 1, 2, 3, 4, 5, 6], { optional: lv.optionalDetectors || [] });
     app.certifyResult = res;
+    const build = buildQuality(res);
     let stars = 0;
     if (res.pass) {
       stars = 1;
-      if (placedCount() <= lv.parElements) stars++;
+      if (build.properBuild) stars++;
       if (res.heatMax <= lv.parHeat) stars++;
       const prev = progress.levels[lv.id] || {};
       progress.levels[lv.id] = { done: true, stars: Math.max(prev.stars || 0, stars) };
       store.save(progress);
       SFX.win();
     } else SFX.fault();
-    showCertifyModal(res, stars);
+    showCertifyModal(res, stars, build);
   }
 
-  function showCertifyModal(res, stars) {
+  function showCertifyModal(res, stars, build) {
     const lv = app.level;
     const m = $('#modal'); m.classList.remove('hidden');
     const box = $('#modal-box'); box.innerHTML = '';
@@ -651,15 +677,17 @@
         `${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}`));
       const why = [];
       why.push('✓ all cases pass under timing wobble');
-      why.push((placedCount() <= lv.parElements ? '✓' : '✗') + ` element budget (${placedCount()} / ${lv.parElements})`);
+      why.push((build.properBuild ? '✓' : '✗') + ' every component placed & used');
       why.push((res.heatMax <= lv.parHeat ? '✓' : '✗') + ` heat budget (${res.heatMax} / ${lv.parHeat})`);
       box.append(h('div', { class: 'why' }, ...why.map(w => h('div', {}, w))));
+      { const warn = buildWarning(build); if (warn) box.append(warn); }
       if (lv.success) box.append(h('p', { class: 'story', html: lv.success }));
     } else {
       for (const c of res.perCase) {
         box.append(h('div', { class: 'case-res ' + (c.pass ? 'ok' : 'bad') },
           h('b', {}, (c.pass ? '✓ ' : '✗ ') + c.name), c.pass ? '' : h('div', { class: 'reasons' }, c.reasons.join(' · '))));
       }
+      { const warn = buildWarning(build); if (warn) box.append(warn); }
       if (lv.hint) box.append(h('p', { class: 'hint', html: '💡 ' + lv.hint }));
     }
     const row = h('div', { class: 'modal-btns' });

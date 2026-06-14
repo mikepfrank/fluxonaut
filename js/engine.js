@@ -410,18 +410,20 @@
     seeds = seeds || [0, 1, 2, 3, 4];
     const perCase = [];
     let pass = true, heatMax = 0;
+    const used = new Set();   // element ids a fluxon reaches (utilization check)
     for (const cs of cases) {
       let cPass = true, reasons = [], heat = 0;
       for (const seed of seeds) {
         const r = runCase(circuit, cs, seed, opts);
         heat = Math.max(heat, r.trace.heat);
+        if (seed === seeds[0]) for (const a of r.trace.arrivals) used.add(a.el);
         if (!r.pass) { cPass = false; reasons = r.reasons; break; }
       }
       heatMax = Math.max(heatMax, heat);
       if (!cPass) pass = false;
       perCase.push({ name: cs.name, pass: cPass, reasons, heat });
     }
-    return { pass, heatMax, perCase };
+    return { pass, heatMax, perCase, usedEls: [...used] };
   }
 
   F.engine = { SPEED, MIN_GAP, GAP, PS_PER_SEC, CORNER_R, portWorld, wirePath, pathLength, pointAlong, roundedPath, validate, simulate, buildInputs, runCase, certify, polSym };
