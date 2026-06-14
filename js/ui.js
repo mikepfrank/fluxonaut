@@ -424,6 +424,13 @@
     for (const s1 of sa) for (const s2 of sb) if (segOverlap(s1, s2) > 0.15) return true;  // >0.15 cell ignores point/stub touches
     return false;
   }
+  function pathSelfOverlaps(pts) {
+    const segs = pathSegs(pts);
+    for (let i = 0; i < segs.length; i++)
+      for (let j = i + 2; j < segs.length; j++)   // non-adjacent collinear runs = a loop back onto itself
+        if (segOverlap(segs[i], segs[j]) > 0.15) return true;
+    return false;
+  }
   function wireOverlapsExisting(pts, ignoreId) {
     const cir = { elements: app.elements };
     for (const w of app.wires) {
@@ -439,6 +446,7 @@
     if (!portFree(to.el, to.port)) return;
     const pts = E.wirePath({ elements: app.elements }, { a: { el: from.el, port: from.port }, b: { el: to.el, port: to.port }, via: app.wiring.via.slice() });
     if (polylineHasReversal(pts)) { SFX.fault(); return; }   // refuse wires that double back on themselves
+    if (pathSelfOverlaps(pts)) { SFX.fault(); return; }   // refuse wires that loop back over themselves
     if (wireOverlapsExisting(pts)) { SFX.fault(); return; }  // refuse wires that overlay an existing wire
     app.wires.push({
       id: 'w' + (app.nextId++),
@@ -825,7 +833,7 @@
         pts.push({ x: v.x, y: v.y });
         cur = v;
       }
-      const previewBad = polylineHasReversal(pts) || wireOverlapsExisting(pts);
+      const previewBad = polylineHasReversal(pts) || pathSelfOverlaps(pts) || wireOverlapsExisting(pts);
       R.drawWire(ctx, pts, { preview: true, bad: previewBad });
     }
 
