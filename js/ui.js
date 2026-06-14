@@ -697,6 +697,24 @@
     box.append(h('div', { class: 'modal-btns' }, h('button', { class: 'big primary', onclick: closeModal }, 'Close')));
   }
 
+  function showReferences() {
+    const m = $('#modal'); m.classList.remove('hidden');
+    const box = $('#modal-box'); box.innerHTML = '';
+    box.append(h('h2', {}, '📚 References'));
+    box.append(h('p', { class: 'dim' }, 'Works cited throughout FLUXONAUT — the game dramatizes the real BARCS research program.'));
+    const wrap = h('div', { class: 'biblio' });
+    for (const entry of (F.BIBLIOGRAPHY || [])) wrap.append(h('div', { class: 'bib-entry', html: formatCitation(entry) }));
+    box.append(wrap);
+    box.append(h('div', { class: 'modal-btns' }, h('button', { class: 'big primary', onclick: closeModal }, 'Close')));
+  }
+  function formatCitation(entry) {
+    let s = String(entry).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    s = s.replace(/^\[([^\]]+)\]/, '<span class="bib-key">[$1]</span>');
+    s = s.replace(/(https?:\/\/[^\s]+)/g, (u) => { const c = u.replace(/[.,;]+$/, ''); return `<a href="${c}" target="_blank" rel="noopener noreferrer">${c}</a>`; });
+    s = s.replace(/doi:\s*([^\s,]+)/gi, (mm, d) => { const c = d.replace(/[.,;]+$/, ''); return `doi: <a href="https://doi.org/${c}" target="_blank" rel="noopener noreferrer">${c}</a>`; });
+    return s;
+  }
+
   function exportDesign() {
     const data = JSON.stringify({ level: app.level.id, elements: app.elements, wires: app.wires }, null, 1);
     navigator.clipboard && navigator.clipboard.writeText(data);
@@ -984,6 +1002,7 @@
     $('#btn-hint').addEventListener('click', () => showStory('Hint', app.level.hint || 'No hint for this one — trust the physics.'));
     $('#btn-notebook').addEventListener('click', showNotebook);
     $('#btn-notebook-title').addEventListener('click', showNotebook);
+    $('#btn-refs').addEventListener('click', showReferences);
     $('#btn-export').addEventListener('click', exportDesign);
     $('#btn-mute').addEventListener('click', () => {
       progress.muted = !progress.muted; store.save(progress);
