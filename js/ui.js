@@ -762,7 +762,7 @@
         `${'★'.repeat(stars)}${'☆'.repeat(4 - stars)}`));
       const why = [];
       why.push('✓ all cases pass under timing wobble');
-      why.push((build.properBuild ? '✓' : '✗') + ' every component placed & used');
+      why.push(build.properBuild ? '✓ every component placed & used' : '✗ not every component placed & used');
       why.push((res.heatMax <= lv.parHeat ? '✓' : '✗') + ` heat budget (${res.heatMax} / ${lv.parHeat})`);
       why.push(crossings === 0 ? '✓ planar — no wire crossings' : `✗ wire crossings make your design harder to manufacture (${crossings})`);
       box.append(h('div', { class: 'why' }, ...why.map(w => h('div', w.startsWith('✗') ? { class: 'why-bad' } : {}, w))));
