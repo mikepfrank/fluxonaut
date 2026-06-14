@@ -105,7 +105,7 @@
         const card = h('div', { class: 'level-card' + (lv.bonus ? ' bonus' : '') },
           h('div', { class: 'lv-num' }, lv.bonus ? '★' : String(lv.n)),
           h('div', { class: 'lv-title' }, lv.title),
-          h('div', { class: 'lv-stars' }, '★'.repeat(stars) + '☆'.repeat(3 - stars)));
+          h('div', { class: 'lv-stars' }, '★'.repeat(stars) + '☆'.repeat(4 - stars)));
         card.addEventListener('click', () => loadLevel(lv));
         row.append(card);
       }
@@ -710,6 +710,26 @@
     return h('p', { class: 'cert-warn', html: '⚠ ' + parts.join('; ') + '. A clean solution places and uses every component.' });
   }
 
+  // Count orthogonal wire crossings (planarity). Collinear overlaps are already
+  // prevented at draw time, so what remains are proper X-crossings (incl. a wire
+  // crossing itself). The twist element's internal crossing is part of its glyph,
+  // not a drawn wire, so it is never counted.
+  function countWireCrossings() {
+    const cir = { elements: app.elements };
+    const segs = [];
+    for (const w of app.wires) for (const s of pathSegs(E.wirePath(cir, w))) segs.push(s);
+    let n = 0;
+    for (let i = 0; i < segs.length; i++) for (let j = i + 1; j < segs.length; j++) {
+      const a = segs[i], b = segs[j];
+      if (a.horiz === b.horiz) continue;
+      const H = a.horiz ? a : b, V = a.horiz ? b : a;
+      const hx1 = Math.min(H.a.x, H.b.x), hx2 = Math.max(H.a.x, H.b.x);
+      const vy1 = Math.min(V.a.y, V.b.y), vy2 = Math.max(V.a.y, V.b.y);
+      if (V.a.x > hx1 + 1e-9 && V.a.x < hx2 - 1e-9 && H.a.y > vy1 + 1e-9 && H.a.y < vy2 - 1e-9) n++;
+    }
+    return n;
+  }
+
   function certify() {
     const lv = app.level;
     if (lv.sandbox) { runSandbox(); return; }
@@ -717,31 +737,34 @@
     const res = E.certify(circuit(), lv.cases, [0, 1, 2, 3, 4, 5, 6], { optional: lv.optionalDetectors || [] });
     app.certifyResult = res;
     const build = buildQuality(res);
+    const crossings = countWireCrossings();
     let stars = 0;
     if (res.pass) {
       stars = 1;
       if (build.properBuild) stars++;
       if (res.heatMax <= lv.parHeat) stars++;
+      if (crossings === 0) stars++;
       const prev = progress.levels[lv.id] || {};
       progress.levels[lv.id] = { done: true, stars: Math.max(prev.stars || 0, stars) };
       store.save(progress);
       SFX.win();
     } else SFX.fault();
-    showCertifyModal(res, stars, build);
+    showCertifyModal(res, stars, build, crossings);
   }
 
-  function showCertifyModal(res, stars, build) {
+  function showCertifyModal(res, stars, build, crossings) {
     const lv = app.level;
     const m = $('#modal'); m.classList.remove('hidden');
     const box = $('#modal-box'); box.innerHTML = '';
     box.append(h('h2', { class: res.pass ? 'ok' : 'bad' }, res.pass ? '✓ CERTIFIED' : '✗ Not yet'));
     if (res.pass) {
       box.append(h('div', { class: 'stars-big' },
-        `${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}`));
+        `${'★'.repeat(stars)}${'☆'.repeat(4 - stars)}`));
       const why = [];
       why.push('✓ all cases pass under timing wobble');
       why.push((build.properBuild ? '✓' : '✗') + ' every component placed & used');
       why.push((res.heatMax <= lv.parHeat ? '✓' : '✗') + ` heat budget (${res.heatMax} / ${lv.parHeat})`);
+      why.push(crossings === 0 ? '✓ planar — no wire crossings' : `✗ wire crossings make your design harder to manufacture (${crossings})`);
       box.append(h('div', { class: 'why' }, ...why.map(w => h('div', {}, w))));
       { const warn = buildWarning(build); if (warn) box.append(warn); }
       if (lv.success) box.append(h('p', { class: 'story', html: lv.success }));
