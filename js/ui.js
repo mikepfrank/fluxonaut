@@ -155,10 +155,12 @@
     app.selection = null; app.mode = 'idle'; app.placing = null; app.wiring = null;
     app.caseIdx = 0; app.trace = null; app.playing = false; app.runResult = null; app.certifyResult = null;
     app.caseDone = {}; app._tabSig = null;
+    app.hintShown = false; app.hintUsed = false;
     app.particles = []; app.banner = null;
     unlockNotebook(lv.notebook);
     showScreen('game');
     buildGameChrome();
+    renderHintBar();
     if (lv.intro) showStory(lv.title, lv.intro, lv === F.SANDBOX ? null : 'Got it — to the bench!');
     sizeCanvas();
   }
@@ -744,6 +746,7 @@
       if (build.properBuild) stars++;
       if (res.heatMax <= lv.parHeat) stars++;
       if (crossings === 0) stars++;
+      if (app.hintUsed) stars = Math.max(0, stars - 1);   // hint penalty
       const prev = progress.levels[lv.id] || {};
       progress.levels[lv.id] = { done: true, stars: Math.max(prev.stars || 0, stars) };
       store.save(progress);
@@ -765,6 +768,7 @@
       why.push(build.properBuild ? '✓ every component placed & used' : '✗ not every component placed & used');
       why.push((res.heatMax <= lv.parHeat ? '✓' : '✗') + ` heat budget (${res.heatMax} / ${lv.parHeat})`);
       why.push(crossings === 0 ? '✓ planar — no wire crossings' : `✗ wire crossings make your design harder to manufacture (${crossings})`);
+      if (app.hintUsed) why.push('✗ hint used — star deducted');
       box.append(h('div', { class: 'why' }, ...why.map(w => h('div', w.startsWith('✗') ? { class: 'why-bad' } : {}, w))));
       { const warn = buildWarning(build); if (warn) box.append(warn); }
       if (lv.success) box.append(h('p', { class: 'story', html: lv.success }));
@@ -1019,6 +1023,15 @@
     return pulse && app.playT >= pulse.born;
   }
 
+  function renderHintBar() {
+    const el = $('#hint-bar');
+    if (!el) return;
+    if (app.hintShown) {
+      el.textContent = '💡 ' + (app.level && app.level.hint ? app.level.hint : 'No hint for this one — trust the physics.');
+      el.classList.remove('hidden');
+    } else { el.classList.add('hidden'); el.textContent = ''; }
+  }
+
   function drawBanner() {
     const el = $('#banner');
     if (!el) return;                       // (stubbed DOM in tests has no banner node)
@@ -1131,7 +1144,7 @@
     $('#btn-reset').addEventListener('click', stopPlayback);
     $('#btn-certify').addEventListener('click', certify);
     $('#btn-story').addEventListener('click', () => showStory(app.level.title, app.level.intro));
-    $('#btn-hint').addEventListener('click', () => showStory('Hint', app.level.hint || 'No hint for this one — trust the physics.'));
+    $('#btn-hint').addEventListener('click', () => { app.hintShown = !app.hintShown; if (app.hintShown) app.hintUsed = true; renderHintBar(); });
     $('#btn-notebook').addEventListener('click', showNotebook);
     $('#btn-notebook-title').addEventListener('click', showNotebook);
     $('#btn-refs').addEventListener('click', showReferences);
