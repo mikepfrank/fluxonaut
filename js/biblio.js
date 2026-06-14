@@ -14,6 +14,7 @@
     `[RM Pat.] M. P. Frank and E. DeBenedictis, "BALLISTIC REVERSIBLE SUPERCONDUCTING MEMORY ELEMENT", US Patent No. 11,289,156, Mar. 2022.`,
     `[ASC 2022] R. M. Lewis and M. P. Frank, "Two Circuits for Directing and Controlling Ballistic Fluxons," in IEEE Transactions on Applied Superconductivity, vol. 33, no. 5, pp. 1–5, Aug. 2023, Art no. 1800505, doi: 10.1109/TASC.2023.3244115.`,
     `[ICRC 2022] M. P. Frank and R. M. Lewis, "Ballistic Asynchronous Reversible Computing in Superconducting Circuits," 2022 IEEE International Conference on Rebooting Computing (ICRC), San Francisco, CA, USA, 2022, pp. 30–35, doi: 10.1109/ICRC57508.2022.00018.`,
+    `[OW 2023] K. D. Osborn and W. Wustmann, "Asynchronous reversible computing unveiled using ballistic shift registers," Physical Review Applied, vol. 19, no. 5, Art. no. 054034, May 2023, doi: 10.1103/PhysRevApplied.19.054034.`,
     `[BARC 2023] M. P. Frank, "BARC Element Classifier (barc)", computer software, US DOE, 2023. https://github.com/sandialabs/barcs. doi: 10.11578/dc.20240910.18.`,
     `[BARC 2024] M. P. Frank, "Classification of BARC Elements Based on Single Flux Quanta (SFQ)", unpublished research memo, 2024.`,
     `[ASC 2024] M. P. Frank, R. M. Lewis and S. B. Kaplan, "First-Principles Derivation of Fluxon Viscosity and Associated Stopping Distance in Long Josephson Junctions," in IEEE Transactions on Applied Superconductivity, vol. 35, no. 5, pp. 1–5, Aug. 2025, Art no. 1700605, doi: 10.1109/TASC.2025.3527959.`,
