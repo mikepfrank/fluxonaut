@@ -765,7 +765,7 @@
       why.push((build.properBuild ? '✓' : '✗') + ' every component placed & used');
       why.push((res.heatMax <= lv.parHeat ? '✓' : '✗') + ` heat budget (${res.heatMax} / ${lv.parHeat})`);
       why.push(crossings === 0 ? '✓ planar — no wire crossings' : `✗ wire crossings make your design harder to manufacture (${crossings})`);
-      box.append(h('div', { class: 'why' }, ...why.map(w => h('div', {}, w))));
+      box.append(h('div', { class: 'why' }, ...why.map(w => h('div', w.startsWith('✗') ? { class: 'why-bad' } : {}, w))));
       { const warn = buildWarning(build); if (warn) box.append(warn); }
       if (lv.success) box.append(h('p', { class: 'story', html: lv.success }));
     } else {

@@ -33,3 +33,19 @@ None are blockers; do not start a new version until playtesting is complete.
 - Michael is playtesting all levels himself first (currently at W3-1 Antifluxon,
   resumed after the Twist polarity-color fix). He will flag any high-priority
   issues as he goes.
+
+## Planarity (no-crossing-wires) — open question (added 2026-06-14)
+
+A 4th, optional star now rewards planar solutions (no crossing wires). An audit
+of the bundled reference solutions found 16/22 already planar; the Twist level
+(w3l1 Antifluxon) is planar — its conductor swap is internal to the element, not
+a drawn wire. These 6 reference solutions currently cross wires:
+w2l1 Gatekeeper (1), w2l3 Merge Lanes (1), w2l5 AND Finally (3),
+w4l2 Round Trip Token (1), w4l3 The Switch Gate For Real (1),
+w4l4 Beyond the Paper (1).
+
+TODO: during playtest, determine which of these 6 actually have planar solutions
+(expected: most/all, since the BARCS research respected planarity except where
+explicitly studying Twist). Where a planar solution exists, update
+test/solutions.json so the reference solution earns the 4th star. Flag any that
+genuinely cannot be solved without a crossing.
