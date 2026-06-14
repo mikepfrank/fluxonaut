@@ -440,6 +440,26 @@
     return false;
   }
 
+  // Wires must not pass through an element's body or skim along its edge over
+  // unconnected ports. A legitimate connection only touches a box at its port
+  // point (perpendicular, zero-length), so it isn't flagged.
+  function segRectOverlapLen(seg, rx1, ry1, rx2, ry2) {
+    if (seg.horiz) {
+      if (seg.a.y < ry1 - 1e-9 || seg.a.y > ry2 + 1e-9) return 0;
+      return Math.max(0, Math.min(Math.max(seg.a.x, seg.b.x), rx2) - Math.max(Math.min(seg.a.x, seg.b.x), rx1));
+    }
+    if (seg.a.x < rx1 - 1e-9 || seg.a.x > rx2 + 1e-9) return 0;
+    return Math.max(0, Math.min(Math.max(seg.a.y, seg.b.y), ry2) - Math.max(Math.min(seg.a.y, seg.b.y), ry1));
+  }
+  function wireCrossesElements(pts) {
+    const segs = pathSegs(pts);
+    for (const el of app.elements) {
+      const t = F.TYPES[el.type], sz = F.rotatedSize(t, el.rot || 0);
+      for (const s of segs) if (segRectOverlapLen(s, el.x, el.y, el.x + sz.w, el.y + sz.h) > 0.05) return true;
+    }
+    return false;
+  }
+
   function finishWire(to) {
     const from = app.wiring.from;
     if (from.el === to.el && from.port === to.port) return;
@@ -448,6 +468,7 @@
     if (polylineHasReversal(pts)) { SFX.fault(); return; }   // refuse wires that double back on themselves
     if (pathSelfOverlaps(pts)) { SFX.fault(); return; }   // refuse wires that loop back over themselves
     if (wireOverlapsExisting(pts)) { SFX.fault(); return; }  // refuse wires that overlay an existing wire
+    if (wireCrossesElements(pts)) { SFX.fault(); return; }   // refuse wires that pass through / skim an element
     app.wires.push({
       id: 'w' + (app.nextId++),
       a: { el: from.el, port: from.port }, b: { el: to.el, port: to.port },
@@ -475,7 +496,7 @@
       for (const p of t.ports) {
         const rp = F.rotatedPort(t, p, el.rot || 0, el.mir);
         const px = el.x + rp.x, py = el.y + rp.y;
-        if (Math.hypot(px - x, py - y) < 0.34) return { el: el.id, port: p.name, x: px, y: py };
+        if (Math.hypot(px - x, py - y) < 0.34) return { el: el.id, port: p.name, x: px, y: py, ox: rp.ox, oy: rp.oy };
       }
     }
     return null;
@@ -826,14 +847,16 @@
     }
     // wiring preview
     if (app.mode === 'wiring' && app.wiring) {
-      const pts = [{ x: app.wiring.fromPos.x, y: app.wiring.fromPos.y }];
-      let cur = pts[0];
+      const fo = app.wiring.fromOut || { ox: 0, oy: 0 };
+      const start = app.wiring.fromPos;
+      const pts = [{ x: start.x, y: start.y }, { x: start.x + fo.ox * 0.5, y: start.y + fo.oy * 0.5 }];
+      let cur = pts[pts.length - 1];
       for (const v of app.wiring.via.concat([app.mouse])) {
         if (v.x !== cur.x && v.y !== cur.y) pts.push({ x: v.x, y: cur.y });
         pts.push({ x: v.x, y: v.y });
         cur = v;
       }
-      const previewBad = polylineHasReversal(pts) || pathSelfOverlaps(pts) || wireOverlapsExisting(pts);
+      const previewBad = polylineHasReversal(pts) || pathSelfOverlaps(pts) || wireOverlapsExisting(pts) || wireCrossesElements(pts);
       R.drawWire(ctx, pts, { preview: true, bad: previewBad });
     }
 
@@ -1017,7 +1040,7 @@
     if (port && portFree(port.el, port.port)) {
       stopPlayback();
       app.mode = 'wiring';
-      app.wiring = { from: { el: port.el, port: port.port }, fromPos: { x: port.x, y: port.y }, via: [] };
+      app.wiring = { from: { el: port.el, port: port.port }, fromPos: { x: port.x, y: port.y }, fromOut: { ox: port.ox, oy: port.oy }, via: [] };
       app.selection = null; renderInspector();
       return;
     }
