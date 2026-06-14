@@ -53,7 +53,7 @@
     ctx.lineWidth = 7;
     ctx.stroke();
     traceWire(ctx, pts);
-    ctx.strokeStyle = opts.preview ? 'rgba(127,180,232,0.8)' : (opts.selected ? COL.wireSel : COL.wireCore);
+    ctx.strokeStyle = opts.preview ? (opts.bad ? 'rgba(255,92,105,0.95)' : 'rgba(127,180,232,0.8)') : (opts.selected ? COL.wireSel : COL.wireCore);
     ctx.lineWidth = 2;
     if (opts.preview) ctx.setLineDash([6, 5]);
     ctx.stroke();

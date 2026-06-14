@@ -400,12 +400,46 @@
     return pts;
   }
 
+  // Collinear-overlap detection so two wires never run on top of each other.
+  function pathSegs(pts) {
+    const segs = [];
+    for (let i = 1; i < pts.length; i++) {
+      const a = pts[i - 1], b = pts[i];
+      if (Math.abs(a.x - b.x) < 1e-9 && Math.abs(a.y - b.y) < 1e-9) continue;
+      segs.push({ a, b, horiz: Math.abs(a.y - b.y) < 1e-9 });
+    }
+    return segs;
+  }
+  function segOverlap(s1, s2) {
+    if (s1.horiz !== s2.horiz) return 0;
+    if (s1.horiz) {
+      if (Math.abs(s1.a.y - s2.a.y) > 1e-9) return 0;
+      return Math.max(0, Math.min(Math.max(s1.a.x, s1.b.x), Math.max(s2.a.x, s2.b.x)) - Math.max(Math.min(s1.a.x, s1.b.x), Math.min(s2.a.x, s2.b.x)));
+    }
+    if (Math.abs(s1.a.x - s2.a.x) > 1e-9) return 0;
+    return Math.max(0, Math.min(Math.max(s1.a.y, s1.b.y), Math.max(s2.a.y, s2.b.y)) - Math.max(Math.min(s1.a.y, s1.b.y), Math.min(s2.a.y, s2.b.y)));
+  }
+  function pathsOverlap(ptsA, ptsB) {
+    const sa = pathSegs(ptsA), sb = pathSegs(ptsB);
+    for (const s1 of sa) for (const s2 of sb) if (segOverlap(s1, s2) > 0.15) return true;  // >0.15 cell ignores point/stub touches
+    return false;
+  }
+  function wireOverlapsExisting(pts, ignoreId) {
+    const cir = { elements: app.elements };
+    for (const w of app.wires) {
+      if (ignoreId && w.id === ignoreId) continue;
+      if (pathsOverlap(pts, E.wirePath(cir, w))) return true;
+    }
+    return false;
+  }
+
   function finishWire(to) {
     const from = app.wiring.from;
     if (from.el === to.el && from.port === to.port) return;
     if (!portFree(to.el, to.port)) return;
     const pts = E.wirePath({ elements: app.elements }, { a: { el: from.el, port: from.port }, b: { el: to.el, port: to.port }, via: app.wiring.via.slice() });
     if (polylineHasReversal(pts)) { SFX.fault(); return; }   // refuse wires that double back on themselves
+    if (wireOverlapsExisting(pts)) { SFX.fault(); return; }  // refuse wires that overlay an existing wire
     app.wires.push({
       id: 'w' + (app.nextId++),
       a: { el: from.el, port: from.port }, b: { el: to.el, port: to.port },
@@ -791,7 +825,8 @@
         pts.push({ x: v.x, y: v.y });
         cur = v;
       }
-      R.drawWire(ctx, pts, { preview: true });
+      const previewBad = polylineHasReversal(pts) || wireOverlapsExisting(pts);
+      R.drawWire(ctx, pts, { preview: true, bad: previewBad });
     }
 
     // wired ports set
