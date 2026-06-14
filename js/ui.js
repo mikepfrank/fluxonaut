@@ -154,6 +154,7 @@
     app.paletteLeft = { ...(lv.palette || {}) };
     app.selection = null; app.mode = 'idle'; app.placing = null; app.wiring = null;
     app.caseIdx = 0; app.trace = null; app.playing = false; app.runResult = null; app.certifyResult = null;
+    app.caseDone = {}; app._tabSig = null;
     app.particles = []; app.banner = null;
     unlockNotebook(lv.notebook);
     showScreen('game');
@@ -173,6 +174,14 @@
   }
 
   function circuit() { return { elements: app.elements, wires: app.wires }; }
+
+  // Compact signature of the simulate-relevant circuit state; used to clear the
+  // per-case "passed" highlights whenever anything about the circuit changes.
+  function circuitSig() {
+    const es = app.elements.map(el => `${el.id}:${el.type}:${el.x},${el.y}:${el.rot || 0}:${el.mir ? 1 : 0}:${el.state}:${el.cfg ? JSON.stringify(el.cfg) : ''}`).join('|');
+    const ws = app.wires.map(w => `${w.a.el}.${w.a.port}-${w.b.el}.${w.b.port}:${(w.via || []).map(v => v.x + ',' + v.y).join(';')}`).join('|');
+    return es + '#' + ws;
+  }
 
   // ───────────────────────── game chrome (DOM panels) ─────────────────────────
   function buildGameChrome() {
@@ -208,7 +217,8 @@
     if (!lv.cases || lv.cases.length <= 1) { if (lv.cases && lv.cases.length === 1) app.caseIdx = 0; tabs.classList.toggle('hidden', !lv.cases || lv.cases.length < 2); return; }
     tabs.classList.remove('hidden');
     lv.cases.forEach((c, i) => {
-      const b = h('button', { class: 'case-tab' + (i === app.caseIdx ? ' active' : '') }, c.name);
+      const done = !!(app.caseDone && app.caseDone[i]);
+      const b = h('button', { class: 'case-tab' + (i === app.caseIdx ? ' active' : '') + (done ? ' done' : '') }, (done ? '✓ ' : '') + c.name);
       b.addEventListener('click', () => { app.caseIdx = i; stopPlayback(); buildCaseTabs(); });
       tabs.append(b);
     });
@@ -588,6 +598,7 @@
           ? { kind: 'ok', text: `Case “${app.level.cases[app.playCase].name}” ✓ — now press CERTIFY to test every case under timing wobble.` }
           : { kind: 'fail', text: 'Not quite: ' + app.pendingResult.reasons.join(' · ') };
         if (ok) SFX.detect(); else SFX.fault();
+        if (ok && app.level.cases && app.level.cases.length > 1) { app.caseDone[app.playCase] = true; buildCaseTabs(); }
       } else {
         app.banner = { kind: 'ok', text: `Run complete. Heat: ${tr.heat}` };
       }
@@ -726,6 +737,10 @@
   function frame(ts) {
     requestAnimationFrame(frame);
     if (app.screen !== 'game' || !app.level) return;
+    if (app.level.cases && app.level.cases.length > 1) {   // a circuit edit clears all case "done" marks
+      const sig = circuitSig();
+      if (sig !== app._tabSig) { app._tabSig = sig; app.caseDone = {}; buildCaseTabs(); }
+    }
     const dt = Math.min(0.05, (ts - lastFrame) / 1000 || 0.016);
     lastFrame = ts;
     advancePlayback(dt);
