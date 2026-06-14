@@ -141,10 +141,16 @@
       if (lbl) {
         const big = type.w > 1 || type.h > 1;
         const inset = big ? 13 : 11;
-        ctx.font = `700 ${big ? 8.5 : 7.5}px system-ui, sans-serif`;
+        const lx = px - rp.ox * inset, ly = py - rp.oy * inset;
+        ctx.font = `700 ${big ? 9.5 : 8.5}px Verdana, Tahoma, system-ui, sans-serif`;
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.fillStyle = 'rgba(159,210,255,0.78)';
-        ctx.fillText(lbl, px - rp.ox * inset, py - rp.oy * inset);
+        const hadLS = 'letterSpacing' in ctx;
+        if (hadLS) ctx.letterSpacing = '0.5px';          // separate letters so e.g. "Ci" doesn't read as "G"
+        ctx.lineJoin = 'round';
+        if (ctx.strokeText) { ctx.strokeStyle = 'rgba(6,11,20,0.92)'; ctx.lineWidth = 3; ctx.strokeText(lbl, lx, ly); }  // dark halo for contrast over artwork
+        ctx.fillStyle = '#ffe14d';                       // bright yellow, stands out
+        ctx.fillText(lbl, lx, ly);
+        if (hadLS) ctx.letterSpacing = '0px';
       }
     }
   }
