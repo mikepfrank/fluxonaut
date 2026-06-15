@@ -323,8 +323,8 @@ version of a <b>Duplicator</b> can reduce the two A’s back to a single copy, p
       fixed: [
         el('L_A', 'LAUNCHER', 1, 2), el('L_M', 'LAUNCHER', 1, 6), el('L_1', 'LAUNCHER', 1, 10), el('L_B', 'LAUNCHER', 1, 13),
         el('dup', 'DUP', 4, 2), el('sg', 'TSG', 11, 6), el('rdup', 'RDUP', 20, 2),
-        el('D_nand', 'DETECTOR', 16, 6), el('D_and', 'DETECTOR', 16, 7),
-        el('D_A', 'DETECTOR', 25, 2), el('D_M', 'DETECTOR', 25, 3), el('D_1', 'DETECTOR', 25, 4),
+        el('D_nand', 'DETECTOR', 16, 5), el('D_and', 'DETECTOR', 16, 8),
+        el('D_A', 'DETECTOR', 25, 2), el('D_M', 'DETECTOR', 25, 4), el('D_1', 'DETECTOR', 25, 6),
       ],
       labels: {
         L_A: 'A IN', L_M: 'M CTL', L_1: 'CONST 1', L_B: 'B IN', dup: 'Dup', sg: 'SG', rdup: 'rDup',
