@@ -246,16 +246,12 @@ goes to its one fixed output port, end of story.
     {
       id: 'w2l4', world: 2, n: 4, title: 'The Duplicator', size: { w: 22, h: 13 },
       bipolar: false,
-      intro: `Copying sounds trivial. It isn’t. A fluxon is conserved — you cannot
-split it. To copy a bit you must <i>recruit a fresh fluxon</i> from a constant supply
-and route it to tell the same story.
-<br><br>This rig is wired-for-you EXCEPT the wires. Switch <b>A</b> does the copying;
-switch <b>B</b> is the merge gate feeding A’s control. If X arrives, it toggles A
-(exiting to OUT as the original); the constant pulse then takes A’s low road,
-loops back through B, re-toggles A (restoring it!), and exits to OUT as the copy.
-No X? The constant takes the high road to NOT-X instead. M-pulses steer B.
-<br><br>Wire it: 8 wires. Mind the loop — it must be quick.`,
-      hint: 'X → B.U; loop → B.D; B.I → A.Ci; CONST → A.I; A.D loops back to B.D; A.U → NOT-X; A.Co → OUT; M → B.Ci; B.Co → M OUT.',
+      intro: `A fluxon is <i>conserved</i> — you can’t split one pulse into two. To <b>copy</b> a bit you borrow a fresh fluxon from a constant supply and make it retell the same story.
+<br><br>Two switch gates do it. <b>A</b> is the copier; <b>B</b> is a multiplexer that feeds signals into A’s control line, steered by the <b>M</b> pulses.
+<br><br>If <b>X</b> arrives, it routes through B into A’s control: A flips, and the pulse leaves at <b>OUT</b> — copy #1. A is now flipped, so the <b>constant</b> pulse takes A’s other road, loops back through B into A’s control, flips A <i>back</i>, and exits <b>OUT</b> — copy #2. Two pulses out; A and B end exactly as they began.
+<br><br>No <b>X</b>? A never flips, so the constant pulse leaves on the <b>¬X</b> line instead — incidental “garbage” you could uncompute later with a mirror circuit.
+<br><br>There’s no clock: <b>order</b> is everything. X must reach A before the constant does — so keep the A↔B loop short. (8 wires.)`,
+      hint: 'Wire three paths (8 wires). Copy: CONST→A.I, then A.D loops to B.D, B.I→A.Ci, A.Co→OUT, A.U→¬X. Trigger: X→B.U. Mux control: M→B.Ci, B.Co→M OUT. Keep the A↔B loop short so the second copy returns in time.',
       success: 'X in, two X’s out — and both switches end exactly as they began. Copying without erasing, paid for with one constant pulse. (When X is absent you got ¬X — a NOT, for free.)',
       notebook: ['copying'],
       fixed: [
