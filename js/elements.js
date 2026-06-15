@@ -270,6 +270,44 @@
   });
 
   // ===========================================================================
+  // COMPOSITE CHIPS (idealized zero-delay reversible Mealy machines)
+  // ===========================================================================
+  def({
+    id: 'DUP', name: 'Duplicator (×2)', glyph: 'DUP',
+    w: 2, h: 3,
+    ports: [
+      p('X', 0, 0.5, W), p('M', 0, 1.5, W), p('C', 0, 2.5, W),
+      p('XX', 2, 0.5, E), p('MO', 2, 1.5, E), p('NX', 2, 2.5, E),
+    ],
+    states: ['UU', 'DU', 'DD', 'UD'], defaultState: 'UU',
+    reversible: true, partial: true, heatPerOp: 0,
+    portLabels: { X: '▸X', M: '▸M', C: '▸1', XX: 'XX▸', MO: 'M▸', NX: '¬X▸' },
+    blurb: 'The asynchronous pulse duplicator (ICRC ’17), packaged as a chip. Given data on X (with a control M and a constant 1, in that order) it emits two copies on XX; if X is absent it emits ¬X instead. Two internal switch gates ⇒ two state bits. Arrivals out of the intended order are undefined.',
+    transition(port, pol, state) {
+      const T = { 'X,UU': ['XX', 'DU'], 'M,DU': ['MO', 'DD'], 'C,DD': ['XX', 'UD'], 'M,UD': ['MO', 'UU'], 'M,UU': ['MO', 'UD'], 'C,UD': ['NX', 'UD'] };
+      const r = T[port + ',' + state];
+      return r ? { port: r[0], pol, state: r[1] } : null;
+    },
+  });
+  def({
+    id: 'RDUP', name: 'Reverse Duplicator', glyph: 'rDUP',
+    w: 2, h: 3,
+    ports: [
+      p('XX', 0, 0.5, W), p('M', 0, 1.5, W), p('NX', 0, 2.5, W),
+      p('X', 2, 0.5, E), p('MO', 2, 1.5, E), p('C', 2, 2.5, E),
+    ],
+    states: ['UU', 'DU', 'DD', 'UD'], defaultState: 'UU',
+    reversible: true, partial: true, heatPerOp: 0,
+    portLabels: { XX: '▸XX', M: '▸M', NX: '▸¬X', X: 'X▸', MO: 'M▸', C: '1▸' },
+    blurb: 'The duplicator run backward: it consumes two copies of X on XX (plus M and the ¬X garbage) and reduces them to a single X out, regenerating the constant 1 — Bennett-style uncomputation. Arrivals out of order are undefined.',
+    transition(port, pol, state) {
+      const T = { 'XX,DU': ['X', 'UU'], 'M,DD': ['MO', 'DU'], 'XX,UD': ['C', 'DD'], 'M,UU': ['MO', 'UD'], 'M,UD': ['MO', 'UU'], 'NX,UD': ['C', 'UD'] };
+      const r = T[port + ',' + state];
+      return r ? { port: r[0], pol, state: r[1] } : null;
+    },
+  });
+
+  // ===========================================================================
   // I/O BOUNDARY
   // ===========================================================================
   def({

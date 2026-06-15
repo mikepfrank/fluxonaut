@@ -311,6 +311,54 @@ version of a <b>Duplicator</b> can reduce the two A’s back to a single copy, p
       parElements: 1, parHeat: 0,
     },
 
+    {
+      id: 'w2l6', world: 2, n: 6, title: 'Putting It Together', size: { w: 28, h: 15 },
+      bipolar: false,
+      intro: `The capstone. You built a <b>Duplicator</b> (W2·4) and a switch-gate <b>AND</b> (W2·5); now assemble the whole Bennett construction — compute, copy, <i>then uncompute</i> — so all that remains at the end is the answer plus a single clean copy of A.
+<br><br>Three chips are bolted down for you: a <b>Dup</b> (×2), the <b>SG</b>, and an <b>rDup</b> (the Duplicator run backward). Dup copies <b>A</b> into two pulses (it needs <b>M</b> and a constant <b>1</b>). The two copies drive the SG’s control while <b>B</b> slips in between — computing <b>A·B</b> and <b>¬A·B</b>. Then the spent copies, the <b>¬X</b> garbage, and the <b>M</b> passes feed the rDup, which folds it all back into one <b>A</b>, a regenerated <b>1</b>, and the <b>M</b> stream.
+<br><br>No clock — <b>order</b> is everything. The rDup only accepts <b>M first</b>, so the copy path (out through the SG and back) must run <i>long enough to fall behind</i> the direct M line. Give the final <b>M</b> a generous gap so the earlier pulses settle before it resets the gates.`,
+      hint: 'Dup: A→X, M→M, 1→C. Copies XX→SG.Ci; B→SG.I; SG.D→A·B, SG.U→¬A·B. Spent copies SG.Co→rDup.XX; Dup.M→rDup.M; Dup.¬X→rDup.¬X. Out: rDup.X→A OUT, rDup.M→M OUT, rDup.1→1 OUT. Make the SG.Co→rDup loop long so M beats the copies into the rDup.',
+      success: `Universal reversible computing, fully assembled: AND and all its garbage computed, then <i>uncomputed</i>, leaving one clean copy of A. That is the 2017 paper’s construction end to end — Landauer’s limit dodged, Bennett’s trick made physical.`,
+      notebook: ['universality'],
+      fixed: [
+        el('L_A', 'LAUNCHER', 1, 2), el('L_M', 'LAUNCHER', 1, 6), el('L_1', 'LAUNCHER', 1, 10), el('L_B', 'LAUNCHER', 1, 13),
+        el('dup', 'DUP', 4, 2), el('sg', 'TSG', 11, 6), el('rdup', 'RDUP', 20, 2),
+        el('D_nand', 'DETECTOR', 16, 6), el('D_and', 'DETECTOR', 16, 7),
+        el('D_A', 'DETECTOR', 25, 2), el('D_M', 'DETECTOR', 25, 3), el('D_1', 'DETECTOR', 25, 4),
+      ],
+      labels: {
+        L_A: 'A IN', L_M: 'M CTL', L_1: 'CONST 1', L_B: 'B IN', dup: 'Dup', sg: 'SG', rdup: 'rDup',
+        D_nand: '¬A·B', D_and: 'A·B', D_A: 'A OUT', D_M: 'M OUT', D_1: '1 OUT',
+      },
+      palette: {},
+      cases: [
+        {
+          name: 'A=1 · B=1', inputs: [
+            { launcher: 'L_A', pol: P }, { launcher: 'L_M', pol: P }, { launcher: 'L_B', pol: P },
+            { launcher: 'L_1', pol: P }, { launcher: 'L_M', pol: P, dt: 2.5 },
+          ], expect: { D_and: [P], D_nand: [], D_A: [P], D_M: [P, P], D_1: [P] },
+        },
+        {
+          name: 'A=1 · B=0', inputs: [
+            { launcher: 'L_A', pol: P }, { launcher: 'L_M', pol: P },
+            { launcher: 'L_1', pol: P }, { launcher: 'L_M', pol: P, dt: 2.5 },
+          ], expect: { D_and: [], D_nand: [], D_A: [P], D_M: [P, P], D_1: [P] },
+        },
+        {
+          name: 'A=0 · B=1', inputs: [
+            { launcher: 'L_M', pol: P }, { launcher: 'L_B', pol: P },
+            { launcher: 'L_1', pol: P }, { launcher: 'L_M', pol: P, dt: 2.5 },
+          ], expect: { D_and: [], D_nand: [P], D_A: [], D_M: [P, P], D_1: [P] },
+        },
+        {
+          name: 'A=0 · B=0', inputs: [
+            { launcher: 'L_M', pol: P }, { launcher: 'L_1', pol: P }, { launcher: 'L_M', pol: P, dt: 2.5 },
+          ], expect: { D_and: [], D_nand: [], D_A: [], D_M: [P, P], D_1: [P] },
+        },
+      ],
+      parElements: 0, parHeat: 0,
+    },
+
     // ════════════════════════════ WORLD 3 — POLARITY ═════════════════════════════
     {
       id: 'w3l1', world: 3, n: 1, title: 'Antifluxon', size: { w: 22, h: 13 },

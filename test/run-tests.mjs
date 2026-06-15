@@ -32,7 +32,8 @@ for (const id of Object.keys(F.TYPES)) {
   else check(`${id} transition table is injective`, inj);
   // exactly one output pulse per input pulse (unless absorber)
   const states = t.states || [null];
-  for (const st of states) for (const port of t.ports) for (const pol of [1, -1]) {
+  // partial chips (DUP/RDUP) intentionally leave out-of-order transitions undefined (fault)
+  if (!t.partial) for (const st of states) for (const port of t.ports) for (const pol of [1, -1]) {
     const r = t.transition(port.name, pol, st, t.config);
     check(`${id}(${port.name},${pol > 0 ? '+' : '−'},${st}) defined`, !!r);
   }

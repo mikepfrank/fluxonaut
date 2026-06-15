@@ -351,6 +351,15 @@
           glyphText(ctx, 'CB', 11, '#9fd2ff', 0, 1);
           break;
         }
+        case 'DUP': case 'RDUP': {
+          bodyRect(ctx, sz, { edge: '#4f7ec2', selected: opts.selected });
+          glyphText(ctx, type.id === 'RDUP' ? 'rDUP' : 'DUP', 12, '#9fd2ff', 0, -sz.h * CELL / 2 + 14);
+          const st = String(state || 'UU');
+          glyphText(ctx, st[0] === 'U' ? '▲' : '▼', 12, st[0] === 'U' ? COL.ok : COL.minus, -8, 2);
+          glyphText(ctx, st[1] === 'U' ? '▲' : '▼', 12, st[1] === 'U' ? COL.ok : COL.minus, 8, 2);
+          glyphText(ctx, 'A    B', 8, COL.dim, 0, 15);
+          break;
+        }
         default: {
           bodyRect(ctx, sz, { selected: opts.selected });
           glyphText(ctx, type.glyph || '?', 12);
