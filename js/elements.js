@@ -239,7 +239,7 @@
     transition(port, pol, state) {
       const flip = state === 'up' ? 'down' : 'up';
       if (port === 'Ci') return { port: 'Co', pol, state: flip };
-      if (port === 'Co') return { port: 'Ci', pol, state: flip };
+      if (port === 'Co') return { port: 'Ci', pol, state };   // one-way rotary: Co bypasses the TCB, no toggle
       if (port === 'I') return { port: state === 'up' ? 'U' : 'D', pol, state };
       if (port === 'U') return state === 'up' ? { port: 'I', pol, state } : { port: 'U', pol, state };
       if (port === 'D') return state === 'down' ? { port: 'I', pol, state } : { port: 'D', pol, state };
