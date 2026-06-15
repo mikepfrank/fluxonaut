@@ -290,9 +290,9 @@ goes to its one fixed output port, end of story.
 <br><br>Route A into the switch’s control and B into its data. If A came, B exits the
 low road: that pulse IS <b>A AND B</b>. If A didn’t, B exits the high road: that’s
 <b>(NOT A) AND B</b>. Both outputs matter — reversible logic keeps its receipts.
-<br><br>One wrinkle: if A toggled the switch, something must toggle it back. The fix is
-pure Bennett: the upstream circuit lends you A <i>twice</i> — compute, then uncompute.
-Catch both spent A’s at A OUT.`,
+<br><br>One wrinkle: if A toggled the switch, something must toggle it back. The fix is pure Bennett — compute, then uncompute: the upstream circuit lends you A <i>twice</i>
+(e.g. by using a <b>Duplicator</b>). Catch both spent A’s at A OUT. Later, if needed, a reversed
+version of a <b>Duplicator</b> can reduce the two A’s back to a single copy, plus constant streams.`,
       hint: 'A → Ci, spent A’s out Co → A OUT. B → I. D port → AND, U port → ¬A·B.',
       success: `AND plus NOT is everything — adders, CPUs, all of it. The 2017 paper proved exactly this construction universal: <i>asynchronous ballistic reversible computing can compute anything</i>. Worlds 3 and 4: making it real, in superconductors.`,
       notebook: ['and', 'universality'],
