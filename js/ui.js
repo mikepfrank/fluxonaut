@@ -800,9 +800,10 @@
     const el = $('#briefing'); if (!el) return;
     const lv = app.level; el.innerHTML = '';
     if (!lv) return;
-    el.append(h('h3', { class: 'brief-title' }, lv.title));
     const body = lv.intro || 'Free play — every element, no objective. Build whatever you like and watch the physics.';
-    el.append(h('div', { class: 'brief-body', html: body }));
+    const wrap = h('div', { class: 'brief-body' });
+    for (const para of body.split(/<br>\s*<br>/i).map(s => s.trim()).filter(Boolean)) wrap.append(h('p', { class: 'brief-p', html: para }));
+    el.append(wrap);
   }
 
   function showStory(title, html, btnText) {
