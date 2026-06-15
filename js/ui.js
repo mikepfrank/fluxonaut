@@ -978,9 +978,9 @@
           ctx.fillStyle = lv.bipolar ? R.polColor(inp.pol) : '#cdeeff';
           ctx.globalAlpha = app.trace && launchedAlready(inp) ? 0.25 : 1;
           ctx.fill(); ctx.globalAlpha = 1;
-          ctx.fillStyle = '#08131f'; ctx.font = '700 8px system-ui';
-          ctx.fillText(String(inp.i + 1), x, y + 2.6);
-          ctx.font = '600 11px system-ui, sans-serif';
+          ctx.fillStyle = '#08131f'; ctx.font = '800 10px system-ui, sans-serif'; ctx.textBaseline = 'middle';
+          ctx.fillText(String(inp.i + 1), x, y);
+          ctx.textBaseline = 'alphabetic'; ctx.font = '600 11px system-ui, sans-serif';
         });
       }
       if (el.type === 'LAUNCHER' && lv.sandbox) {
