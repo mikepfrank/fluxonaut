@@ -161,7 +161,7 @@
     showScreen('game');
     buildGameChrome();
     renderHintBar();
-    if (lv.intro) showStory(lv.title, lv.intro, lv === F.SANDBOX ? null : 'Got it — to the bench!');
+    renderBriefing();
     sizeCanvas();
   }
 
@@ -796,6 +796,15 @@
   }
 
   // ───────────────────────── modals: story & notebook ─────────────────────────
+  function renderBriefing() {
+    const el = $('#briefing'); if (!el) return;
+    const lv = app.level; el.innerHTML = '';
+    if (!lv) return;
+    el.append(h('h3', { class: 'brief-title' }, lv.title));
+    const body = lv.intro || 'Free play — every element, no objective. Build whatever you like and watch the physics.';
+    el.append(h('div', { class: 'brief-body', html: body }));
+  }
+
   function showStory(title, html, btnText) {
     const m = $('#modal'); m.classList.remove('hidden');
     const box = $('#modal-box'); box.innerHTML = '';
