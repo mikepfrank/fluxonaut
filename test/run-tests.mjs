@@ -80,6 +80,22 @@ function buildCircuit(level, solution) {
   return { elements, wires };
 }
 
+function _gsegs(pts){const o=[];for(let i=1;i<pts.length;i++){const a=pts[i-1],b=pts[i];if(Math.abs(a.x-b.x)<1e-9&&Math.abs(a.y-b.y)<1e-9)continue;o.push({a,b,horiz:Math.abs(a.y-b.y)<1e-9});}return o;}
+function _gRect(s,r){if(s.horiz){if(s.a.y<r.y1-1e-9||s.a.y>r.y2+1e-9)return 0;return Math.max(0,Math.min(Math.max(s.a.x,s.b.x),r.x2)-Math.max(Math.min(s.a.x,s.b.x),r.x1));}if(s.a.x<r.x1-1e-9||s.a.x>r.x2+1e-9)return 0;return Math.max(0,Math.min(Math.max(s.a.y,s.b.y),r.y2)-Math.max(Math.min(s.a.y,s.b.y),r.y1));}
+function _gOv(s1,s2){if(s1.horiz!==s2.horiz)return 0;if(s1.horiz){if(Math.abs(s1.a.y-s2.a.y)>1e-9)return 0;return Math.max(0,Math.min(Math.max(s1.a.x,s1.b.x),Math.max(s2.a.x,s2.b.x))-Math.max(Math.min(s1.a.x,s1.b.x),Math.min(s2.a.x,s2.b.x)));}if(Math.abs(s1.a.x-s2.a.x)>1e-9)return 0;return Math.max(0,Math.min(Math.max(s1.a.y,s1.b.y),Math.max(s2.a.y,s2.b.y))-Math.max(Math.min(s1.a.y,s1.b.y),Math.min(s2.a.y,s2.b.y)));}
+// reference solutions must be drawable under the editor's hard wiring rules
+function checkGeometry(circuit){
+  const boxes=circuit.elements.map(el=>{const t=F.TYPES[el.type],sz=F.rotatedSize(t,el.rot||0);return{x1:el.x,y1:el.y,x2:el.x+sz.w,y2:el.y+sz.h};});
+  const ws=circuit.wires.map(w=>_gsegs(F.engine.wirePath(circuit,w)));
+  let thr=0,ov=0,self=0;
+  for(let wi=0;wi<circuit.wires.length;wi++)for(const r of boxes){let f=false;for(const sg of ws[wi])if(_gRect(sg,r)>0.05)f=true;if(f){thr++;break;}}
+  for(let i=0;i<ws.length;i++)for(let j=i+1;j<ws.length;j++){let f=false;for(const a of ws[i])for(const b of ws[j])if(_gOv(a,b)>0.15)f=true;if(f)ov++;}
+  for(const ss of ws){for(let i=0;i<ss.length;i++)for(let j=i+2;j<ss.length;j++)if(_gOv(ss[i],ss[j])>0.15){self++;break;}}
+  check('no wire passes through an element',thr===0,`(${thr})`);
+  check('no overlapping wires',ov===0,`(${ov})`);
+  check('no wire self-overlap',self===0,`(${self})`);
+}
+
 function testLevel(level, solution) {
   console.log(`Level ${level.id} — ${level.title}:`);
   const circuit = buildCircuit(level, solution);
@@ -89,6 +105,7 @@ function testLevel(level, solution) {
   const placed = (solution.place || []).length;
   check(`element count ${placed} ≤ par ${level.parElements}`, placed <= level.parElements);
   check(`heat ${res.heatMax} ≤ par ${level.parHeat}`, res.heatMax <= level.parHeat, `(heat ${res.heatMax})`);
+  checkGeometry(circuit);
   return res;
 }
 
