@@ -246,8 +246,8 @@ goes to its one fixed output port, end of story.
     {
       id: 'w2l4', world: 2, n: 4, title: 'The Duplicator', size: { w: 22, h: 13 },
       bipolar: false,
-      intro: `A fluxon is <i>conserved</i> — you can’t split one pulse into two. To <b>copy</b> a bit you borrow a fresh fluxon from a constant supply and make it retell the same story.
-<br><br>Two switch gates do it. <b>A</b> is the copier; <b>B</b> is a multiplexer that feeds signals into A’s control line, steered by the <b>M</b> pulses.
+      intro: `Copying sounds trivial. It isn’t. A fluxon is <i>conserved</i> — you can’t split one pulse into two. To <b>copy</b> a bit you borrow a fresh fluxon from a constant supply and make it retell the same story.
+<br><br>This rig is wired-for-you EXCEPT the wires. Two switch gates do it. <b>A</b> is the copier; <b>B</b> is a multiplexer that feeds signals into A’s control line, steered by the <b>M</b> pulses.
 <br><br>If <b>X</b> arrives, it routes through B into A’s control: A flips, and the pulse leaves at <b>OUT</b> — copy #1. A is now flipped, so the <b>constant</b> pulse takes A’s other road, loops back through B into A’s control, flips A <i>back</i>, and exits <b>OUT</b> — copy #2. Two pulses out; A and B end exactly as they began.
 <br><br>No <b>X</b>? A never flips, so the constant pulse leaves on the <b>¬X</b> line instead — incidental “garbage” you could uncompute later with a mirror circuit.
 <br><br>There’s no clock: <b>order</b> is everything. X must reach A before the constant does — so keep the A↔B loop short. (8 wires.)`,
