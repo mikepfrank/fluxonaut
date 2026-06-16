@@ -1,0 +1,9 @@
+{
+  "name": "fluxonaut",
+  "version": "0.1.0",
+  "private": true,
+  "description": "FLUXONAUT — vanilla-JS browser puzzle game about BARCS. No build step; this file only pins dev tooling (PNG rendering of reference solutions).",
+  "devDependencies": {
+    "@napi-rs/canvas": "^1.0.0"
+  }
+}
