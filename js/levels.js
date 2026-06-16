@@ -447,7 +447,7 @@ and no power draw.`,
 simulated circuit from the 2022 paper. From the stem, + goes one branch, − the other.
 But the PS leans on an external <b>bias current</b>, and the bias supply pays a little
 energy <i>every single time</i>. Watch the heat counter when you run —
-those embers are real entropy, the kind Landauer warned us about.`,
+those embers are real entropy, the kind Landauer warned us about.<br><br>And it’s <i>logically</i> irreversible, too: once a fluxon leaves on an output arm, you can’t tell whether it passed straight through from the stem or merely bounced off that arm after arriving from the wrong direction. Two possible histories, one output — the map can’t be run backwards, and that erased information is the heat you just watched accrue.`,
       hint: 'IN → stem. + branch (marked +) → PLUS, − branch → MINUS.',
       success: 'It works — the real chips use it. But four sorted fluxons cost four puffs of waste heat. Surely physics permits better…',
       notebook: ['ps', 'landauer'],

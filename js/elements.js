@@ -178,11 +178,13 @@
     ports: [p('S', 0, 0.5, W), p('P', 0.5, 0, N), p('M', 1, 0.5, E)],
     states: null, reversible: false, heatPerOp: 1, bipolarOnly: true,
     portLabels: { S: 'S', P: '+', M: '−' },
-    blurb: 'A biased three-way: from the stem, + fluxons go to the + branch and − fluxons to the − branch; matching fluxons on a branch are passed to the stem. The workhorse router of the real BARCS test circuits (ASC’22) — but its bias supply dissipates on every pass.',
+    blurb: 'A biased three-way: from the stem, + fluxons go to the + branch and − fluxons to the − branch; a matching fluxon on an arm reflects and a mismatched one crosses to the other arm; nothing returns to the stem. The workhorse router of the real BARCS test circuits (ASC’22) — but its bias supply dissipates on every pass, and it is logically irreversible: the + output cannot tell a stem pass-through from a bounce.',
     transition(port, pol, state) {
-      if (port === 'S') return { port: pol === 1 ? 'P' : 'M', pol, state, heat: 1 };
-      if (port === 'P') return pol === 1 ? { port: 'S', pol, state, heat: 1 } : { port: 'P', pol, state, heat: 1 };
-      return pol === -1 ? { port: 'S', pol, state, heat: 1 } : { port: 'M', pol, state, heat: 1 };
+      // Biased: the bias always pushes + out the + arm and − out the − arm, whatever
+      // port the fluxon enters — a matching fluxon reflects, a mismatched one crosses
+      // over, and nothing returns to the stem. Non-injective (a + leaving the + arm could
+      // have passed from the stem, reflected, or crossed), hence logically irreversible.
+      return { port: pol === 1 ? 'P' : 'M', pol, state, heat: 1 };
     },
   });
 

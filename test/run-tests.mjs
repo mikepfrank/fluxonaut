@@ -28,7 +28,7 @@ console.log('Element table audit:');
 for (const id of Object.keys(F.TYPES)) {
   const t = F.TYPES[id];
   const inj = F.checkReversibility(id);
-  if (id === 'PFG') check(`${id} is non-injective (genuinely irreversible)`, !inj);
+  if (id === 'PFG' || id === 'PS') check(`${id} is non-injective (genuinely irreversible)`, !inj);
   else check(`${id} transition table is injective`, inj);
   // exactly one output pulse per input pulse (unless absorber)
   const states = t.states || [null];
