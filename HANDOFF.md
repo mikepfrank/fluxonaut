@@ -1,16 +1,22 @@
 # FLUXONAUT — session handoff notes
 
-For future Claude sessions (or humans) continuing this project. State as of 2026-06-13.
+For future Claude sessions (or humans) continuing this project. State as of 2026-06-16.
 
 ## Status
 
 - Game complete and deployed at **https://fluxonaut.netlify.app** (Netlify drag-and-drop
   of `../fluxonaut-site.zip`, which is rebuilt from runtime files only — no `test/`,
   so no solution spoilers ship).
-- All tests green: `node test/run-tests.mjs` (219 checks: element-table audits, every
+- All tests green: `node test/run-tests.mjs` (293 checks: element-table audits, every
   level certified solvable within element & heat par across 7 jitter seeds, fault rules,
-  per-segment polarity regression) and `node test/smoke-ui.mjs` (99 checks: full UI flow
+  per-segment polarity regression) and `node test/smoke-ui.mjs` (105 checks: full UI flow
   with stubbed DOM).
+- W2·6 "Putting It Together" capstone (full Bennett AND from Dup + SG + rDup) is done
+  on `main`; suite green.
+- Branch `ps-physics-fix` (UNMERGED) applies the correct PS table + a w3l4
+  irreversibility note. It intentionally BREAKS w4l2 (Round Trip Token) and w4l3
+  (Switch Gate For Real), which need redesign with the real lossy PS before merge.
+  See `CLAUDE.md` "Current state / pending work" for the full story.
 - Michael has playtested through World 3's "Antifluxon"; feedback so far applied:
   picosecond display units (1 cell ≈ 50 µm, ~c/30 ⇒ 16 ps per sim-second), port labels
   on element icons, bottom-edge detector labels drawn beside the element, and
@@ -24,29 +30,21 @@ For future Claude sessions (or humans) continuing this project. State as of 2026
   test harnesses). If you change level geometry or timing constants, re-run tests —
   the certify step is sensitive to wire lengths vs. the input-gap jitter (0.7–1.5×).
 
-## Environment quirks worth knowing
+## Environment
 
-- **File-sync truncation / stale mirror:** in Cowork, Write/Edit (and git's own
-  internal writes) to files in the mounted folder sometimes leave the sandbox-side
-  mirror tail-truncated or NUL-padded — and sometimes the *reverse*, where the sandbox
-  sees a stale old copy while the canonical Windows file is correct. The Read tool always
-  reads the canonical file; trust it over `cat`/bash when they disagree. Most reliable
-  remedy: make the edit on a sandbox-disk copy (`git show HEAD:path > /tmp/x`, or work in
-  a fresh clone under /tmp), verify there, then `cp` the clean file back onto the mount —
-  a plain `cp` round-trips reliably, unlike the Write/Edit tools on larger files.
-  `python3 test/clean.py` strips trailing NUL padding. Always `node --check js/*.js`
-  before running tests.
-- **Mount blocks deletion:** `rm`/`rmdir` on the mounted folder fail with "Operation not
-  permitted" until you call the Cowork `allow_cowork_file_delete` tool (asks Michael once,
-  then `rm` works for the rest of the session). Related trap: `git config <set>` rewrites
-  `.git/config` via a temp-file rename the mount mishandles — it once blanked and then
-  deleted the config outright. Don't run `git config` on this repo; instead write
-  `.git/config` from a sandbox-staged copy with `cp`, and keep the `[user]` identity
-  baked into that file.
-- **Claude in Chrome:** this conversation acquired a permanently cached navigation
-  denial (from a 180 s permission timeout while the extension was wedged). Fresh
-  sessions work fine. The extension allows action only on the account-level
-  "approved sites" list; fluxonaut.netlify.app is now approved.
+- Work is now done in the **Claude Code CLI on Windows** (initially via the desktop
+  app's CLI tab, also runnable in any terminal). Node.js LTS v24 + npm 11 are installed
+  system-wide via `winget install OpenJS.NodeJS.LTS`, so the CLAUDE.md commands run
+  verbatim from a normal shell.
+- All the old Cowork sandbox quirks (file-sync truncation, NUL-padded writes, mount
+  blocking `rm`/`git config`, the `cp`-round-trip workaround, `clean.py`, etc.) NO
+  LONGER APPLY and have been removed from this doc. If you ever need them as
+  historical reference, see git history for `HANDOFF.md` before 2026-06-16.
+- **npm supply-chain caution:** before any `npm install`, `npm update`, or accepting
+  a lockfile change, verify each affected package (direct AND transitive) is at least
+  14 days old. Tests run on the real OS with real credentials in scope, so a freshly
+  hijacked package can exfiltrate secrets or corrupt the remote repo. `@napi-rs/canvas`
+  was vetted manually on 2026-06-15 (1.0.0 published 2026-05-04).
 
 ## Live playtest results (2026-06-11, fresh session, Chrome integration working)
 
@@ -78,28 +76,17 @@ Friction worth considering:
 - At 1× speed long boards take 10-15 s per run; fine for watching physics, but a
   "skip to result" affordance would help when iterating.
 
-## Source control (added 2026-06-12; corrected 2026-06-13)
+## Source control
 
 - Code is on GitHub: **https://github.com/mikepfrank/fluxonaut** (public).
-- This local folder IS now a real git clone tracking `origin/main` (restored
-  2026-06-13). The previous `.git` here was corrupt — `config` was all NUL bytes and the
-  `objects/` directory was missing; the v1 "push" had only uploaded raw files, so there
-  was never any real local history. It was rebuilt by cloning origin into /tmp, exploding
-  the packfile into small loose objects (to dodge large-write truncation), setting
-  `core.filemode = false` (the mount reports odd perm bits), and copying the clean `.git`
-  onto the mount. Current history is just: v1 → README warning → clear-progress button →
-  this HANDOFF update. No older history exists to recover (checked the sandbox, the BARCS
-  folder, and Google Drive).
+- This local folder is a normal git clone tracking `origin/main`. Claude Code sessions
+  often run in a worktree under `.claude/worktrees/<name>/` on branch
+  `claude/<name>`; commit there, push the branch, fast-forward `main` afterwards.
 - The `docs/` PDFs at the BARCS root must NEVER be pushed (not publicly distributable).
   `.gitignore` covers `*.zip`, `node_modules/`, and `.DS_Store`.
-- GitHub auth — **the connector does NOT work in Cowork.** The `plugin:engineering:github`
-  MCP server (`api.githubcopilot.com/mcp`) needs OAuth with dynamic client registration,
-  which the app's flow can't perform, and there is no `/mcp` command in Cowork (that's
-  Claude Code only). The sandbox shell also has no stored git credentials, so it cannot
-  push. **Working loop:** Claude edits + commits locally on this repo and verifies
-  (`node --check` + both test suites); Michael pushes via GitHub Desktop or VS Code, where
-  he's already authenticated. Read-only clone/fetch over HTTPS works from the sandbox
-  without auth since the repo is public.
+- **Pushing now works directly from Claude Code on Windows** — `git push` uses the
+  user's authenticated git credentials (no need to hand off to GitHub Desktop /
+  VS Code as in the Cowork days).
 
 ## Sensible next steps
 
