@@ -311,13 +311,16 @@
         }
         case 'RPF': {
           bodyRect(ctx, sz, { edge: '#4f7ec2', selected: opts.selected });
-          // data line with a trapped-flux barrier (colored by the stored polarity);
-          // the matching polarity crosses it, a mismatch reflects. No bias, no heat.
+          // The barrier sits on the port axis and rotates WITH the element, so it always
+          // connects the two ports; its colored center is the trapped-flux barrier (by
+          // stored polarity) that a matching fluxon crosses and a mismatch reflects.
+          ctx.save(); orient(ctx, el);
           ctx.strokeStyle = '#6f93bb'; ctx.lineWidth = 1.8;
-          ctx.beginPath(); ctx.moveTo(-15, 5); ctx.lineTo(-6, 5); ctx.moveTo(6, 5); ctx.lineTo(15, 5); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(-15, 0); ctx.lineTo(-6, 0); ctx.moveTo(6, 0); ctx.lineTo(15, 0); ctx.stroke();
           ctx.strokeStyle = polColor(state); ctx.lineWidth = 2.8;
-          ctx.beginPath(); ctx.moveTo(-6, 5); ctx.lineTo(6, 5); ctx.stroke();
-          glyphText(ctx, 'rPF', 10, '#9fd2ff', 0, -7);
+          ctx.beginPath(); ctx.moveTo(-6, 0); ctx.lineTo(6, 0); ctx.stroke();
+          ctx.restore();
+          glyphText(ctx, 'rPF', 8.5, '#9fd2ff', 0, -12);
           break;
         }
         case 'PS': case 'RPS': {
