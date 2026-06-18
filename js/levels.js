@@ -542,6 +542,52 @@ give back</b>. (Both solutions pass. Only one earns all four stars.)`,
       parElements: 1, parHeat: 0,
     },
 
+    {
+      id: 'w3l8', world: 3, n: 8, title: 'The Bias Bill', size: { w: 22, h: 13 },
+      bipolar: true,
+      intro: `The lab’s simplest biased gate: a <b>Polarity Filter</b>. A DC bias current
+gives it a favorite sign and shoves that polarity one way — <i>no matter which way the
+fluxon was going</i>. Drop one in and set its bias to <span class="pol-p">+</span>: a
+<span class="pol-p">+</span> sails through to DELIVER, while a
+<span class="pol-m">−</span> can’t fight the bias and <i>reflects straight back the way
+it came</i>.
+<br><br>The rotary will catch that reflection — recycle it to the RETURN LINE, or burn
+it in an <b>Exhaust</b>, your call. Now watch the heat meter: the bias supply only pays
+when it <i>pumps a fluxon through</i> (the junction flicks into its voltage state to
+shove it across). The ones it reflects cost nothing — they recoil elastically, the
+junction never leaving its superconducting state. You’re billed for what you deliver,
+never for what you bounce… unless you choose to burn it.
+<br><br>(Both solutions pass. Only recycling — letting the free reflections go home
+intact — earns all four stars.)`,
+      hint: `Place the FILTER one cell right of the rotary and set its bias +. Wire IN → rotary → filter; the + leaves the filter’s far side for DELIVER. The − reflects back into the rotary and out its top port — aim that at RETURN LINE to keep all four stars (or an Exhaust to burn it).`,
+      success: `The bias did its job — and billed you only for the fluxons it <i>pumped
+through</i>, not the ones it bounced; those recoiled for free. That asymmetry is the
+deep point: an irreversible gate needn’t dissipate on <i>every</i> path into a merged
+result — only the ones that actually erase a distinction. The reflections were already
+the non-dissipative branch, so burning them would have thrown that gift away. Next
+world, this same pass-or-reflect trick goes fully <b>reversible</b>: the data rail of
+the Controlled Barrier.`,
+      notebook: ['pfg'],
+      fixed: [
+        el('L_in', 'LAUNCHER', 1, 6),
+        el('rot', 'ROTARY', 8, 6, 0, { cfg: { ccw: true } }),
+        el('D_out', 'DETECTOR', 20, 10), el('D_ret', 'DETECTOR', 20, 2),
+      ],
+      labels: { L_in: 'IN', D_out: 'DELIVER', D_ret: 'RETURN LINE' },
+      palette: { PFG: 1, EXHAUST: 1 },
+      optionalPalette: ['EXHAUST'],
+      optionalDetectors: ['D_ret'],
+      cases: [
+        { name: 'a + is delivered', inputs: [{ launcher: 'L_in', pol: P }], expect: { D_out: [P] } },
+        { name: 'a − is rejected', inputs: [{ launcher: 'L_in', pol: M }], expect: { D_out: [] } },
+        { name: 'the bias bill adds up', inputs: [{ launcher: 'L_in', pol: P }, { launcher: 'L_in', pol: M }, { launcher: 'L_in', pol: P }, { launcher: 'L_in', pol: M }], expect: { D_out: [P, P] } },
+      ],
+      // Heat = 2: only the two delivered + fluxons are pumped through the filter
+      // (1 heat each); the two − fluxons reflect for free. parHeat 2 makes the heat
+      // star reward NOT burning the free reflections.
+      parElements: 1, parHeat: 2,
+    },
+
     // ════════════════════════════ WORLD 4 — THE UNIVERSAL ELEMENT ════════════════
     {
       id: 'w4l1', world: 4, n: 1, title: 'The Controlled Barrier', size: { w: 22, h: 13 },
@@ -633,7 +679,9 @@ The future is the next level.`,
         { name: 'C=1 D=0', inputs: [{ launcher: 'L_C', pol: P }], expect: { D_cout: [P], D_cd: [], D_ncd: [] }, finalStates: { cb: M } },
         { name: 'C=0 D=0', inputs: [], expect: { D_cout: [], D_cd: [], D_ncd: [] }, finalStates: { cb: M } },
       ],
-      parElements: 3, parHeat: 8,
+      // parHeat 5 (was 8): under the corrected PF/PS physics, fluxons the separators
+      // REFLECT cost nothing; only the pumped-through passes dissipate.
+      parElements: 3, parHeat: 5,
     },
 
     {
@@ -943,6 +991,24 @@ them (Bennett's garbage-collection discipline). Real BARCS test circuits do use
 exhausts — pragmatism has its place on a lab bench — but every exhaust in a design
 is a little flag reading "this part isn't reversible yet." The game's third star
 enforces the discipline.`,
+    },
+    pfg: {
+      title: 'The Polarity Filter (biased)',
+      body: `The simplest biased BARCS gate (Lewis &amp; Frank, ASC’22). A DC bias current
+picks a favored sign: a <b>+</b> fluxon is pushed out one side, a <b>−</b> out the other,
+whichever port it arrived on — so it both filters by polarity and forces a direction.
+Physically it’s a short, 3×-wide defect in the line that briefly slows the fluxon enough
+for the bias to deflect it. When a fluxon’s leading edge <i>aligns</i> with the bias it’s
+pumped on through: the junction flips into its voltage state and dissipates a little as
+quasiparticles tunnel. When it <i>opposes</i> the bias the currents cancel, the junction
+stays superconducting, and the fluxon recoils elastically — a free reflection. So the
+gate is <b>irreversible</b> (which port a fluxon came from can be lost) yet it spends
+energy only on the transitions that actually merge information — the lesson of
+<i>generalized reversible computing</i>: an irreversible op needn’t dissipate on every
+path, only on all-but-one of those that collide on a shared result. The 2022 paper
+presents the filter first, then generalizes it into the three-port Polarity Separator;
+its reversible cousin, biased by trapped flux instead of a power rail, is the data rail
+of the Controlled Barrier in World 4.`,
     },
     cb: {
       title: 'The Controlled Barrier (the universal element)',
