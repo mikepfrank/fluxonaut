@@ -125,11 +125,14 @@
     w: 1, h: 1, ports: [p('A', 0, 0.5, W), p('B', 1, 0.5, E)],
     states: null, reversible: false, heatPerOp: 1, bipolarOnly: true,
     config: { bias: 1 }, // bias polarity is forced toward port B
-    blurb: 'A current-biased barrier. The bias shoves its favorite polarity toward one side — regardless of which way the fluxon was going. Handy, but the bias supply pays for every shove. (ASC’22.)',
+    blurb: 'A current-biased barrier. The bias shoves its favorite polarity toward one side — regardless of which way the fluxon was going. It dissipates only when it PUMPS a fluxon through (the junction briefly switches to its voltage state); a fluxon it reflects recoils elastically, staying on the supercurrent branch, for free. (ASC’22.)',
     transition(port, pol, state, cfg) {
       const b = (cfg && cfg.bias) || 1;
-      if (pol === b) return { port: 'B', pol, state, heat: 1 };  // forced toward B
-      return { port: 'A', pol, state, heat: 1 };                 // forced toward A
+      const out = (pol === b) ? 'B' : 'A';   // bias forces + toward B, − toward A
+      // Heat only when the fluxon is PUMPED through to the other port (the JJ enters
+      // the voltage state and quasiparticles tunnel). A reflection (out === entry
+      // port) stays superconducting — elastic recoil, ~zero dissipation.
+      return { port: out, pol, state, heat: out === port ? 0 : 1 };
     },
   });
 
@@ -178,13 +181,18 @@
     ports: [p('S', 0, 0.5, W), p('P', 0.5, 0, N), p('M', 1, 0.5, E)],
     states: null, reversible: false, heatPerOp: 1, bipolarOnly: true,
     portLabels: { S: 'S', P: '+', M: '−' },
-    blurb: 'A biased three-way: from the stem, + fluxons go to the + branch and − fluxons to the − branch; a matching fluxon on an arm reflects and a mismatched one crosses to the other arm; nothing returns to the stem. The workhorse router of the real BARCS test circuits (ASC’22) — but its bias supply dissipates on every pass, and it is logically irreversible: the + output cannot tell a stem pass-through from a bounce.',
+    blurb: 'A biased three-way: from the stem, + fluxons go to the + branch and − fluxons to the − branch; a matching fluxon on an arm reflects and a mismatched one crosses to the other arm; nothing returns to the stem. The workhorse router of the real BARCS test circuits (ASC’22) — logically irreversible (the + output can’t tell a stem pass-through from a bounce or a cross), and its bias supply dissipates whenever it pumps a fluxon through, though a fluxon it reflects off its matching arm recoils for free.',
     transition(port, pol, state) {
       // Biased: the bias always pushes + out the + arm and − out the − arm, whatever
       // port the fluxon enters — a matching fluxon reflects, a mismatched one crosses
       // over, and nothing returns to the stem. Non-injective (a + leaving the + arm could
       // have passed from the stem, reflected, or crossed), hence logically irreversible.
-      return { port: pol === 1 ? 'P' : 'M', pol, state, heat: 1 };
+      const out = (pol === 1) ? 'P' : 'M';
+      // This device's dissipative set: it pays only when it pumps a fluxon through to a
+      // different port; a matching fluxon reflecting off its arm (out === entry port)
+      // stays on the supercurrent branch and is free. (Per-device property — not a
+      // universal law; the Landauer merge-check in the test suite validates the flags.)
+      return { port: out, pol, state, heat: out === port ? 0 : 1 };
     },
   });
 

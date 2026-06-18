@@ -88,6 +88,35 @@ stays as-is: the short, sweet introduction.
     an expanded edition could add personnel, milestones mirroring the real papers,
     and the CB discovery as the plot climax.
 
+## F. Cell-library mining (from BARCS-Cell-Library-0v15.pdf, reviewed 2026-06-17)
+
+Parking-lot candidates spotted while researching the Polarity Filter level (w3l8).
+Set aside deliberately — not built. The cell library documents several cells with no
+game presence yet:
+
+14. **RM3 — the Three-Port Reversible Memory cell (§7/§A.7).** The game has RM1
+    (1-port) and RM2 (2-port); RM3 is the documented 3-port sibling. A natural new
+    element + level: a memory you can address/read from three sides. Worth deriving
+    its exact reversible transition table from the doc before designing.
+
+15. **DC-to-SFQ converter (§3/§A.4) — "where fluxons come from."** The real fluxon
+    *source* cell. Could anchor an origin-story level ("launch your own fluxons")
+    or a fault lesson (the source isn't designed to absorb returning fluxons — the
+    exact constraint the PF test bench works around).
+
+16. **The PF test-bench mechanic, as a harder PF sequel.** The ASC'22 / cell-library
+    PF bench does something the w3l8 intro doesn't: it *reconfigures routing mid-stream*
+    — send 3 fluxons through the filter, then flip the filter to reflect-mode and
+    re-aim a downstream separator to catch the 4th, then re-route all the rest. That
+    dynamic-reconfiguration puzzle (toggling bias/PS between pulses) is a meatier
+    World-3.5 challenge once the static PF (w3l8) has been taught.
+
+17. **"Port test rig for SCIT" (§10).** Testing-infrastructure flavor; lower priority,
+    but a possible meta/credits-era sandbox showcase.
+
+(To mine the doc's *figures* for more, we'd need a PDF page renderer installed —
+text extraction alone was enough for these.)
+
 ## Suggested priority if/when we build it
 
 Tier 1 (defines the expanded edition): #1, #2, #3, #7

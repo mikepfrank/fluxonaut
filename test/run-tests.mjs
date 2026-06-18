@@ -58,6 +58,44 @@ for (const id of Object.keys(F.TYPES)) {
   check('CB obeys flux-negation symmetry', fsym);
 }
 
+// Dissipation consistency (Landauer / merge law). Heat is each device's OWN property
+// (which transitions dissipate depends on its physical implementation) — but one rule
+// is universal: whenever ≥2 transitions land on the same (port, polarity, state)
+// output, all but one MUST be dissipative. A non-dissipative many-to-one would erase a
+// distinction for free, violating Landauer. This validates the heat flags are
+// self-consistent for every device in the palette, across all of its bias settings.
+console.log('\nDissipation (Landauer merge law):');
+for (const id of Object.keys(F.TYPES)) {
+  const t = F.TYPES[id];
+  if (!t.transition || t.io) continue;            // skip I/O endpoints (launcher/detector)
+  // enumerate config variants (e.g. bias ±1, ccw on/off) so we check every mode
+  let cfgs = [undefined];
+  if (t.config) {
+    cfgs = [{}];
+    for (const k of Object.keys(t.config)) {
+      const base = t.config[k];
+      const alts = typeof base === 'boolean' ? [false, true] : (base === 1 || base === -1 ? [1, -1] : [base]);
+      cfgs = cfgs.flatMap(c => alts.map(a => ({ ...c, [k]: a })));
+    }
+  }
+  let worstFree = 1, detail = null;
+  for (const cfg of cfgs) {
+    const groups = {};
+    for (const st of (t.states || [null])) for (const port of t.ports) for (const pol of [1, -1]) {
+      let r; try { r = t.transition(port.name, pol, st, cfg); } catch (e) { r = null; }
+      if (!r) continue;                            // null = undefined/fault transition, not a logical output
+      const outKey = r.absorb ? 'ABSORB' : `${r.port}|${r.pol}|${r.state}`;
+      (groups[outKey] = groups[outKey] || []).push(r.heat || 0);
+    }
+    for (const [ok, heats] of Object.entries(groups)) {
+      if (heats.length < 2) continue;
+      const free = heats.filter(h => h === 0).length;
+      if (free > worstFree) { worstFree = free; detail = `${id} ${JSON.stringify(cfg || {})} → ${ok}: ${free} non-dissipative merges`; }
+    }
+  }
+  check(`${id}: merged outputs leave ≤1 non-dissipative transition`, worstFree <= 1, detail);
+}
+
 // ───────────────────────────── helpers ────────────────────────────────────────
 function buildCircuit(level, solution) {
   const elements = level.fixed.map(e => ({ ...e, cfg: e.cfg ? { ...e.cfg } : undefined }));

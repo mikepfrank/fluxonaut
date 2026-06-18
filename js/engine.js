@@ -305,7 +305,11 @@
         }
         if (res.heat) {
           trace.heat += res.heat;
-          trace.heatEvents.push({ t: ev.t, x: pp.x, y: pp.y, amount: res.heat, el: ev.el });
+          // Spark at the EXIT port: for these biased devices the cost is realized as the
+          // fluxon is pumped through (dissipation accompanies transmission, not arrival).
+          // Absorbers have no exit port, so they spark where the fluxon dies (input).
+          const hp = (res.port && !res.absorb) ? portWorld(el, type, res.port) : pp;
+          trace.heatEvents.push({ t: ev.t, x: hp.x, y: hp.y, amount: res.heat, el: ev.el });
         }
         if (res.state !== st) {
           states.set(ev.el, res.state);
