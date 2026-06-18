@@ -490,9 +490,12 @@ In this game it’s legal — consider it a glimpse over the horizon.`,
     {
       id: 'w3l6', world: 3, n: 6, title: 'The Comparator', size: { w: 22, h: 13 },
       bipolar: true,
-      intro: `A mystery fluxon X arrives and settles into the memory cell (its eviction
+      intro: `The memory cell returns — now with <b>two ports</b>. This is the <b>RM2</b>
+cell: the same reflect-or-swap rule you learned, but a visitor can knock on <i>either</i>
+side — which is exactly what lets it compare two fluxons.
+<br><br>A mystery fluxon X arrives and settles into the memory cell (its eviction
 notice — the old stored <span class="pol-m">−</span> — pops out; recycle it to TOKEN).
-Then a <span class="pol-p">+</span> probe knocks on the cell’s other port.
+Then a <span class="pol-p">+</span> probe knocks on the cell’s <i>other</i> port.
 <br><br>Think it through: the probe <i>bounces back unchanged</i> if X was +, but
 <i>swaps to −</i> if X was −. The probe’s answer carries X’s value!
 Route + answers to SAME and − answers to DIFF, reversibly.
@@ -590,11 +593,47 @@ the Controlled Barrier.`,
 
     // ════════════════════════════ WORLD 4 — THE UNIVERSAL ELEMENT ════════════════
     {
-      id: 'w4l1', world: 4, n: 1, title: 'The Controlled Barrier', size: { w: 22, h: 13 },
+      id: 'w4l1', world: 4, n: 1, title: 'The Reversible Barrier', size: { w: 22, h: 13 },
       bipolar: true,
-      intro: `Here it is — the discovery the whole program built toward (JJ Workshop, 2025).
-The <b>Controlled Barrier</b>: a two-port memory cell (top rail) magnetically coupled
-to a reversible polarity filter (bottom rail). One device, two personalities:
+      intro: `World 3 closed with a <i>biased</i> filter that forced every polarity one way
+and paid heat to do it. Meet its reversible cousin: the <b>rPF</b> — the data rail of the
+device this whole world is built around.
+<br><br>A <b>trapped flux</b> sets a barrier polarity — no power supply. A fluxon that
+<i>matches</i> the barrier passes straight through; a <i>mismatch</i> bounces straight
+back the way it came. Because it never loses track of which way a fluxon was going, it is
+<b>fully reversible</b> — and the heat meter never twitches.
+<br><br>Set the barrier to <span class="pol-p">+</span>: pass the matching
+<span class="pol-p">+</span> to PASS, and catch the rejected <span class="pol-m">−</span>
+on the rotary for BOUNCE.`,
+      hint: `Place the rPF one cell right of the rotary and set its barrier +. Wire IN → rotary → rPF; a matching + passes out the far side to PASS. A mismatched − reflects back into the rotary and out its top port — send that to BOUNCE.`,
+      success: `Pass-or-reflect by polarity, exactly like the biased filter — but with the
+power supply replaced by a stored flux, the whole gate turns <b>reversible and free</b>:
+zero heat, no information lost. Next, couple this barrier to a memory cell so the memory
+can <i>flip</i> it on command — and you have the universal element.`,
+      notebook: ['rpf'],
+      fixed: [
+        el('L_in', 'LAUNCHER', 1, 6),
+        el('rot', 'ROTARY', 8, 6, 0, { cfg: { ccw: true } }),
+        el('D_pass', 'DETECTOR', 20, 10), el('D_bounce', 'DETECTOR', 20, 2),
+      ],
+      labels: { L_in: 'IN', D_pass: 'PASS', D_bounce: 'BOUNCE' },
+      palette: { RPF: 1 },
+      cases: [
+        { name: 'a match passes', inputs: [{ launcher: 'L_in', pol: P }], expect: { D_pass: [P], D_bounce: [] } },
+        { name: 'a mismatch reflects', inputs: [{ launcher: 'L_in', pol: M }], expect: { D_pass: [], D_bounce: [M] } },
+        { name: 'a mixed stream', inputs: [{ launcher: 'L_in', pol: P }, { launcher: 'L_in', pol: M }, { launcher: 'L_in', pol: P }, { launcher: 'L_in', pol: M }], expect: { D_pass: [P, P], D_bounce: [M, M] } },
+      ],
+      parElements: 1, parHeat: 0,
+    },
+
+    {
+      id: 'w4l2', world: 4, n: 2, title: 'The Controlled Barrier', size: { w: 22, h: 13 },
+      bipolar: true,
+      intro: `Two devices you already know, fused into one (JJ Workshop, 2025). The control
+rail (top) is the <b>RM2</b> memory cell from the Comparator — match bounces, mismatch
+swaps. The data rail (bottom) is the <b>rPF</b> you just met — pass on a match, reflect on
+a mismatch. Magnetically couple them so the RM2’s <i>stored fluxon becomes the rPF’s
+barrier</i>, and you have the <b>Controlled Barrier</b>: the universal element.
 <br>• <b>Control rail</b> (K1/K2): the RM rule — match bounces, mismatch swaps.
 <br>• <b>Data rail</b> (D1/D2): a fluxon <i>passes</i> if its polarity matches the
 stored state, else it <i>reflects</i>. The stored fluxon IS the barrier.
@@ -620,7 +659,7 @@ through. No control, and data bounces.`,
     },
 
     {
-      id: 'w4l2', world: 4, n: 2, title: 'Round Trip Token', size: { w: 22, h: 13 },
+      id: 'w4l3', world: 4, n: 3, title: 'Round Trip Token', size: { w: 22, h: 13 },
       bipolar: true,
       intro: `In a real gate, nobody resets the barrier by hand. The published design makes
 the barrier reset <b>itself</b>, with one gorgeous trick:
@@ -648,7 +687,7 @@ the gate’s <b>logic window</b>. No clock sets it — wire length does. Build t
     },
 
     {
-      id: 'w4l3', world: 4, n: 3, title: 'The Switch Gate, For Real', size: { w: 22, h: 13 },
+      id: 'w4l4', world: 4, n: 4, title: 'The Switch Gate, For Real', size: { w: 22, h: 13 },
       bipolar: true,
       intro: `Everything converges. The <b>asynchronous Ressler–Feynman Switch Gate</b> —
 the universal reversible logic element, as actually designed at the lab and taped out
@@ -685,7 +724,7 @@ The future is the next level.`,
     },
 
     {
-      id: 'w4l4', world: 4, n: 4, title: 'Beyond the Paper', size: { w: 22, h: 13 },
+      id: 'w4l5', world: 4, n: 5, title: 'Beyond the Paper', size: { w: 22, h: 13 },
       bipolar: true,
       intro: `The 2025 talk ends with a wish list, and at the top: <i>"replace the
 polarity separators with some efficient, logically reversible, unpowered element."</i>
@@ -719,7 +758,7 @@ without one — the BARCS bibliography in the Notebook tells you exactly who to 
     },
 
     {
-      id: 'w4l5', world: 4, n: 5, title: 'The Boomerang Theorem', size: { w: 22, h: 13 },
+      id: 'w4l6', world: 4, n: 6, title: 'The Boomerang Theorem', size: { w: 22, h: 13 },
       bonus: true,
       bipolar: true,
       intro: `A bonus puzzle for the theoretically brave. Obvious idea: why conjure a
@@ -1009,6 +1048,18 @@ path, only on all-but-one of those that collide on a shared result. The 2022 pap
 presents the filter first, then generalizes it into the three-port Polarity Separator;
 its reversible cousin, biased by trapped flux instead of a power rail, is the data rail
 of the Controlled Barrier in World 4.`,
+    },
+    rpf: {
+      title: 'The reversible Polarity Filter (rPF)',
+      body: `The biased Polarity Filter forced a polarity one way using a DC power supply,
+lost track of which port the fluxon came from, and dissipated on every pass. The
+<b>rPF</b> swaps that power supply for a <b>trapped flux</b> that sets a barrier: a fluxon
+whose polarity matches the barrier is accelerated through; a mismatch is decelerated and
+recoils. Match-pass / mismatch-reflect keeps the entry port recoverable, so the map is
+one-to-one — <b>logically reversible and unpowered</b> (zero heat). The lab asserts such a
+cell is buildable (JJ Workshop ’25), though no standalone design is published; it appears
+only as the data rail of the Controlled Barrier. Couple an rPF to a 2-port memory (RM2) so
+the stored fluxon <i>is</i> the barrier, and you get that universal element.`,
     },
     cb: {
       title: 'The Controlled Barrier (the universal element)',

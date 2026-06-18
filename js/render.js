@@ -309,6 +309,17 @@
           glyphText(ctx, '⚡', 9, '#ffd16e', 0, 12);
           break;
         }
+        case 'RPF': {
+          bodyRect(ctx, sz, { edge: '#4f7ec2', selected: opts.selected });
+          // data line with a trapped-flux barrier (colored by the stored polarity);
+          // the matching polarity crosses it, a mismatch reflects. No bias, no heat.
+          ctx.strokeStyle = '#6f93bb'; ctx.lineWidth = 1.8;
+          ctx.beginPath(); ctx.moveTo(-15, 5); ctx.lineTo(-6, 5); ctx.moveTo(6, 5); ctx.lineTo(15, 5); ctx.stroke();
+          ctx.strokeStyle = polColor(state); ctx.lineWidth = 2.8;
+          ctx.beginPath(); ctx.moveTo(-6, 5); ctx.lineTo(6, 5); ctx.stroke();
+          glyphText(ctx, 'rPF', 10, '#9fd2ff', 0, -7);
+          break;
+        }
         case 'PS': case 'RPS': {
           const conj = type.id === 'RPS';
           bodyRect(ctx, sz, { edge: conj ? COL.conj : '#7c6440', conj, selected: opts.selected });
@@ -334,11 +345,13 @@
           ctx.fillStyle = polColor(state);
           ctx.beginPath(); ctx.arc(0, -22, 6, 0, 7); ctx.fill();
           glyphText(ctx, state === 1 ? '+' : '−', 10, '#08131f', 0, -21.5);
-          // coupling
-          ctx.strokeStyle = 'rgba(159,210,255,0.5)'; ctx.lineWidth = 1.2;
-          ctx.setLineDash([2, 3]);
-          ctx.beginPath(); ctx.moveTo(0, -10); ctx.lineTo(0, 10); ctx.stroke();
-          ctx.setLineDash([]);
+          // coupling: two short parallel horizontal lines (the mutual-inductance /
+          // transformer glyph — the RM2's stored flux inductively biasing the rPF barrier)
+          ctx.strokeStyle = 'rgba(159,210,255,0.8)'; ctx.lineWidth = 1.6;
+          ctx.beginPath();
+          ctx.moveTo(-10, -3); ctx.lineTo(10, -3);
+          ctx.moveTo(-7, 3); ctx.lineTo(7, 3);
+          ctx.stroke();
           // data rail (bottom): barrier, open for matching polarity
           ctx.strokeStyle = '#6f93bb'; ctx.lineWidth = 2;
           ctx.beginPath(); ctx.moveTo(-36, 22); ctx.lineTo(-7, 22); ctx.moveTo(7, 22); ctx.lineTo(36, 22); ctx.stroke();
@@ -348,7 +361,6 @@
           glyphText(ctx, state === 1 ? '+ passes' : '− passes', 8.5, COL.dim, 0, 33);
           ctx.restore();
           ctx.restore();
-          glyphText(ctx, 'CB', 11, '#9fd2ff', 0, 1);
           break;
         }
         case 'DUP': case 'RDUP': {

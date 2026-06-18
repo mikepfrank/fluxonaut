@@ -136,6 +136,19 @@
     },
   });
 
+  def({
+    id: 'RPF', name: 'Reversible Filter (rPF)', glyph: 'rPF',
+    w: 1, h: 1, ports: [p('A', 0, 0.5, W), p('B', 1, 0.5, E)],
+    states: [1, -1], defaultState: 1, stateIsPolarity: true, playerSettable: true,
+    reversible: true, heatPerOp: 0, bipolarOnly: true,
+    portLabels: { A: 'A', B: 'B' },
+    blurb: 'The reversible Polarity Filter — the unbiased cousin of the biased PF. A trapped flux sets a barrier polarity: a fluxon whose polarity MATCHES the barrier passes straight through; a mismatch reflects straight back the way it came. The entry port is never lost, so it is fully reversible and dissipates nothing — no power supply. This is the data rail of the Controlled Barrier. (JJ Workshop ’25.)',
+    transition(port, pol, state) {
+      if (pol === state) return { port: port === 'A' ? 'B' : 'A', pol, state };  // match → pass through
+      return { port, pol, state };                                                // mismatch → reflect (same port)
+    },
+  });
+
   // ===========================================================================
   // 3-PORT ELEMENTS  (unrotated: A=W stem/first, B=N, C=E)
   // ===========================================================================
