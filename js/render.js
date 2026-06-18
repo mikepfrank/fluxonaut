@@ -142,7 +142,7 @@
         const big = type.w > 1 || type.h > 1;
         const inset = big ? 13 : 11;
         const lx = px - rp.ox * inset, ly = py - rp.oy * inset;
-        ctx.font = `700 ${big ? 9.5 : 8.5}px Verdana, Tahoma, system-ui, sans-serif`;
+        ctx.font = `700 ${big ? 9.5 : 8.5}px Verdana, Tahoma, 'Segoe UI Symbol', 'Segoe UI Emoji', system-ui, sans-serif`;
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
         const hadLS = 'letterSpacing' in ctx;
         if (hadLS) ctx.letterSpacing = '0.5px';          // separate letters so e.g. "Ci" doesn't read as "G"
@@ -157,7 +157,7 @@
 
   function glyphText(ctx, txt, size, color, dx, dy) {
     ctx.fillStyle = color || COL.elGlyph;
-    ctx.font = `600 ${size || 13}px 'Segoe UI', system-ui, sans-serif`;
+    ctx.font = `600 ${size || 13}px 'Segoe UI', 'Segoe UI Symbol', 'Segoe UI Emoji', system-ui, sans-serif`;
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText(txt, dx || 0, dy || 0);
   }
