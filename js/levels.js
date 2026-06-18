@@ -545,7 +545,7 @@ give back</b>. (Both solutions pass. Only one earns all four stars.)`,
     {
       id: 'w3l8', world: 3, n: 8, title: 'The Bias Bill', size: { w: 22, h: 13 },
       bipolar: true,
-      intro: `The lab’s simplest biased gate: a <b>Polarity Filter</b>. A DC bias current
+      intro: `The lab’s simplest biased gate (from the ASC ’22 paper): a <b>Polarity Filter</b>. A DC bias current
 gives it a favorite sign and shoves that polarity one way — <i>no matter which way the
 fluxon was going</i>. Drop one in and set its bias to <span class="pol-p">+</span>: a
 <span class="pol-p">+</span> sails through to DELIVER, while a
