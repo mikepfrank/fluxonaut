@@ -524,21 +524,22 @@ fluxons whole. It works! It also torches everything that fluxon was, as one fat
 burst of waste heat. That’s <i>erasure</i>, the exact thing Landauer taxed.
 <br><br>Or… route the unwanted fluxon to the RETURN LINE, intact, for the upstream
 circuit to reuse. Reversible computing in one choice: <b>never burn what you can
-give back</b>. (Both solutions pass. Only one earns the third star.)`,
+give back</b>. (Both solutions pass. Only one earns all four stars.)`,
       hint: 'Split by polarity. Where you point the − branch is between you and your thermodynamic conscience.',
       success: 'Decomputation beats deletion. Every fluxon you hand back is heat that never happens.',
       notebook: ['erasure'],
       fixed: [
         el('L_in', 'LAUNCHER', 1, 6),
-        el('D_out', 'DETECTOR', 20, 4), el('D_ret', 'DETECTOR', 20, 12),
+        el('D_out', 'DETECTOR', 20, 4), el('D_ret', 'DETECTOR', 20, 11),
       ],
       labels: { L_in: 'IN', D_out: 'DELIVER', D_ret: 'RETURN LINE' },
       palette: { PR3: 1, EXHAUST: 1 },
       optionalDetectors: ['D_ret'],
+      optionalPalette: ['EXHAUST'],
       cases: [
         { name: 'keep + , return −', inputs: [{ launcher: 'L_in', pol: P }, { launcher: 'L_in', pol: M }], expect: { D_out: [P] } },
       ],
-      parElements: 2, parHeat: 0,
+      parElements: 1, parHeat: 0,
     },
 
     // ════════════════════════════ WORLD 4 — THE UNIVERSAL ELEMENT ════════════════

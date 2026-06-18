@@ -688,13 +688,17 @@
 
   // ───────────────────────── certify ─────────────────────────
   // Build-quality: which placed/pre-placed devices were actually used by a fluxon,
-  // and whether all supplied components were placed.
+  // and whether all supplied components were placed. `optionalPalette` types
+  // (e.g. the Exhaust on Waste Not) don't count toward the required minimum
+  // and don't penalize the build star if placed-but-unused.
   function buildQuality(res) {
     const lv = app.level;
     const used = new Set(res.usedEls || []);
+    const optionalTypes = new Set(lv.optionalPalette || []);
     const devices = app.elements.filter(e => !F.TYPES[e.type].io);   // non-I/O components
-    const unused = devices.filter(e => !used.has(e.id));
-    const supplied = isFinite(lv.parElements) ? lv.parElements : 0;
+    const unused = devices.filter(e => !used.has(e.id) && !optionalTypes.has(e.type));
+    const optionalSupplied = [...optionalTypes].reduce((s, t) => s + ((lv.palette && lv.palette[t]) || 0), 0);
+    const supplied = Math.max(0, (isFinite(lv.parElements) ? lv.parElements : 0) - optionalSupplied);
     const placed = placedCount();
     const placedAll = placed >= supplied;
     return { unused, placedAll, placed, supplied, properBuild: placedAll && unused.length === 0 };
