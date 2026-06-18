@@ -28,7 +28,7 @@
   // --- geometry --------------------------------------------------------------
   function portWorld(el, type, portName) {
     const port = type.ports.find(q => q.name === portName);
-    const rp = F.rotatedPort(type, port, el.rot || 0, el.mir);
+    const rp = F.rotatedPort(type, F.swappedPort(el, type, port), el.rot || 0, el.mir);
     return { x: el.x + rp.x, y: el.y + rp.y, ox: rp.ox, oy: rp.oy };
   }
 

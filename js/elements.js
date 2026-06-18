@@ -192,6 +192,7 @@
     w: 1, h: 1,
     ports: [p('S', 0, 0.5, W), p('P', 0.5, 0, N), p('M', 1, 0.5, E)],
     states: null, reversible: false, heatPerOp: 1, bipolarOnly: true,
+    bentPort: 'P', bentCycle: ['P', 'M', 'S'], config: { bent: 'P' },   // which arm sticks out orthogonally (cycles +/−/S)
     portLabels: { S: 'S', P: '+', M: '−' },
     blurb: 'A biased three-way: from the stem, + fluxons go to the + branch and − fluxons to the − branch; a matching fluxon on an arm reflects and a mismatched one crosses to the other arm; nothing returns to the stem. The workhorse router of the real BARCS test circuits (ASC’22) — logically irreversible (the + output can’t tell a stem pass-through from a bounce or a cross), and its bias supply dissipates whenever it pumps a fluxon through, though a fluxon it reflects off its matching arm recoils for free.',
     transition(port, pol, state) {
@@ -213,6 +214,7 @@
     w: 1, h: 1,
     ports: [p('S', 0, 0.5, W), p('P', 0.5, 0, N), p('M', 1, 0.5, E)],
     states: null, reversible: true, heatPerOp: 0, bipolarOnly: true, conjectural: true,
+    bentPort: 'P', bentCycle: ['P', 'M', 'S'], config: { bent: 'P' },   // which arm sticks out orthogonally (cycles +/−/S)
     portLabels: { S: 'S', P: '+', M: '−' },
     blurb: 'CONJECTURAL. A polarity separator biased by trapped flux instead of a power supply — the same trick that made the polarity filter reversible (rPF). Nobody has designed one yet. If it exists, it routes like a PS while dissipating nothing.',
     transition(port, pol, state) {
@@ -366,6 +368,21 @@
     return (rot % 2 === 0) ? { w: type.w, h: type.h } : { w: type.h, h: type.w };
   }
 
+  // Per-instance "bent arm" choice (PS/RPS): cfg.bent names which port sticks out
+  // orthogonally (the other two form the straight line through the cell), while every
+  // port keeps its logical name and routing. Geometrically distinct from rotate/mirror.
+  // Implemented by trading the chosen bent port's slot with the type's naturally-bent
+  // port (type.bentPort). Returns the port object whose GEOMETRY the given port uses.
+  function swappedPort(el, type, port) {
+    const nb = type.bentPort;
+    if (!nb) return port;
+    const bent = (el && el.cfg && el.cfg.bent) || nb;
+    if (bent === nb) return port;                       // natural layout, no remap
+    if (port.name === bent) return type.ports.find(p => p.name === nb) || port;
+    if (port.name === nb) return type.ports.find(p => p.name === bent) || port;
+    return port;
+  }
+
   // Verify injectivity of every state-bearing transition table (sanity check).
   function checkReversibility(typeId, cfg) {
     const t = TYPES[typeId];
@@ -383,6 +400,7 @@
 
   F.TYPES = TYPES;
   F.rotatedPort = rotatedPort;
+  F.swappedPort = swappedPort;
   F.rotatedSize = rotatedSize;
   F.checkReversibility = checkReversibility;
 })();

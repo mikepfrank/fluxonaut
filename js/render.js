@@ -125,7 +125,7 @@
 
   function drawPorts(ctx, el, type, hoverPort, wiredPorts) {
     for (const p of type.ports) {
-      const rp = F.rotatedPort(type, p, el.rot || 0, el.mir);
+      const rp = F.rotatedPort(type, F.swappedPort(el, type, p), el.rot || 0, el.mir);
       const px = (el.x + rp.x) * CELL, py = (el.y + rp.y) * CELL;
       const wired = wiredPorts && wiredPorts.has(el.id + ':' + p.name);
       const hov = hoverPort && hoverPort.el === el.id && hoverPort.port === p.name;
@@ -327,12 +327,15 @@
           const conj = type.id === 'RPS';
           bodyRect(ctx, sz, { edge: conj ? COL.conj : '#7c6440', conj, selected: opts.selected });
           ctx.save(); orient(ctx, el);
-          ctx.strokeStyle = '#6f93bb'; ctx.lineWidth = 1.8;
-          ctx.beginPath(); ctx.moveTo(-14, 0); ctx.lineTo(0, 0); ctx.stroke();
-          ctx.strokeStyle = COL.plus;
-          ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, -13); ctx.stroke();
-          ctx.strokeStyle = COL.minus;
-          ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(13, 0); ctx.stroke();
+          // draw each arm toward its (possibly remapped) slot; the "bent" arm is whichever
+          // cfg.bent picks (default +), the other two form the straight line through the cell.
+          const armCol = { S: '#6f93bb', P: COL.plus, M: COL.minus };
+          for (const nm of ['S', 'P', 'M']) {
+            const ep = F.swappedPort(el, type, type.ports.find(q => q.name === nm));
+            const len = nm === 'S' ? 14 : 13;
+            ctx.strokeStyle = armCol[nm]; ctx.lineWidth = 1.8;
+            ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(ep.ox * len, ep.oy * len); ctx.stroke();
+          }
           ctx.restore();
           if (conj) glyphText(ctx, '?', 10, COL.conj, 12, 12);
           else glyphText(ctx, '⚡', 9, '#ffd16e', -10, 12);
