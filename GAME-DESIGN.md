@@ -135,7 +135,9 @@ geometry only, no behavior change).
 24. *Beyond the Paper* — a zero-heat RFSG using the PR3 and the **conjectural** rPS;
     explicitly past the published frontier.
 
-**Bonus** — 25. *The Boomerang Theorem*: try to peel the evicted token off the control
+**Bonus** — 
+
+25. *The Boomerang Theorem*: try to peel the evicted token off the control
 line with reversible rotaries and twists alone — it always retraces. Only a biased
 circulator catches it, at a heat cost: a genuine open problem, walked by hand.
 
