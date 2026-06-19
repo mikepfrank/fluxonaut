@@ -319,7 +319,7 @@ version of a <b>Duplicator</b> can reduce the two A’s back to a single copy, p
 <br><br>No clock — <b>order</b> is everything. The rDup only accepts <b>M first</b>, so the copy path (out through the SG and back) must run <i>long enough to fall behind</i> the direct M line. Give the final <b>M</b> a generous gap so the earlier pulses settle before it resets the gates.`,
       hint: 'Dup: A→X, M→M, 1→C. Copies XX→SG.Ci; B→SG.I; SG.D→A·B, SG.U→¬A·B. Spent copies SG.Co→rDup.XX; Dup.M→rDup.M; Dup.¬X→rDup.¬X. Out: rDup.X→A OUT, rDup.M→M OUT, rDup.1→1 OUT. Make the SG.Co→rDup loop long so M beats the copies into the rDup.',
       success: `Universal reversible computing, fully assembled: AND and all its garbage computed, then <i>uncomputed</i>, leaving one clean copy of A. That is the 2017 paper’s construction end to end — Landauer’s limit dodged, Bennett’s trick made physical.<br><br>Notice how complicated a construction this is just to get an <b>AND</b>! It suffices to show that asynchronous ballistic reversible computing is <i>universal</i> — but we’d really like to do logic without all those extra constant streams. In the next two worlds, we’ll figure out how to do that, using primitives we can implement in <i>actual</i> superconducting circuits!`,
-      notebook: ['universality'],
+      notebook: ['universality', 'and'],
       fixed: [
         el('L_A', 'LAUNCHER', 1, 2), el('L_M', 'LAUNCHER', 1, 6), el('L_1', 'LAUNCHER', 1, 10), el('L_B', 'LAUNCHER', 1, 13),
         el('dup', 'DUP', 4, 2), el('sg', 'TSG', 11, 6), el('rdup', 'RDUP', 20, 2),
@@ -570,7 +570,7 @@ result — only the ones that actually erase a distinction. The reflections were
 the non-dissipative branch, so burning them would have thrown that gift away. Next
 world, this same pass-or-reflect trick goes fully <b>reversible</b>: the data rail of
 the Controlled Barrier.`,
-      notebook: ['pfg'],
+      notebook: ['pfg', 'landauer'],
       fixed: [
         el('L_in', 'LAUNCHER', 1, 6),
         el('rot', 'ROTARY', 8, 6, 0, { cfg: { ccw: true } }),
@@ -711,7 +711,7 @@ the design the BARCS team simulated with wide margins and sent to the foundry.
 You have rebuilt the actual frontier of reversible computing. One blemish: the biased
 PS cells and circulator still smolder. The papers call replacing them "future work."
 The future is the next level.`,
-      notebook: ['rfsg'],
+      notebook: ['rfsg', 'circulator'],
       fixed: [
         el('cb', 'CB', 11, 6, 0, { state: M }),
         el('L_C', 'LAUNCHER', 1, 8), el('L_D', 'LAUNCHER', 1, 11),
@@ -900,8 +900,10 @@ transition function f(input port &amp; pulse type, state) → (new state, output
 &amp; pulse type), applied once per arriving pulse — with one extra demand:
 f must be <b>injective</b> (one-to-one), so distinct situations never merge. Merging
 would erase information, and erasure costs energy (see Landauer's principle).
-Every element in this game satisfies exactly that condition — you can check the
-tables yourself in the in-game inspector. <i>Ref: ICRC'17, §II.13.</i>`,
+Every <b>reversible</b> element in this game satisfies exactly that condition; select
+any device to read its exact rule. (Later worlds add a few deliberately
+<b>irreversible</b> biased gates — the Polarity Filter, Separator, and Circulator —
+that break injectivity on purpose, and pay heat for it.) <i>Ref: ICRC'17, §II.13.</i>`,
     },
     tcb: {
       title: 'The Toggle Barrier (TCB)',
@@ -1001,11 +1003,15 @@ reversible behaviors waiting for circuits to embody them.`,
       title: 'The Polarity Separator (and its bias bill)',
       body: `A real, simulated circuit (ASC'22): three ports around a loop, with DC
 bias currents that deflect + one way and − the other (the Magnus force on a vortex,
-if you like). It made the lab's test rigs possible. But each routing event draws
-work from the bias supply — measured in simulation at roughly a tenth of the
-fluxon's rest energy — and a biased element isn't time-reversal honest: run it
-backwards and the bias pushes the wrong way. In this game every PS/PFG/Circulator
-operation shows you that cost as sparks.`,
+if you like). It made the lab's test rigs possible. + always exits the + arm, − the
+− arm — a matching fluxon <b>reflects</b> off its arm, a mismatched one
+<b>crosses over</b>, and nothing returns to the stem; that non-injective routing is
+exactly why it's irreversible. The bill comes only when it <b>pumps</b> a fluxon
+through to a different arm — roughly a tenth of the fluxon's rest energy, drawn from
+the bias supply — while a fluxon it merely reflects recoils elastically,
+<b>for free</b>. And it isn't time-reversal honest: run it backwards and the bias
+pushes the wrong way. In this game, PS and PFG spark only on those pump-through
+events; the Circulator, biased on every path, sparks on every pass.`,
     },
     landauer: {
       title: "Landauer's principle",
@@ -1027,6 +1033,16 @@ break the symmetry with permanently trapped flux, like the reversible polarity
 filter does. The BARC memo (2024) lists it as a prime target; no verified JJ design
 exists yet. In this game it works perfectly — consider that a challenge.`,
     },
+    circulator: {
+      title: 'The Circulator (the every-pass toll)',
+      body: `The lab's stand-in for a polarity-blind rotary: DC bias currents shove every
+fluxon one step clockwise around three ports, whatever its sign. That makes it the
+workhorse that routes the data rail of the real Switch Gate — but, unlike a filter or a
+separator, it <i>never</i> simply reflects, so there is no free path through it. Every
+pass is a pump: it draws on the bias supply and sparks. It is the one element here that
+dissipates on <b>every</b> operation — which is exactly why "replace the separators and
+the circulator with something reversible" is the standing wish at the end of the talk.`,
+    },
     comparator: {
       title: 'Reading by asking',
       body: `The probe trick: store the unknown X, then send a known +. The answer
@@ -1043,7 +1059,7 @@ informationally, everything it was — paid in heat. The reversible alternative 
 route unwanted intermediate results <i>back</i>, intact, to whoever can uncompute
 them (Bennett's garbage-collection discipline). Real BARCS test circuits do use
 exhausts — pragmatism has its place on a lab bench — but every exhaust in a design
-is a little flag reading "this part isn't reversible yet." The game's third star
+is a little flag reading "this part isn't reversible yet." The game's heat-par star
 enforces the discipline.`,
     },
     pfg: {
@@ -1072,8 +1088,9 @@ lost track of which port the fluxon came from, and dissipated on every pass. The
 whose polarity matches the barrier is accelerated through; a mismatch is decelerated and
 recoils. Match-pass / mismatch-reflect keeps the entry port recoverable, so the map is
 one-to-one — <b>logically reversible and unpowered</b> (zero heat). The lab asserts such a
-cell is buildable (JJ Workshop ’25), though no standalone design is published; it appears
-only as the data rail of the Controlled Barrier. Couple an rPF to a 2-port memory (RM2) so
+cell is buildable (JJ Workshop ’25), though no standalone design is published; in real hardware it
+appears only as the data rail of the Controlled Barrier (this game lets you place one on
+its own to study it). Couple an rPF to a 2-port memory (RM2) so
 the stored fluxon <i>is</i> the barrier, and you get that universal element.`,
     },
     cb: {
