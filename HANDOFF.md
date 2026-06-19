@@ -1,22 +1,23 @@
 # FLUXONAUT — session handoff notes
 
-For future Claude sessions (or humans) continuing this project. State as of 2026-06-16.
+For future Claude sessions (or humans) continuing this project. State as of 2026-06-18.
 
 ## Status
 
 - Game complete and deployed at **https://fluxonaut.netlify.app** (Netlify drag-and-drop
   of `../fluxonaut-site.zip`, which is rebuilt from runtime files only — no `test/`,
   so no solution spoilers ship).
-- All tests green: `node test/run-tests.mjs` (293 checks: element-table audits, every
+- All tests green: `node test/run-tests.mjs` (356 checks: element-table audits, every
   level certified solvable within element & heat par across 7 jitter seeds, fault rules,
-  per-segment polarity regression) and `node test/smoke-ui.mjs` (105 checks: full UI flow
-  with stubbed DOM).
-- W2·6 "Putting It Together" capstone (full Bennett AND from Dup + SG + rDup) is done
-  on `main`; suite green.
-- Branch `ps-physics-fix` (UNMERGED) applies the correct PS table + a w3l4
-  irreversibility note. It intentionally BREAKS w4l2 (Round Trip Token) and w4l3
-  (Switch Gate For Real), which need redesign with the real lossy PS before merge.
-  See `CLAUDE.md` "Current state / pending work" for the full story.
+  per-segment polarity regression, Landauer merge-law, sandbox coverage) and
+  `node test/smoke-ui.mjs` (116 checks: full UI flow with stubbed DOM).
+- `ps-physics-fix` is now MERGED into `main` (2026-06-18): the corrected lossy PS plus
+  the full World 4 rebuild — new rPF element & level w4l1, redrawn CB symbol, C1/C2
+  control ports, w4l3 (Round Trip) and w4l4 (Switch Gate) rebuilt for the real PS
+  (w4l4 has a self-resetting "twice" case), the PS/RPS +/−/S bent-arm toggle, a
+  complete sandbox, and a regenerated reference gallery. Suite green.
+- Not yet redeployed to Netlify — regenerate the zip from `main` HEAD first.
+- The W2·6 "Putting It Together" capstone (full Bennett AND from Dup + SG + rDup) is done.
 - Michael has playtested through World 3's "Antifluxon"; feedback so far applied:
   picosecond display units (1 cell ≈ 50 µm, ~c/30 ⇒ 16 ps per sim-second), port labels
   on element icons, bottom-edge detector labels drawn beside the element, and

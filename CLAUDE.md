@@ -10,8 +10,8 @@ the domain authority on its physics/CS. Defer to him on conceptual correctness;
 don't treat in-game text as ground truth.
 
 ## Commands
-- Tests (keep green): `node test/run-tests.mjs` (293 checks) and
-  `node test/smoke-ui.mjs` (105 checks).
+- Tests (keep green): `node test/run-tests.mjs` (356 checks) and
+  `node test/smoke-ui.mjs` (116 checks).
 - Render reference solutions to `sols/*.png`: `node test/render-sols.mjs`
   (run `npm i` first — dev dep `@napi-rs/canvas`).
 - Re-route references to obey the wiring rules: `node test/route-solutions.mjs`.
@@ -20,9 +20,12 @@ don't treat in-game text as ground truth.
 
 ## Architecture (load order = index.html)
 - `js/elements.js` — element/device types; each is a reversible Mealy machine
-  `transition(port, pol, state) -> {port, pol, state, heat, absorb}`. Biased
-  elements (PS, PFG, CIRC) are irreversible and cost heat; partial chips
-  (DUP/RDUP) fault on out-of-order arrivals.
+  `transition(port, pol, state) -> {port, pol, state, heat, absorb}`. The biased
+  filter/separator (PFG, PS) and the circulator (CIRC) are irreversible; PFG/PS
+  dissipate only when they PUMP a fluxon through (reflections are free). `rPF` is
+  the reversible, unpowered filter — the CB's data rail, standalone. Partial chips
+  (DUP/RDUP) fault on out-of-order arrivals. PS/RPS have a `cfg.bent` (+/−/S) that
+  picks which arm exits orthogonally — geometry only, distinct from rotate/mirror.
 - `js/engine.js` — deterministic event-driven simulator + `certify` (runs each
   case under 7 jitter seeds; **order must hold, exact timing must not**).
 - `js/levels.js` — `LEVELS`, `SANDBOX`, `NOTEBOOK`: fixed elements, palette,
@@ -42,16 +45,17 @@ don't treat in-game text as ground truth.
   arm labeled "+" is biased to push + fluxons OUT, so it pulls − in and reflects +.)
 
 ## Current state / pending work
-- `main`: the W2·6 "Putting It Together" capstone (full Bennett AND from
-  Dup + SG + rDup) is done; suite green.
-- Branch `ps-physics-fix` (UNMERGED): applies the correct PS table above + a
-  w3l4 irreversibility note. It intentionally BREAKS w4l2 (Round Trip Token) and
-  w4l3 (Switch Gate For Real), which route a fluxon into a PS branch and expect
-  it out the stem — impossible for the real biased PS. Those two need redesign
-  (keep using the real lossy PS, NOT the conjectural rPS) before this branch
-  merges to main. The original game design drifted from the true PS behavior, so
-  the later PS-using puzzles need a careful review.
-- See `TODO.md` for UX-friction items and the planarity (no-crossing) audit.
+- `main`: `ps-physics-fix` is **MERGED** in (2026-06-18). The corrected lossy PS is
+  live and World 4 was rebuilt around it: new rPF element + level w4l1 "The
+  Reversible Barrier"; CB symbol redrawn (RM2 ⊗ rPF coupling lines, no redundant
+  "CB"); CB control ports relabeled C1/C2; w4l3 (Round Trip) and w4l4 (Switch Gate)
+  rebuilt for the real PS (w4l4 has a self-resetting "twice" case); PS/RPS gained
+  the +/−/S bent-arm toggle; the sandbox offers every element (guard-tested);
+  reference gallery regenerated. Suite green.
+- **Not yet deployed**: regenerate the deploy zip from `main` HEAD and drag it to
+  Netlify (zips live in the non-repo `../netlify-zips/`).
+- Open thread: the bonus level w4l6 "The Boomerang Theorem" still wants a
+  standalone review. See `TODO.md` for UX-friction items and the planarity audit.
 
 ## Folder layout
 This git repo is `fluxon-game/`. Its PARENT (`C:\Users\MikeFrank\BARCS\`) also
