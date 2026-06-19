@@ -447,7 +447,7 @@ and no power draw.`,
 simulated circuit from the 2022 paper. From the stem, + goes one branch, − the other.
 But the PS leans on an external <b>bias current</b>, and the bias supply pays a little
 energy <i>every single time</i>. Watch the heat counter when you run —
-those embers are real entropy, the kind Landauer warned us about.`,
+those embers are real entropy, the kind Landauer warned us about.<br><br>And it’s <i>logically</i> irreversible, too: once a fluxon leaves on an output arm, you can’t tell whether it passed straight through from the stem or merely bounced off that arm after arriving from the wrong direction. Two possible histories, one output — the map can’t be run backwards, and that erased information is the heat you just watched accrue.`,
       hint: 'IN → stem. + branch (marked +) → PLUS, − branch → MINUS.',
       success: 'It works — the real chips use it. But four sorted fluxons cost four puffs of waste heat. Surely physics permits better…',
       notebook: ['ps', 'landauer'],
@@ -490,9 +490,12 @@ In this game it’s legal — consider it a glimpse over the horizon.`,
     {
       id: 'w3l6', world: 3, n: 6, title: 'The Comparator', size: { w: 22, h: 13 },
       bipolar: true,
-      intro: `A mystery fluxon X arrives and settles into the memory cell (its eviction
+      intro: `The memory cell returns — now with <b>two ports</b>. This is the <b>RM2</b>
+cell: the same reflect-or-swap rule you learned, but a visitor can knock on <i>either</i>
+side — which is exactly what lets it compare two fluxons.
+<br><br>A mystery fluxon X arrives and settles into the memory cell (its eviction
 notice — the old stored <span class="pol-m">−</span> — pops out; recycle it to TOKEN).
-Then a <span class="pol-p">+</span> probe knocks on the cell’s other port.
+Then a <span class="pol-p">+</span> probe knocks on the cell’s <i>other</i> port.
 <br><br>Think it through: the probe <i>bounces back unchanged</i> if X was +, but
 <i>swaps to −</i> if X was −. The probe’s answer carries X’s value!
 Route + answers to SAME and − answers to DIFF, reversibly.
@@ -590,18 +593,54 @@ the Controlled Barrier.`,
 
     // ════════════════════════════ WORLD 4 — THE UNIVERSAL ELEMENT ════════════════
     {
-      id: 'w4l1', world: 4, n: 1, title: 'The Controlled Barrier', size: { w: 22, h: 13 },
+      id: 'w4l1', world: 4, n: 1, title: 'The Reversible Barrier', size: { w: 22, h: 13 },
       bipolar: true,
-      intro: `Here it is — the discovery the whole program built toward (JJ Workshop, 2025).
-The <b>Controlled Barrier</b>: a two-port memory cell (top rail) magnetically coupled
-to a reversible polarity filter (bottom rail). One device, two personalities:
-<br>• <b>Control rail</b> (K1/K2): the RM rule — match bounces, mismatch swaps.
+      intro: `World 3 closed with a <i>biased</i> filter that forced every polarity one way
+and paid heat to do it. Meet its reversible cousin: the <b>rPF</b> — the data rail of the
+device this whole world is built around.
+<br><br>A <b>trapped flux</b> sets a barrier polarity — no power supply. A fluxon that
+<i>matches</i> the barrier passes straight through; a <i>mismatch</i> bounces straight
+back the way it came. Because it never loses track of which way a fluxon was going, it is
+<b>fully reversible</b> — and the heat meter never twitches.
+<br><br>Set the barrier to <span class="pol-p">+</span>: pass the matching
+<span class="pol-p">+</span> to PASS, and catch the rejected <span class="pol-m">−</span>
+on the rotary for BOUNCE.`,
+      hint: `Place the rPF one cell right of the rotary and set its barrier +. Wire IN → rotary → rPF; a matching + passes out the far side to PASS. A mismatched − reflects back into the rotary and out its top port — send that to BOUNCE.`,
+      success: `Pass-or-reflect by polarity, exactly like the biased filter — but with the
+power supply replaced by a stored flux, the whole gate turns <b>reversible and free</b>:
+zero heat, no information lost. Next, couple this barrier to a memory cell so the memory
+can <i>flip</i> it on command — and you have the universal element.`,
+      notebook: ['rpf'],
+      fixed: [
+        el('L_in', 'LAUNCHER', 1, 6),
+        el('rot', 'ROTARY', 8, 6, 0, { cfg: { ccw: true } }),
+        el('D_pass', 'DETECTOR', 20, 10), el('D_bounce', 'DETECTOR', 20, 2),
+      ],
+      labels: { L_in: 'IN', D_pass: 'PASS', D_bounce: 'BOUNCE' },
+      palette: { RPF: 1 },
+      cases: [
+        { name: 'a match passes', inputs: [{ launcher: 'L_in', pol: P }], expect: { D_pass: [P], D_bounce: [] } },
+        { name: 'a mismatch reflects', inputs: [{ launcher: 'L_in', pol: M }], expect: { D_pass: [], D_bounce: [M] } },
+        { name: 'a mixed stream', inputs: [{ launcher: 'L_in', pol: P }, { launcher: 'L_in', pol: M }, { launcher: 'L_in', pol: P }, { launcher: 'L_in', pol: M }], expect: { D_pass: [P, P], D_bounce: [M, M] } },
+      ],
+      parElements: 1, parHeat: 0,
+    },
+
+    {
+      id: 'w4l2', world: 4, n: 2, title: 'The Controlled Barrier', size: { w: 22, h: 13 },
+      bipolar: true,
+      intro: `Two devices you already know, fused into one (JJ Workshop, 2025). The control
+rail (top) is the <b>RM2</b> memory cell from the Comparator — match bounces, mismatch
+swaps. The data rail (bottom) is the <b>rPF</b> you just met — pass on a match, reflect on
+a mismatch. Magnetically couple them so the RM2’s <i>stored fluxon becomes the rPF’s
+barrier</i>, and you have the <b>Controlled Barrier</b>: the universal element.
+<br>• <b>Control rail</b> (C1/C2): the RM rule — match bounces, mismatch swaps.
 <br>• <b>Data rail</b> (D1/D2): a fluxon <i>passes</i> if its polarity matches the
 stored state, else it <i>reflects</i>. The stored fluxon IS the barrier.
 <br><br>It starts storing <span class="pol-m">−</span>. Open it with a
 <span class="pol-p">+</span> control (catch the evicted token!), then pass data
 through. No control, and data bounces.`,
-      hint: 'Control: launcher → rotary → K1; the evicted − re-enters the rotary → TOKEN. Data: launcher → polarized rotary → D1; bounced + data re-enters it and exits the next port clockwise → BOUNCE; passed data D2 → PASS.',
+      hint: 'Control: launcher → rotary → C1; the evicted − re-enters the rotary → TOKEN. Data: launcher → polarized rotary → D1; bounced + data re-enters it and exits the next port clockwise → BOUNCE; passed data D2 → PASS.',
       success: 'Fully reversible, no bias, good margins in simulation. One element that stores, gates, and switches. Now we make it COMPUTE.',
       notebook: ['cb'],
       fixed: [
@@ -620,7 +659,7 @@ through. No control, and data bounces.`,
     },
 
     {
-      id: 'w4l2', world: 4, n: 2, title: 'Round Trip Token', size: { w: 22, h: 13 },
+      id: 'w4l3', world: 4, n: 3, title: 'Round Trip Token', size: { w: 22, h: 13 },
       bipolar: true,
       intro: `In a real gate, nobody resets the barrier by hand. The published design makes
 the barrier reset <b>itself</b>, with one gorgeous trick:
@@ -629,9 +668,15 @@ Separators then chaperone that token <i>around a long loop</i> and back into the
 far control port — where it swaps back in, re-closing the barrier and ejecting the
 + control out the far side as C-OUT.
 <br><br>While the token is in transit, the barrier stands open: that transit time is
-the gate’s <b>logic window</b>. No clock sets it — wire length does. Build the loop.`,
-      hint: 'PS stems face the CB. Control + enters the left PS’s + branch → stem → K1. Token − : stem → − branch → the long loop → right PS’s − branch → stem → K2. The recovered + leaves stem → + branch → C OUT.',
-      success: 'Open… and shut, all by itself, after exactly one loop-time. You built an asynchronous timer out of pure geometry. The window is open — next, we sneak data through it.',
+the gate’s <b>logic window</b>. No clock sets it — wire length does.
+<br><br>This one is all about the <b>control rail</b> (C1/C2) — the data ports (D1/D2)
+play no part in this level, so leave them be. Build the loop.`,
+      hint: 'Each PS sends + out its + arm and − out its − arm, from any port. Left PS: C IN → stem, + arm → C1; the evicted − comes back into that + arm, crosses to the − arm, and heads up into the loop. Right PS: bend its stem up (the “bent arm” toggle) to catch the returning token — its − arm → C2, its + arm → C OUT. Make the loop long.',
+      success: `Open… and shut, all by itself, after exactly one loop-time. You built an
+asynchronous timer out of pure geometry. The window is open — next, we sneak data through it.
+<br><br>Compare the elegant simplicity of <i>this</i> to the complexity of the
+self-resetting <b>unipolar</b> switch gate — with its forward and reverse pulse
+duplicators — that you wrestled together at the end of World 2. You’ve come a long way.`,
       notebook: ['token'],
       fixed: [
         el('cb', 'CB', 11, 6, 0, { state: M }),
@@ -648,7 +693,7 @@ the gate’s <b>logic window</b>. No clock sets it — wire length does. Build t
     },
 
     {
-      id: 'w4l3', world: 4, n: 3, title: 'The Switch Gate, For Real', size: { w: 22, h: 13 },
+      id: 'w4l4', world: 4, n: 4, title: 'The Switch Gate, For Real', size: { w: 22, h: 13 },
       bipolar: true,
       intro: `Everything converges. The <b>asynchronous Ressler–Feynman Switch Gate</b> —
 the universal reversible logic element, as actually designed at the lab and taped out
@@ -678,14 +723,16 @@ The future is the next level.`,
         { name: 'C=0 D=1', inputs: [{ launcher: 'L_D', pol: P }], expect: { D_cout: [], D_cd: [], D_ncd: [P] }, finalStates: { cb: M } },
         { name: 'C=1 D=0', inputs: [{ launcher: 'L_C', pol: P }], expect: { D_cout: [P], D_cd: [], D_ncd: [] }, finalStates: { cb: M } },
         { name: 'C=0 D=0', inputs: [], expect: { D_cout: [], D_cd: [], D_ncd: [] }, finalStates: { cb: M } },
+        { name: 'C=1 D=1; twice', inputs: [{ launcher: 'L_C', pol: P }, { launcher: 'L_D', pol: P }, { launcher: 'L_C', pol: P, dt: 14 }, { launcher: 'L_D', pol: P }], expect: { D_cout: [P, P], D_cd: [P, P], D_ncd: [] }, finalStates: { cb: M } },
       ],
-      // parHeat 5 (was 8): under the corrected PF/PS physics, fluxons the separators
-      // REFLECT cost nothing; only the pumped-through passes dissipate.
-      parElements: 3, parHeat: 5,
+      // parHeat 10: only the biased PS cells + the circulator dissipate, and the heaviest
+      // case ("twice") runs two self-resetting cycles at 5 heat each. (Under the corrected
+      // physics, fluxons the separators merely REFLECT cost nothing.)
+      parElements: 3, parHeat: 10,
     },
 
     {
-      id: 'w4l4', world: 4, n: 4, title: 'Beyond the Paper', size: { w: 22, h: 13 },
+      id: 'w4l5', world: 4, n: 5, title: 'Beyond the Paper', size: { w: 22, h: 13 },
       bipolar: true,
       intro: `The 2025 talk ends with a wish list, and at the top: <i>"replace the
 polarity separators with some efficient, logically reversible, unpowered element."</i>
@@ -719,7 +766,7 @@ without one — the BARCS bibliography in the Notebook tells you exactly who to 
     },
 
     {
-      id: 'w4l5', world: 4, n: 5, title: 'The Boomerang Theorem', size: { w: 22, h: 13 },
+      id: 'w4l6', world: 4, n: 6, title: 'The Boomerang Theorem', size: { w: 22, h: 13 },
       bonus: true,
       bipolar: true,
       intro: `A bonus puzzle for the theoretically brave. Obvious idea: why conjure a
@@ -730,7 +777,7 @@ path. Always. It’s a theorem: through any network of polarized rotaries and tw
 the token (always opposite in sign to the control, thanks to flux conservation)
 exactly <b>retraces the control’s route</b>. Catch the boomerang at TOKEN — you’ll
 need one biased circulator on the inbound line to do even that.`,
-      hint: 'L → circulator → polarized rotary → K1. The token retraces to the circulator — which, being biased (not polarity-reversible), finally breaks the symmetry and deflects it to TOKEN.',
+      hint: 'L → circulator → polarized rotary → C1. The token retraces to the circulator — which, being biased (not polarity-reversible), finally breaks the symmetry and deflects it to TOKEN.',
       success: `So the obvious fix is provably impossible — polarity-reversible routers
 alone can never separate the token from the control line. THAT is why the rPS (or
 something genuinely new) is required, and why "replace the separators" sits unsolved
@@ -767,7 +814,7 @@ because physics doesn’t take nights off.`,
     palette: {
       LAUNCHER: 6, DETECTOR: 6, REFLECTOR: 8, IREFLECTOR: 4, NOT: 8, ROTARY: 8,
       FD: 4, TCB: 4, TSG: 3, RM1: 4, RM2: 4, BSR: 6, PS: 4, PR3: 6, CIRC: 4,
-      PFG: 4, RPS: 4, CB: 3, EXHAUST: 4,
+      PFG: 4, RPF: 4, RPS: 4, CB: 3, DUP: 2, RDUP: 2, EXHAUST: 4,
     },
     cases: [],
     parElements: Infinity, parHeat: Infinity,
@@ -1009,6 +1056,18 @@ path, only on all-but-one of those that collide on a shared result. The 2022 pap
 presents the filter first, then generalizes it into the three-port Polarity Separator;
 its reversible cousin, biased by trapped flux instead of a power rail, is the data rail
 of the Controlled Barrier in World 4.`,
+    },
+    rpf: {
+      title: 'The reversible Polarity Filter (rPF)',
+      body: `The biased Polarity Filter forced a polarity one way using a DC power supply,
+lost track of which port the fluxon came from, and dissipated on every pass. The
+<b>rPF</b> swaps that power supply for a <b>trapped flux</b> that sets a barrier: a fluxon
+whose polarity matches the barrier is accelerated through; a mismatch is decelerated and
+recoils. Match-pass / mismatch-reflect keeps the entry port recoverable, so the map is
+one-to-one — <b>logically reversible and unpowered</b> (zero heat). The lab asserts such a
+cell is buildable (JJ Workshop ’25), though no standalone design is published; it appears
+only as the data rail of the Controlled Barrier. Couple an rPF to a 2-port memory (RM2) so
+the stored fluxon <i>is</i> the barrier, and you get that universal element.`,
     },
     cb: {
       title: 'The Controlled Barrier (the universal element)',

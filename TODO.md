@@ -41,8 +41,8 @@ of the bundled reference solutions found 16/22 already planar; the Twist level
 (w3l1 Antifluxon) is planar — its conductor swap is internal to the element, not
 a drawn wire. These 6 reference solutions currently cross wires:
 w2l1 Gatekeeper (1), w2l3 Merge Lanes (1), w2l5 AND Finally (3),
-w4l2 Round Trip Token (1), w4l3 The Switch Gate For Real (1),
-w4l4 Beyond the Paper (1).
+w4l3 Round Trip Token (1), w4l4 The Switch Gate For Real (1),
+w4l5 Beyond the Paper (1).
 
 TODO: during playtest, determine which of these 6 actually have planar solutions
 (expected: most/all, since the BARCS research respected planarity except where

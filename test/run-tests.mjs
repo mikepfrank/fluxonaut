@@ -28,7 +28,7 @@ console.log('Element table audit:');
 for (const id of Object.keys(F.TYPES)) {
   const t = F.TYPES[id];
   const inj = F.checkReversibility(id);
-  if (id === 'PFG') check(`${id} is non-injective (genuinely irreversible)`, !inj);
+  if (id === 'PFG' || id === 'PS') check(`${id} is non-injective (genuinely irreversible)`, !inj);
   else check(`${id} transition table is injective`, inj);
   // exactly one output pulse per input pulse (unless absorber)
   const states = t.states || [null];
@@ -56,6 +56,13 @@ for (const id of Object.keys(F.TYPES)) {
     if (a.port !== b.port || a.pol !== -b.pol || a.state !== -b.state) fsym = false;
   }
   check('CB obeys flux-negation symmetry', fsym);
+}
+
+// Sandbox must offer EVERY defined element (placeable + I/O), so the free bench can
+// build anything. Guards against forgetting a newly-added element (e.g. rPF).
+console.log('\nSandbox palette coverage:');
+for (const id of Object.keys(F.TYPES)) {
+  check(`sandbox palette includes ${id}`, id in F.SANDBOX.palette, '(add it to SANDBOX.palette)');
 }
 
 // Dissipation consistency (Landauer / merge law). Heat is each device's OWN property
@@ -102,7 +109,7 @@ function buildCircuit(level, solution) {
   for (const e of (solution.place || [])) {
     const t = F.TYPES[e.type];
     elements.push({
-      id: e.id, type: e.type, x: e.x, y: e.y, rot: e.rot || 0,
+      id: e.id, type: e.type, x: e.x, y: e.y, rot: e.rot || 0, mir: !!e.mir,
       state: 'state' in e ? e.state : (t.states ? t.defaultState : null),
       cfg: e.cfg ? { ...e.cfg } : (t.config ? { ...t.config } : undefined),
     });

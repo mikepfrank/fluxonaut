@@ -267,6 +267,16 @@
         class: 'mini', onclick: () => { el.cfg = el.cfg || {}; el.cfg.bias = -(el.cfg.bias || 1); SFX.toggle(); renderInspector(); },
       }, 'bias: ' + ((el.cfg && el.cfg.bias) === -1 ? '−' : '+')));
     }
+    if (t.bentCycle && !el.locked) {
+      const lab = { P: '+', M: '−', S: 'S' }, cur = (el.cfg && el.cfg.bent) || t.bentPort;
+      box.append(h('button', {
+        class: 'mini', title: 'which arm bends out (orthogonal to the other two)', onclick: () => {
+          el.cfg = el.cfg || {};
+          const cyc = t.bentCycle, i = cyc.indexOf(el.cfg.bent || t.bentPort);
+          el.cfg.bent = cyc[(i + 1) % cyc.length]; SFX.toggle(); renderInspector();
+        },
+      }, 'bent arm: ' + (lab[cur] || cur)));
+    }
     if (t.states && t.playerSettable && !el.stateLocked) {
       box.append(h('button', {
         class: 'mini', onclick: () => {
@@ -496,7 +506,7 @@
     for (const el of app.elements) {
       const t = F.TYPES[el.type];
       for (const p of t.ports) {
-        const rp = F.rotatedPort(t, p, el.rot || 0, el.mir);
+        const rp = F.rotatedPort(t, F.swappedPort(el, t, p), el.rot || 0, el.mir);
         const px = el.x + rp.x, py = el.y + rp.y;
         if (Math.hypot(px - x, py - y) < 0.34) return { el: el.id, port: p.name, x: px, y: py, ox: rp.ox, oy: rp.oy };
       }

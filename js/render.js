@@ -125,7 +125,7 @@
 
   function drawPorts(ctx, el, type, hoverPort, wiredPorts) {
     for (const p of type.ports) {
-      const rp = F.rotatedPort(type, p, el.rot || 0, el.mir);
+      const rp = F.rotatedPort(type, F.swappedPort(el, type, p), el.rot || 0, el.mir);
       const px = (el.x + rp.x) * CELL, py = (el.y + rp.y) * CELL;
       const wired = wiredPorts && wiredPorts.has(el.id + ':' + p.name);
       const hov = hoverPort && hoverPort.el === el.id && hoverPort.port === p.name;
@@ -309,16 +309,33 @@
           glyphText(ctx, '⚡', 9, '#ffd16e', 0, 12);
           break;
         }
+        case 'RPF': {
+          bodyRect(ctx, sz, { edge: '#4f7ec2', selected: opts.selected });
+          // The barrier sits on the port axis and rotates WITH the element, so it always
+          // connects the two ports; its colored center is the trapped-flux barrier (by
+          // stored polarity) that a matching fluxon crosses and a mismatch reflects.
+          ctx.save(); orient(ctx, el);
+          ctx.strokeStyle = '#6f93bb'; ctx.lineWidth = 1.8;
+          ctx.beginPath(); ctx.moveTo(-15, 0); ctx.lineTo(-6, 0); ctx.moveTo(6, 0); ctx.lineTo(15, 0); ctx.stroke();
+          ctx.strokeStyle = polColor(state); ctx.lineWidth = 2.8;
+          ctx.beginPath(); ctx.moveTo(-6, 0); ctx.lineTo(6, 0); ctx.stroke();
+          ctx.restore();
+          glyphText(ctx, 'rPF', 8.5, '#9fd2ff', 0, -12);
+          break;
+        }
         case 'PS': case 'RPS': {
           const conj = type.id === 'RPS';
           bodyRect(ctx, sz, { edge: conj ? COL.conj : '#7c6440', conj, selected: opts.selected });
           ctx.save(); orient(ctx, el);
-          ctx.strokeStyle = '#6f93bb'; ctx.lineWidth = 1.8;
-          ctx.beginPath(); ctx.moveTo(-14, 0); ctx.lineTo(0, 0); ctx.stroke();
-          ctx.strokeStyle = COL.plus;
-          ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, -13); ctx.stroke();
-          ctx.strokeStyle = COL.minus;
-          ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(13, 0); ctx.stroke();
+          // draw each arm toward its (possibly remapped) slot; the "bent" arm is whichever
+          // cfg.bent picks (default +), the other two form the straight line through the cell.
+          const armCol = { S: '#6f93bb', P: COL.plus, M: COL.minus };
+          for (const nm of ['S', 'P', 'M']) {
+            const ep = F.swappedPort(el, type, type.ports.find(q => q.name === nm));
+            const len = nm === 'S' ? 14 : 13;
+            ctx.strokeStyle = armCol[nm]; ctx.lineWidth = 1.8;
+            ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(ep.ox * len, ep.oy * len); ctx.stroke();
+          }
           ctx.restore();
           if (conj) glyphText(ctx, '?', 10, COL.conj, 12, 12);
           else glyphText(ctx, '⚡', 9, '#ffd16e', -10, 12);
@@ -334,11 +351,13 @@
           ctx.fillStyle = polColor(state);
           ctx.beginPath(); ctx.arc(0, -22, 6, 0, 7); ctx.fill();
           glyphText(ctx, state === 1 ? '+' : '−', 10, '#08131f', 0, -21.5);
-          // coupling
-          ctx.strokeStyle = 'rgba(159,210,255,0.5)'; ctx.lineWidth = 1.2;
-          ctx.setLineDash([2, 3]);
-          ctx.beginPath(); ctx.moveTo(0, -10); ctx.lineTo(0, 10); ctx.stroke();
-          ctx.setLineDash([]);
+          // coupling: two short parallel horizontal lines (the mutual-inductance /
+          // transformer glyph — the RM2's stored flux inductively biasing the rPF barrier)
+          ctx.strokeStyle = 'rgba(159,210,255,0.8)'; ctx.lineWidth = 1.6;
+          ctx.beginPath();
+          ctx.moveTo(-10, -3); ctx.lineTo(10, -3);
+          ctx.moveTo(-7, 3); ctx.lineTo(7, 3);
+          ctx.stroke();
           // data rail (bottom): barrier, open for matching polarity
           ctx.strokeStyle = '#6f93bb'; ctx.lineWidth = 2;
           ctx.beginPath(); ctx.moveTo(-36, 22); ctx.lineTo(-7, 22); ctx.moveTo(7, 22); ctx.lineTo(36, 22); ctx.stroke();
@@ -348,7 +367,6 @@
           glyphText(ctx, state === 1 ? '+ passes' : '− passes', 8.5, COL.dim, 0, 33);
           ctx.restore();
           ctx.restore();
-          glyphText(ctx, 'CB', 11, '#9fd2ff', 0, 1);
           break;
         }
         case 'DUP': case 'RDUP': {

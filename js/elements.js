@@ -136,6 +136,18 @@
     },
   });
 
+  def({
+    id: 'RPF', name: 'Reversible Filter (rPF)', glyph: 'rPF',
+    w: 1, h: 1, ports: [p('A', 0, 0.5, W), p('B', 1, 0.5, E)],
+    states: [1, -1], defaultState: 1, stateIsPolarity: true, playerSettable: true,
+    reversible: true, heatPerOp: 0, bipolarOnly: true,
+    blurb: 'The reversible Polarity Filter — the unbiased cousin of the biased PF. A trapped flux sets a barrier polarity: a fluxon whose polarity MATCHES the barrier passes straight through; a mismatch reflects straight back the way it came. The entry port is never lost, so it is fully reversible and dissipates nothing — no power supply. This is the data rail of the Controlled Barrier. (JJ Workshop ’25.)',
+    transition(port, pol, state) {
+      if (pol === state) return { port: port === 'A' ? 'B' : 'A', pol, state };  // match → pass through
+      return { port, pol, state };                                                // mismatch → reflect (same port)
+    },
+  });
+
   // ===========================================================================
   // 3-PORT ELEMENTS  (unrotated: A=W stem/first, B=N, C=E)
   // ===========================================================================
@@ -180,17 +192,19 @@
     w: 1, h: 1,
     ports: [p('S', 0, 0.5, W), p('P', 0.5, 0, N), p('M', 1, 0.5, E)],
     states: null, reversible: false, heatPerOp: 1, bipolarOnly: true,
+    bentPort: 'P', bentCycle: ['P', 'M', 'S'], config: { bent: 'P' },   // which arm sticks out orthogonally (cycles +/−/S)
     portLabels: { S: 'S', P: '+', M: '−' },
-    blurb: 'A biased three-way: from the stem, + fluxons go to the + branch and − fluxons to the − branch; matching fluxons on a branch are passed to the stem. The workhorse router of the real BARCS test circuits (ASC’22) — its bias supply dissipates whenever it pumps a fluxon through, but a fluxon it reflects off a branch recoils for free.',
+    blurb: 'A biased three-way: from the stem, + fluxons go to the + branch and − fluxons to the − branch; a matching fluxon on an arm reflects and a mismatched one crosses to the other arm; nothing returns to the stem. The workhorse router of the real BARCS test circuits (ASC’22) — logically irreversible (the + output can’t tell a stem pass-through from a bounce or a cross), and its bias supply dissipates whenever it pumps a fluxon through, though a fluxon it reflects off its matching arm recoils for free.',
     transition(port, pol, state) {
-      let out;
-      if (port === 'S') out = (pol === 1) ? 'P' : 'M';        // stem: + → +arm, − → −arm
-      else if (port === 'P') out = (pol === 1) ? 'S' : 'P';   // +arm: + passes to stem, − reflects
-      else out = (pol === -1) ? 'S' : 'M';                    // −arm: − passes to stem, + reflects
-      // This device's dissipative set: it pays only when it pumps a fluxon through to
-      // a different port; reflecting a fluxon off a branch stays on the supercurrent
-      // branch and costs ~nothing. (A per-device property — not a universal law; the
-      // Landauer merge-check in the test suite validates the heat flags are consistent.)
+      // Biased: the bias always pushes + out the + arm and − out the − arm, whatever
+      // port the fluxon enters — a matching fluxon reflects, a mismatched one crosses
+      // over, and nothing returns to the stem. Non-injective (a + leaving the + arm could
+      // have passed from the stem, reflected, or crossed), hence logically irreversible.
+      const out = (pol === 1) ? 'P' : 'M';
+      // This device's dissipative set: it pays only when it pumps a fluxon through to a
+      // different port; a matching fluxon reflecting off its arm (out === entry port)
+      // stays on the supercurrent branch and is free. (Per-device property — not a
+      // universal law; the Landauer merge-check in the test suite validates the flags.)
       return { port: out, pol, state, heat: out === port ? 0 : 1 };
     },
   });
@@ -200,6 +214,7 @@
     w: 1, h: 1,
     ports: [p('S', 0, 0.5, W), p('P', 0.5, 0, N), p('M', 1, 0.5, E)],
     states: null, reversible: true, heatPerOp: 0, bipolarOnly: true, conjectural: true,
+    bentPort: 'P', bentCycle: ['P', 'M', 'S'], config: { bent: 'P' },   // which arm sticks out orthogonally (cycles +/−/S)
     portLabels: { S: 'S', P: '+', M: '−' },
     blurb: 'CONJECTURAL. A polarity separator biased by trapped flux instead of a power supply — the same trick that made the polarity filter reversible (rPF). Nobody has designed one yet. If it exists, it routes like a PS while dissipating nothing.',
     transition(port, pol, state) {
@@ -265,7 +280,7 @@
     ],
     states: [1, -1], defaultState: -1, stateIsPolarity: true, playerSettable: true,
     reversible: true, heatPerOp: 0, bipolarOnly: true,
-    portLabels: { K1: 'K1', K2: 'K2', D1: 'D1', D2: 'D2' },
+    portLabels: { K1: 'C1', K2: 'C2', D1: 'D1', D2: 'D2' },
     blurb: 'THE universal BARCS element (JJ Workshop ’25): a two-port memory cell (top rail) magnetically coupled to a reversible polarity filter (bottom rail). Control rule: match ⇒ reflect, mismatch ⇒ exchange (stored fluxon ejected out the same port). Data rule: a fluxon whose polarity MATCHES the stored state passes; otherwise it reflects. Fully reversible.',
     transition(port, pol, state) {
       if (port === 'K1' || port === 'K2') {
@@ -353,6 +368,22 @@
     return (rot % 2 === 0) ? { w: type.w, h: type.h } : { w: type.h, h: type.w };
   }
 
+  // Per-instance "bent arm" choice (PS/RPS): cfg.bent names which port sticks out
+  // orthogonally (the other two form the straight line through the cell), while every
+  // port keeps its logical name and routing. Geometrically distinct from rotate/mirror.
+  // Implemented by trading the chosen bent port's slot with the type's naturally-bent
+  // port (type.bentPort). Returns the port object whose GEOMETRY the given port uses.
+  // (Want the +/− on the straight line the other way round? Use mirror/flip.)
+  function swappedPort(el, type, port) {
+    const nb = type.bentPort;
+    if (!nb) return port;
+    const bent = (el && el.cfg && el.cfg.bent) || nb;
+    if (bent === nb) return port;                       // natural layout, no remap
+    if (port.name === bent) return type.ports.find(p => p.name === nb) || port;
+    if (port.name === nb) return type.ports.find(p => p.name === bent) || port;
+    return port;
+  }
+
   // Verify injectivity of every state-bearing transition table (sanity check).
   function checkReversibility(typeId, cfg) {
     const t = TYPES[typeId];
@@ -370,6 +401,7 @@
 
   F.TYPES = TYPES;
   F.rotatedPort = rotatedPort;
+  F.swappedPort = swappedPort;
   F.rotatedSize = rotatedSize;
   F.checkReversibility = checkReversibility;
 })();
