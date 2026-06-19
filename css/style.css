@@ -166,6 +166,32 @@ h1 { font-size: 54px; letter-spacing: 12px; font-weight: 200; color: #e8f4ff;
 .nb-body a:visited, .bib-entry a:visited { color: #c9a9ff; }   /* clicked:   pastel lavender */
 .nb-body a:hover,   .bib-entry a:hover   { color: #bcdcff; text-decoration: underline; }
 
+/* notebook unlock cues: toolbar dot, NEW badge, and the top "new page" toast */
+#btn-notebook { position: relative; }
+#btn-notebook.has-unread::after {
+  content: ''; position: absolute; top: 1px; right: 1px;
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--gold); border: 1.5px solid var(--panel);
+  box-shadow: 0 0 8px var(--gold); animation: nb-pulse 1.6s ease-in-out infinite;
+}
+@keyframes nb-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
+.nb-new {
+  display: inline-block; margin-left: 8px; padding: 0 6px;
+  font-size: 10px; font-weight: 700; letter-spacing: .05em; line-height: 1.6;
+  color: #1a1206; background: var(--gold); border-radius: 4px; vertical-align: middle;
+}
+#nb-toast {
+  position: fixed; top: 14px; left: 50%; z-index: 45;
+  transform: translateX(-50%) translateY(-16px);
+  max-width: 92vw; padding: 11px 20px; border-radius: 10px;
+  background: rgba(58, 47, 18, 0.96); border: 1px solid #8a6f2f; color: var(--gold);
+  font-size: 14.5px; font-weight: 600; box-shadow: 0 8px 30px rgba(0, 0, 0, .5);
+  cursor: pointer; opacity: 0; pointer-events: none;
+  transition: opacity .35s ease, transform .35s ease;
+}
+#nb-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+#nb-toast .nb-toast-cue { color: var(--text); font-weight: 400; font-size: 13px; margin-left: 6px; opacity: .92; }
+
 @media (max-width: 900px) {
   #game-main { flex-direction: column; }
   #palette { width: 100%; flex-direction: row; flex-wrap: wrap; }

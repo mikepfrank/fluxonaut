@@ -13,6 +13,7 @@
   let progress = store.load();           // { levels: {id:{stars, done}}, notebook: [ids], muted }
   progress.levels = progress.levels || {};
   progress.notebook = progress.notebook || [];
+  progress.notebookUnread = progress.notebookUnread || [];
 
   // ───────────────────────── sound ─────────────────────────
   let actx = null;
@@ -157,19 +158,47 @@
     app.caseDone = {}; app._tabSig = null;
     app.hintShown = false; app.hintUsed = false;
     app.particles = []; app.banner = null;
-    unlockNotebook(lv.notebook);
+    const newPages = unlockNotebook(lv.notebook);
     showScreen('game');
     buildGameChrome();
     renderHintBar();
     renderBriefing();
     sizeCanvas();
+    updateNotebookBadge();
+    if (newPages.length) showNotebookToast(newPages.length);
   }
 
   function unlockNotebook(ids) {
-    let changed = false;
-    for (const id of (ids || [])) if (!progress.notebook.includes(id)) { progress.notebook.push(id); changed = true; }
-    if (changed) store.save(progress);
+    const added = [];
+    for (const id of (ids || [])) if (!progress.notebook.includes(id)) { progress.notebook.push(id); added.push(id); }
+    if (added.length) {
+      progress.notebookUnread = (progress.notebookUnread || []).concat(added);
+      store.save(progress);
+    }
+    return added;
   }
+  // The toolbar 📓 button shows a dot while newly-unlocked pages are still unread.
+  function updateNotebookBadge() {
+    const b = $('#btn-notebook');
+    if (b && b.classList) b.classList.toggle('has-unread', (progress.notebookUnread || []).length > 0);
+  }
+  // A temporary top-of-screen prompt the first time a level reveals new page(s).
+  function showNotebookToast(n) {
+    if (typeof document === 'undefined') return;
+    let t = $('#nb-toast');
+    if (!t) {
+      t = h('div', { id: 'nb-toast', onclick: () => { hideNotebookToast(); showNotebook(); } });
+      if (document.body) document.body.appendChild(t);
+    }
+    t.innerHTML = `📓 New Lab Notebook ${n > 1 ? 'pages' : 'page'} unlocked! ` +
+      `<span class="nb-toast-cue">Tap the 📓 (top-right) to read ${n > 1 ? 'them' : 'it'} — free, no hint penalty.</span>`;
+    t.classList.add('show');
+    clearTimeout(app._nbToastTimer);
+    const timer = setTimeout(hideNotebookToast, 6000);
+    if (timer && timer.unref) timer.unref();   // don't keep the headless test process alive
+    app._nbToastTimer = timer;
+  }
+  function hideNotebookToast() { const t = $('#nb-toast'); if (t && t.classList) t.classList.remove('show'); }
 
   function placedCount() {
     return app.elements.filter(e => e.placed).length;
@@ -830,16 +859,22 @@
   function closeModal() { $('#modal').classList.add('hidden'); }
 
   function showNotebook() {
+    hideNotebookToast();
     const m = $('#modal'); m.classList.remove('hidden');
     const box = $('#modal-box'); box.innerHTML = '';
     box.append(h('h2', {}, '📓 Lab Notebook'));
     const wrap = h('div', { class: 'notebook' });
+    const unread = new Set(progress.notebookUnread || []);
     const order = Object.keys(F.NOTEBOOK);
     let shown = 0;
     for (const id of order) {
       const entry = F.NOTEBOOK[id];
       if (progress.notebook.includes(id) || id === 'refs') {
-        wrap.append(h('details', {}, h('summary', {}, entry.title), h('div', { class: 'nb-body', html: entry.body })));
+        const isNew = unread.has(id);
+        const summary = isNew
+          ? h('summary', {}, entry.title, h('span', { class: 'nb-new' }, 'NEW'))
+          : h('summary', {}, entry.title);
+        wrap.append(h('details', isNew ? { open: '' } : {}, summary, h('div', { class: 'nb-body', html: entry.body })));
         shown++;
       } else {
         wrap.append(h('details', { class: 'locked' }, h('summary', {}, '🔒 ' + entry.title)));
@@ -848,6 +883,8 @@
     box.append(h('p', { class: 'dim' }, `${shown} of ${order.length} entries unlocked — keep playing to fill the notebook.`));
     box.append(wrap);
     box.append(h('div', { class: 'modal-btns' }, h('button', { class: 'big primary', onclick: closeModal }, 'Close')));
+    // everything currently unlocked has now been seen
+    if ((progress.notebookUnread || []).length) { progress.notebookUnread = []; store.save(progress); updateNotebookBadge(); }
   }
 
   function showReferences() {
