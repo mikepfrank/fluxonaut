@@ -82,6 +82,11 @@ real-world implementation status shown in the Notebook.
 F-symmetry note: bipolar stateful elements obey flux-negation symmetry
 (negate all pulse polarities and internal states ⇒ same behavior), per ICRC'22.
 
+Player config (Inspector): any placed element can be rotated (R) and mirrored (F);
+some carry an extra toggle — rotary direction (CW/CCW), filter/separator bias sign,
+and the PS/rPS **bent-arm** selector (which of the +/−/stem arms exits orthogonally —
+geometry only, no behavior change).
+
 ## 4. Level progression (4 worlds + bonus + sandbox)
 
 **World 1 — Ballistic Bootcamp** (unary pulses)
