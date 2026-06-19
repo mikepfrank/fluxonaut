@@ -10,7 +10,7 @@ For future Claude sessions (or humans) continuing this project. State as of 2026
 - All tests green: `node test/run-tests.mjs` (356 checks: element-table audits, every
   level certified solvable within element & heat par across 7 jitter seeds, fault rules,
   per-segment polarity regression, Landauer merge-law, sandbox coverage) and
-  `node test/smoke-ui.mjs` (116 checks: full UI flow with stubbed DOM).
+  `node test/smoke-ui.mjs` (117 checks: full UI flow with stubbed DOM).
 - `ps-physics-fix` is now MERGED into `main` (2026-06-18): the corrected lossy PS plus
   the full World 4 rebuild — new rPF element & level w4l1, redrawn CB symbol, C1/C2
   control ports, w4l3 (Round Trip) and w4l4 (Switch Gate) rebuilt for the real PS
@@ -23,34 +23,35 @@ For future Claude sessions (or humans) continuing this project. State as of 2026
   on element icons, bottom-edge detector labels drawn beside the element, and
   per-segment pulse polarity so color flips at twists/RM/BSR (with a flash ring).
 
-## Pending — resume here (mid-session 2026-06-18)
-World 4 redesign is DONE and merged to `main` (pushed). Suite green 356 + 116. Open items:
+## Pending — resume here (2026-06-18)
+World 4 polish is DONE and pushed to `origin/main` (commits 4f70cc8, d0f3792, 98849f0,
+3c2e355, + this HANDOFF). Suite green 356 + 117.
 
-1. **w4l5 "Beyond the Paper" — add the self-reset case (NOT yet done; Michael asked).**
-   Mirror what w4l4 got: in its intro change "**same four schedules**" → "**same five
-   schedules**", and append a 5th case to its `cases` array:
-   `{ name: 'C=1 D=1; twice', inputs: [{launcher:'L_C',pol:P},{launcher:'L_D',pol:P},{launcher:'L_C',pol:P,dt:14},{launcher:'L_D',pol:P}], expect: { D_cout:[P,P], D_cd:[P,P], D_ncd:[] }, finalStates:{ cb:M } }`
-   w4l5 is the ZERO-heat version (rPS+PR3+RM2+NOT), so parHeat stays 0 (twice is still 0
-   heat). Re-run `node test/run-tests.mjs` to confirm; the w4l5 reference solution should
-   already pass it (same loop topology as w4l4). Compare to how w4l4's case was added.
+DONE this session
+- w4l5 reference solution re-tidied with the rPS bent-port selector (psL mir+bent='M',
+  psR bent='M') — fully planar, 0 wire crossings, still certifies at heat 0.
+- w4l5 gained the self-reset "C=1 D=1, twice" case; w4l4's same case renamed to match
+  (comma, not semicolon); both intros reworded to a coherent "five schedules" (four logic
+  cases + one fired twice to prove self-reset).
+- Palette fix (Michael spotted stray elements): w4l5 trimmed to its real set `{RPS:2, PR3:1}`
+  (it had carried surplus PR3/RM2/NOT); the rotary + twists moved to w4l6 "Boomerang" so
+  players can experiment toward the theorem → `{CIRC:1, PR3:1, NOT:2}`.
+- w4l6 success text rescoped to rotaries+twists, dropping "provably impossible" (intro/hint/
+  notebook were already correctly scoped). Mechanics/solution unchanged.
 
-2. **Boomerang Theorem (w4l6) — analysis done, prose fix pending (Michael to discuss).**
-   Full verdict in `../notes/boomerang-theorem-analysis.md` (+ per-agent audit in
-   `../notes/world4-research/boomerang-*.md`). Bottom line: the narrow PR3+NOT theorem is
-   VALID; but the w4l6 **success text** + `boomerang` notebook OVER-CLAIM ("provably
-   impossible"). The unbiased ROTARY peels the token off **reversibly at zero heat**
-   (engine-verified) — the impossibility is a *realizability* gap (no JJ rotary), not logic,
-   and the real papers call it open *future work*. FIX = prose only (scope to PR3+twists, add
-   the realizability caveat, drop "provably impossible"); leave mechanics/solution alone.
-   Suggested rewordings are in the notes file. Likely why "players solved it": a ROTARY in
-   the Sandbox builds a free token loop (w4l6 itself is fine — palette `{CIRC:1}` forces it).
+KEY FINDING — see the erratum atop `../notes/boomerang-theorem-analysis.md`. An exhaustive
+circulator-free wiring sweep (1.67M wirings) found that an **RM2 memory cell** enables a robust,
+geometry-independent, **zero-heat** peel of the token — so RM2 was deliberately kept OUT of the
+w4l6 palette (the PR3+NOT-only space re-verified safe: 0 wins). The notes' old "2-port can't peel"
+topology-wall claim was corrected. The RM2 peel only *defers* the cost (the cell ends flipped —
+Bennett debt), so whether it's a genuine reversible separator is a real open question for Michael;
+intentionally left out of the player-facing text. The narrow PR3+NOT Boomerang theorem stands.
 
-3. **Deploy** — live Netlify site is still the OLD build. Regenerate the zip from `main` HEAD
+TODO
+1. **Deploy** — live Netlify site is still the OLD build. Regenerate the zip from `main` HEAD
    (`git archive HEAD index.html README.md GAME-DESIGN.md css js -o ../netlify-zips/...zip`)
    and drag it to Netlify. Zips live in non-repo `../netlify-zips/`.
-
-4. **`ps-physics-fix` branch** — merged into `main`; its remote is stale (6 behind). Harmless;
-   delete (local + remote) or leave, Michael's call.
+2. **`ps-physics-fix` branch** — merged into `main`; its remote is stale. Harmless; delete or leave.
 
 ## Architecture (see GAME-DESIGN.md and README.md first)
 
