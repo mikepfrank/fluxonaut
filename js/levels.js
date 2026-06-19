@@ -780,10 +780,13 @@ the token (always opposite in sign to the control, thanks to flux conservation)
 exactly <b>retraces the control’s route</b>. Catch the boomerang at TOKEN — you’ll
 need one biased circulator on the inbound line to do even that.`,
       hint: 'L → circulator → polarized rotary → C1. The token retraces to the circulator — which, being biased (not polarity-reversible), finally breaks the symmetry and deflects it to TOKEN.',
-      success: `So the obvious fix is provably impossible — polarity-reversible routers
-alone can never separate the token from the control line. THAT is why the rPS (or
-something genuinely new) is required, and why "replace the separators" sits unsolved
-in the literature. You’ve just walked the actual argument. Welcome to research.`,
+      success: `So with polarized rotaries and twists alone, the token can’t be peeled
+off the control line — every such network just sends it straight back, exactly as you
+proved by trying. Only a biased element, like the circulator you used, breaks that
+symmetry, and it pays for the privilege in heat. THAT gap — a reversible, unpowered
+separator (the rPS, or something genuinely new) — is what "replace the separators"
+means, and why it sits unsolved in the literature. You’ve just walked the actual
+argument. Welcome to research.`,
       notebook: ['boomerang'],
       fixed: [
         el('cb', 'CB', 12, 6, 0, { state: M }),
