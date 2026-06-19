@@ -703,7 +703,8 @@ if the barrier is open (C arrived), data passes the CB and exits <b>C·D</b>; if
 it bounces back through the circulator to <b>C̄·D</b>. The token re-shuts the door
 behind itself and the spent control exits C-OUT. AND and NAND from one gate — and the
 data fluxon must catch the logic window in flight.
-<br><br>Four test schedules. This is the published milestone. Build it.`,
+<br><br>Five test schedules — four logic cases, then one fired twice over to prove
+the gate resets itself. This is the published milestone. Build it.`,
       hint: 'Token loop exactly as before; keep the data paths short and the loop long, so data always beats the token under timing wobble. Circulator: D-IN → A, B → D1; bounced data re-enters B and exits C → C̄·D.',
       success: `That circuit — the one running on your screen — is, give or take a wire,
 the design the BARCS team simulated with wide margins and sent to the foundry.
@@ -740,8 +741,8 @@ Nobody has designed one. Tonight, the lab is yours, and hypotheses are free.
 <br><br>On your bench: the <b>rPS</b> — a <span class="conj">CONJECTURAL</span>
 separator biased by trapped flux instead of a power supply, the same trick that made
 the polarity filter reversible. And the Polarized Rotary you already trust.
-<br><br>Same gate. Same five schedules. <b>Zero heat.</b> Step past the edge of the
-literature.`,
+<br><br>Same gate, same five schedules — now at <b>zero heat</b>. Step past the edge
+of the literature.`,
       hint: 'Swap each PS for an rPS, and the circulator for a Polarized Rotary (+ data circulates clockwise both coming and going). The topology you built last level is already right.',
       success: `Silence in the heat meter. A universal reversible logic gate, end to end,
 with nothing burned anywhere — contingent on one circuit nobody has designed yet.
@@ -755,7 +756,7 @@ without one — the BARCS bibliography in the Notebook tells you exactly who to 
         el('D_cout', 'DETECTOR', 20, 2), el('D_cd', 'DETECTOR', 20, 8), el('D_ncd', 'DETECTOR', 20, 12),
       ],
       labels: { L_C: 'C IN', L_D: 'D IN', D_cout: 'C OUT', D_cd: 'C·D', D_ncd: 'C̄·D', cb: 'CB' },
-      palette: { RPS: 2, PR3: 2, RM2: 1, NOT: 2 },
+      palette: { RPS: 2, PR3: 1 },
       cases: [
         { name: 'C=1 D=1', inputs: [{ launcher: 'L_C', pol: P }, { launcher: 'L_D', pol: P }], expect: { D_cout: [P], D_cd: [P], D_ncd: [] }, finalStates: { cb: M } },
         { name: 'C=0 D=1', inputs: [{ launcher: 'L_D', pol: P }], expect: { D_cout: [], D_cd: [], D_ncd: [P] }, finalStates: { cb: M } },
@@ -794,7 +795,7 @@ in the literature. You’ve just walked the actual argument. Welcome to research
         { a: ['pr', 'C'], b: ['cb', 'K1'], via: [] },
       ],
       labels: { L_C: 'C IN', D_tok: 'TOKEN', cb: 'CB', pr: 'PR' },
-      palette: { CIRC: 1 },
+      palette: { CIRC: 1, PR3: 1, NOT: 2 },
       cases: [
         { name: 'throw it', inputs: [{ launcher: 'L_C', pol: P }], expect: { D_tok: [M] }, finalStates: { cb: P } },
       ],
