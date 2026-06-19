@@ -1,5 +1,3 @@
-# <span style="color: red;">⚠️ WARNING: A NUMBER OF THE LATER LEVELS ARE BUGGY. THIS GAME IS A WORK IN PROGRESS.</span>
-
 # FLUXONAUT
 
 *A browser puzzle game that teaches the principles of Ballistic Asynchronous
