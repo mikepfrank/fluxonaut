@@ -319,7 +319,7 @@ version of a <b>Duplicator</b> can reduce the two A’s back to a single copy, p
 <br><br>No clock — <b>order</b> is everything. The rDup only accepts <b>M first</b>, so the copy path (out through the SG and back) must run <i>long enough to fall behind</i> the direct M line. Give the final <b>M</b> a generous gap so the earlier pulses settle before it resets the gates.`,
       hint: 'Dup: A→X, M→M, 1→C. Copies XX→SG.Ci; B→SG.I; SG.D→A·B, SG.U→¬A·B. Spent copies SG.Co→rDup.XX; Dup.M→rDup.M; Dup.¬X→rDup.¬X. Out: rDup.X→A OUT, rDup.M→M OUT, rDup.1→1 OUT. Make the SG.Co→rDup loop long so M beats the copies into the rDup.',
       success: `Universal reversible computing, fully assembled: AND and all its garbage computed, then <i>uncomputed</i>, leaving one clean copy of A. That is the 2017 paper’s construction end to end — Landauer’s limit dodged, Bennett’s trick made physical.<br><br>Notice how complicated a construction this is just to get an <b>AND</b>! It suffices to show that asynchronous ballistic reversible computing is <i>universal</i> — but we’d really like to do logic without all those extra constant streams. In the next two worlds, we’ll figure out how to do that, using primitives we can implement in <i>actual</i> superconducting circuits!`,
-      notebook: ['universality', 'and'],
+      notebook: ['universality', 'and', 'garbage'],
       fixed: [
         el('L_A', 'LAUNCHER', 1, 2), el('L_M', 'LAUNCHER', 1, 6), el('L_1', 'LAUNCHER', 1, 10), el('L_B', 'LAUNCHER', 1, 13),
         el('dup', 'DUP', 4, 2), el('sg', 'TSG', 11, 6), el('rdup', 'RDUP', 20, 2),
@@ -960,6 +960,20 @@ every step reversible. The ICRC'17 paper's universality proof is exactly your Wo
 toolchain. From here on, the question stops being "can asynchronous ballistic
 reversible logic compute?" and becomes "can we build it in actual superconductors?"
 — which is Worlds 3 and 4, and most of a decade of lab work.`,
+    },
+    garbage: {
+      title: 'The cost of garbage',
+      body: `That AND took two device types and almost no heat — but look at the
+<i>space</i> it took. Bennett's cycle (1973) — compute, use the answer, then run the
+whole thing backwards to tidy up — never throws anything away; it can only
+<i>un-make</i> garbage, in the reverse of the order it was made. So every intermediate
+(the ¬A·B terms, the spent copies of A, the constant "1" streams) has to stay alive,
+holding wires and gates, until the reverse pass reaches it. That standing pile of
+temporary data <i>is</i> the overhead of reversible computing — paid in circuitry and
+scheduling, not joules. Shrinking it is most of what comes next: World 4 trades all
+this bookkeeping for a single self-resetting gate whose entire scratch space is one
+token on a round trip, holding a logic window open just long enough for the data to
+slip through. Same logic — a fraction of the garbage.`,
     },
     polarity: {
       title: 'Polarity: the free bit',
