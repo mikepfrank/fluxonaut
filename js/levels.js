@@ -773,7 +773,9 @@ without one — the BARCS bibliography in the Notebook tells you exactly who to 
       bipolar: true,
       intro: `A bonus puzzle for the theoretically brave. Obvious idea: why conjure a
 hypothetical rPS when the reversible Polarized Rotary might route the token loop?
-<br><br>Try it — the left rotary is wired in for you. Send the control.
+<br><br>Try it — the left rotary is wired in for you. Send the control. Then add some
+more polarized rotaries and twists to the path and see if any arrangement lets the
+token slip free of the control line.
 <br><br>You’ll find the evicted token comes straight back along the control’s own
 path. Always. It’s a theorem: through any network of polarized rotaries and twists,
 the token (always opposite in sign to the control, thanks to flux conservation)
