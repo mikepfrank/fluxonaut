@@ -92,6 +92,7 @@ geometry only, no behavior change).
 ## 4. Level progression (4 worlds + bonus + sandbox)
 
 **World 1 — Ballistic Bootcamp** (unary pulses)
+
 1. *First Light* — wires, the run button, constant-speed pulses.
 2. *Roundabout* — rotaries route cyclically; plan a path.
 3. *Tailgaters* — collision & asynchrony faults; design so pulses can never meet.
@@ -101,6 +102,7 @@ geometry only, no behavior change).
    devices are reversible Mealy machines, so giving a network history is what makes logic.
 
 **World 2 — Stateful Logic** (unary; the ICRC'17 universality arc)
+
 6. *Gatekeeper* — the TCB: a control pulse opens the barrier.
 7. *The Sorting Office* — the sealed TSG chip: control toggles it, data routes by state (mux/demux).
 8. *Merge Lanes* — stateless devices can't merge two lines into one; do it reversibly with state.
@@ -110,6 +112,7 @@ geometry only, no behavior change).
     the garbage, leaving one clean copy of the input — universal reversible computing, end to end (boss).
 
 **World 3 — Polarity** (bipolar fluxons; enter the superconductor)
+
 12. *Antifluxon* — ± polarity, the NOT twist, polarity-typed detectors.
 13. *Exchange Rate* — the RM memory cell: reflect-or-exchange; final-state goals.
 14. *Bucket Brigade* — the BSR shift-register FIFO.
@@ -121,6 +124,7 @@ geometry only, no behavior change).
     element is billed only when it **pumps** a fluxon through, never when it reflects.
 
 **World 4 — The Universal Element** (the BARCS endgame)
+
 20. *The Reversible Barrier* — the **rPF**: the reversible, unpowered cousin of the
     biased filter (match passes, mismatch reflects, zero heat) — the CB's data rail.
 21. *The Controlled Barrier* — the **CB**: an RM2 control rail fused to an rPF data rail
