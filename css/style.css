@@ -160,8 +160,11 @@ h1 { font-size: 54px; letter-spacing: 12px; font-weight: 200; color: #e8f4ff;
 .biblio { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
 .bib-entry { font-size: 12.5px; line-height: 1.55; color: #c4d9ee; padding-left: 1.5em; text-indent: -1.5em; }
 .bib-key { color: var(--gold); font-weight: 700; }
-.bib-entry a { color: var(--edge-hi); text-decoration: none; word-break: break-word; }
-.bib-entry a:hover { text-decoration: underline; }
+.bib-entry a { text-decoration: none; word-break: break-word; }
+/* notebook + bibliography hyperlinks: bright pastels for contrast on the dark panel */
+.nb-body a:link,    .bib-entry a:link    { color: #8fc4ff; }   /* unclicked: pastel sky-blue */
+.nb-body a:visited, .bib-entry a:visited { color: #c9a9ff; }   /* clicked:   pastel lavender */
+.nb-body a:hover,   .bib-entry a:hover   { color: #bcdcff; text-decoration: underline; }
 
 @media (max-width: 900px) {
   #game-main { flex-direction: column; }
