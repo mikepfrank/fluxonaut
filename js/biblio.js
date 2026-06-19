@@ -6,6 +6,11 @@
 (function () {
   const F = (globalThis.FLUXON = globalThis.FLUXON || {});
   F.BIBLIOGRAPHY = [
+    `[Landauer 1961] R. Landauer, "Irreversibility and Heat Generation in the Computing Process," IBM Journal of Research and Development, vol. 5, no. 3, pp. 183–191, Jul. 1961, doi: 10.1147/rd.53.0183.`,
+    `[Bennett 1973] C. H. Bennett, "Logical Reversibility of Computation," IBM Journal of Research and Development, vol. 17, no. 6, pp. 525–532, Nov. 1973, doi: 10.1147/rd.176.0525.`,
+    `[Ressler 1981] A. L. Ressler, "The Design of a Conservative Logic Computer and a Graphical Editor Simulator," M.S. thesis, Massachusetts Institute of Technology, 1981. https://dspace.mit.edu/handle/1721.1/15895`,
+    `[Fredkin & Toffoli 1982] E. Fredkin and T. Toffoli, "Conservative Logic," International Journal of Theoretical Physics, vol. 21, no. 3–4, pp. 219–253, Apr. 1982, doi: 10.1007/BF01857727.`,
+    `[Feynman 1986] R. P. Feynman, "Quantum Mechanical Computers," Foundations of Physics, vol. 16, no. 6, pp. 507–531, Jun. 1986, doi: 10.1007/BF01886518.`,
     `[ARC 2016] M. P. Frank, "Introducing Asynchronous Reversible Computing (ARC)", unpublished slide deck, 2016-17.`,
     `[ICRC 2017] M. P. Frank, "Asynchronous ballistic reversible computing," 2017 IEEE International Conference on Rebooting Computing (ICRC), Washington, DC, USA, 2017, pp. 1–8, doi: 10.1109/ICRC.2017.8123659.`,
     `[ASC 2018] M. P. Frank, R. M. Lewis, N. A. Missert, M. A. Wolak and M. D. Henry, "Asynchronous Ballistic Reversible Fluxon Logic," in IEEE Transactions on Applied Superconductivity, vol. 29, no. 5, pp. 1–7, Aug. 2019, Art no. 1302007, doi: 10.1109/TASC.2019.2904962.`,

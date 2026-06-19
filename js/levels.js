@@ -1132,21 +1132,22 @@ genuinely new idea. Quod erat frustrandum.`,
     },
     refs: {
       title: 'The real papers (go read them!)',
-      body: `<b>The BARCS program</b> · M.P. Frank, Sandia National Laboratories, 2016–2026.<br>
-• "Asynchronous Ballistic Reversible Computing," IEEE ICRC 2017 — the abstract model &amp; universality.<br>
-• "Asynchronous Ballistic Reversible Fluxon Logic," IEEE Trans. Appl. Supercond. 2019 — fluxons as pulses.<br>
-• "Semi-Automated Design of Functional Elements…," ISEC 2019 — the RM cell circuit.<br>
-• US Patent 11,289,156 (2022) — the Ballistic Reversible Superconducting Memory Element.<br>
-• Lewis &amp; Frank, "Two Circuits for Directing and Controlling Ballistic Fluxons," IEEE TAS 2023 — PFG &amp; PS.<br>
-• Frank &amp; Lewis, "BARCS in Superconducting Circuits," IEEE ICRC 2022 — the element classification.<br>
-• Frank, Lewis &amp; Kaplan, "First-Principles Derivation of Fluxon Viscosity…," ASC 2024.<br>
-• Frank &amp; Kaplan, "A Universal Circuit Element for BARCS," JJ Workshop 2025 — the CB cell &amp; asynchronous RFSG.<br>
-• Osborn &amp; Wustmann, arXiv:2201.12999 — Ballistic Shift Registers.<br>
-<b>Foundations</b> · Landauer 1961 · Bennett 1973 · Fredkin &amp; Toffoli 1982 ·
-Ressler 1981 · Feynman 1986.<br><br>
+      body: `<b>The BARCS program</b> · M.P. Frank, R.M. Lewis, S.B. Kaplan et al., Sandia National Laboratories, 2016–2026.<br>
+• Frank, <a href="https://doi.org/10.1109/ICRC.2017.8123659" target="_blank" rel="noopener noreferrer">"Asynchronous Ballistic Reversible Computing"</a>, IEEE ICRC 2017 — the abstract model &amp; universality.<br>
+• Frank et al., <a href="https://doi.org/10.1109/TASC.2019.2904962" target="_blank" rel="noopener noreferrer">"Asynchronous Ballistic Reversible Fluxon Logic"</a>, IEEE Trans. Appl. Supercond. 2019 — fluxons as the pulses.<br>
+• Frank et al., <a href="https://doi.org/10.1109/ISEC46533.2019.8990900" target="_blank" rel="noopener noreferrer">"Semi-Automated Design of Functional Elements for a New Approach to Digital Superconducting Electronics"</a>, ISEC 2019 — the RM cell circuit.<br>
+• Frank &amp; DeBenedictis, <a href="https://patents.google.com/patent/US11289156B2/en" target="_blank" rel="noopener noreferrer">"Ballistic Reversible Superconducting Memory Element"</a>, US Patent 11,289,156, 2022 — the RM cell.<br>
+• Frank &amp; Lewis, <a href="https://doi.org/10.1109/ICRC57508.2022.00018" target="_blank" rel="noopener noreferrer">"Ballistic Asynchronous Reversible Computing in Superconducting Circuits"</a>, IEEE ICRC 2022 — the element classification.<br>
+• Lewis &amp; Frank, <a href="https://doi.org/10.1109/TASC.2023.3244115" target="_blank" rel="noopener noreferrer">"Two Circuits for Directing and Controlling Ballistic Fluxons"</a>, IEEE TAS 2023 — the PFG &amp; PS.<br>
+• Osborn &amp; Wustmann, <a href="https://doi.org/10.1103/PhysRevApplied.19.054034" target="_blank" rel="noopener noreferrer">"Asynchronous Reversible Computing Unveiled Using Ballistic Shift Registers"</a>, Phys. Rev. Applied 2023 — the BSR.<br>
+• Frank, Lewis &amp; Kaplan, <a href="https://doi.org/10.1109/TASC.2025.3527959" target="_blank" rel="noopener noreferrer">"First-Principles Derivation of Fluxon Viscosity and Associated Stopping Distance in Long Josephson Junctions"</a>, ASC 2024 — why real fluxons slow down.<br>
+• Frank &amp; Kaplan, <a href="https://tinyurl.com/Frank-Kaplan-JJ25" target="_blank" rel="noopener noreferrer">"A Universal Circuit Element for Ballistic Asynchronous Reversible Computing in Superconductors"</a>, JJ Workshop 2025 — the CB cell &amp; asynchronous RFSG.<br>
+• Lewis, Frank &amp; Kaplan, <a href="https://patents.google.com/patent/US12620993B1/en" target="_blank" rel="noopener noreferrer">"Ballistic Superconducting Circuit for Asynchronous Reversible Logic Element"</a>, US Patent 12,620,993, 2026 — the CB cell.<br>
+<b>Foundations</b> · Landauer 1961 · Bennett 1973 · Ressler 1981 · Fredkin &amp; Toffoli 1982 · Feynman 1986.<br><br>
+<i>See also the bibliography popup within the game for additional references and citation information.</i><br><br>
 <i>This game idealizes: no fluxon viscosity, perfect device reliability, and a few
 abstract elements (Rotary, TCB, PR3, rPS) that real niobium hasn't caught up with
-yet. Everything else — the RM cell, BSR, PS, PFG, circulator, CB, and the RFSG —
+yet. Everything else — the RM cell, rPF, BSR, PS, PFG, circulator, CB, and the RFSG —
 follows the published designs' digital behavior.</i>`,
     },
   };
