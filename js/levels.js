@@ -723,7 +723,7 @@ The future is the next level.`,
         { name: 'C=0 D=1', inputs: [{ launcher: 'L_D', pol: P }], expect: { D_cout: [], D_cd: [], D_ncd: [P] }, finalStates: { cb: M } },
         { name: 'C=1 D=0', inputs: [{ launcher: 'L_C', pol: P }], expect: { D_cout: [P], D_cd: [], D_ncd: [] }, finalStates: { cb: M } },
         { name: 'C=0 D=0', inputs: [], expect: { D_cout: [], D_cd: [], D_ncd: [] }, finalStates: { cb: M } },
-        { name: 'C=1 D=1; twice', inputs: [{ launcher: 'L_C', pol: P }, { launcher: 'L_D', pol: P }, { launcher: 'L_C', pol: P, dt: 14 }, { launcher: 'L_D', pol: P }], expect: { D_cout: [P, P], D_cd: [P, P], D_ncd: [] }, finalStates: { cb: M } },
+        { name: 'C=1 D=1, twice', inputs: [{ launcher: 'L_C', pol: P }, { launcher: 'L_D', pol: P }, { launcher: 'L_C', pol: P, dt: 14 }, { launcher: 'L_D', pol: P }], expect: { D_cout: [P, P], D_cd: [P, P], D_ncd: [] }, finalStates: { cb: M } },
       ],
       // parHeat 10: only the biased PS cells + the circulator dissipate, and the heaviest
       // case ("twice") runs two self-resetting cycles at 5 heat each. (Under the corrected
@@ -740,7 +740,7 @@ Nobody has designed one. Tonight, the lab is yours, and hypotheses are free.
 <br><br>On your bench: the <b>rPS</b> — a <span class="conj">CONJECTURAL</span>
 separator biased by trapped flux instead of a power supply, the same trick that made
 the polarity filter reversible. And the Polarized Rotary you already trust.
-<br><br>Same gate. Same four schedules. <b>Zero heat.</b> Step past the edge of the
+<br><br>Same gate. Same five schedules. <b>Zero heat.</b> Step past the edge of the
 literature.`,
       hint: 'Swap each PS for an rPS, and the circulator for a Polarized Rotary (+ data circulates clockwise both coming and going). The topology you built last level is already right.',
       success: `Silence in the heat meter. A universal reversible logic gate, end to end,
@@ -761,6 +761,7 @@ without one — the BARCS bibliography in the Notebook tells you exactly who to 
         { name: 'C=0 D=1', inputs: [{ launcher: 'L_D', pol: P }], expect: { D_cout: [], D_cd: [], D_ncd: [P] }, finalStates: { cb: M } },
         { name: 'C=1 D=0', inputs: [{ launcher: 'L_C', pol: P }], expect: { D_cout: [P], D_cd: [], D_ncd: [] }, finalStates: { cb: M } },
         { name: 'C=0 D=0', inputs: [], expect: { D_cout: [], D_cd: [], D_ncd: [] }, finalStates: { cb: M } },
+        { name: 'C=1 D=1, twice', inputs: [{ launcher: 'L_C', pol: P }, { launcher: 'L_D', pol: P }, { launcher: 'L_C', pol: P, dt: 14 }, { launcher: 'L_D', pol: P }], expect: { D_cout: [P, P], D_cd: [P, P], D_ncd: [] }, finalStates: { cb: M } },
       ],
       parElements: 3, parHeat: 0,
     },
