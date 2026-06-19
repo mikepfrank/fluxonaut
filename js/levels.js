@@ -634,13 +634,13 @@ rail (top) is the <b>RM2</b> memory cell from the Comparator — match bounces, 
 swaps. The data rail (bottom) is the <b>rPF</b> you just met — pass on a match, reflect on
 a mismatch. Magnetically couple them so the RM2’s <i>stored fluxon becomes the rPF’s
 barrier</i>, and you have the <b>Controlled Barrier</b>: the universal element.
-<br>• <b>Control rail</b> (K1/K2): the RM rule — match bounces, mismatch swaps.
+<br>• <b>Control rail</b> (C1/C2): the RM rule — match bounces, mismatch swaps.
 <br>• <b>Data rail</b> (D1/D2): a fluxon <i>passes</i> if its polarity matches the
 stored state, else it <i>reflects</i>. The stored fluxon IS the barrier.
 <br><br>It starts storing <span class="pol-m">−</span>. Open it with a
 <span class="pol-p">+</span> control (catch the evicted token!), then pass data
 through. No control, and data bounces.`,
-      hint: 'Control: launcher → rotary → K1; the evicted − re-enters the rotary → TOKEN. Data: launcher → polarized rotary → D1; bounced + data re-enters it and exits the next port clockwise → BOUNCE; passed data D2 → PASS.',
+      hint: 'Control: launcher → rotary → C1; the evicted − re-enters the rotary → TOKEN. Data: launcher → polarized rotary → D1; bounced + data re-enters it and exits the next port clockwise → BOUNCE; passed data D2 → PASS.',
       success: 'Fully reversible, no bias, good margins in simulation. One element that stores, gates, and switches. Now we make it COMPUTE.',
       notebook: ['cb'],
       fixed: [
@@ -668,9 +668,15 @@ Separators then chaperone that token <i>around a long loop</i> and back into the
 far control port — where it swaps back in, re-closing the barrier and ejecting the
 + control out the far side as C-OUT.
 <br><br>While the token is in transit, the barrier stands open: that transit time is
-the gate’s <b>logic window</b>. No clock sets it — wire length does. Build the loop.`,
-      hint: 'PS stems face the CB. Control + enters the left PS’s + branch → stem → K1. Token − : stem → − branch → the long loop → right PS’s − branch → stem → K2. The recovered + leaves stem → + branch → C OUT.',
-      success: 'Open… and shut, all by itself, after exactly one loop-time. You built an asynchronous timer out of pure geometry. The window is open — next, we sneak data through it.',
+the gate’s <b>logic window</b>. No clock sets it — wire length does.
+<br><br>This one is all about the <b>control rail</b> (C1/C2) — the data ports (D1/D2)
+play no part in this level, so leave them be. Build the loop.`,
+      hint: 'Each PS sends + out its + arm and − out its − arm, from any port. Left PS: C IN → stem, + arm → C1; the evicted − comes back into that + arm, crosses to the − arm, and heads up into the loop. Right PS: bend its stem up (the “bent arm” toggle) to catch the returning token — its − arm → C2, its + arm → C OUT. Make the loop long.',
+      success: `Open… and shut, all by itself, after exactly one loop-time. You built an
+asynchronous timer out of pure geometry. The window is open — next, we sneak data through it.
+<br><br>Compare the elegant simplicity of <i>this</i> to the complexity of the
+self-resetting <b>unipolar</b> switch gate — with its forward and reverse pulse
+duplicators — that you wrestled together at the end of World 2. You’ve come a long way.`,
       notebook: ['token'],
       fixed: [
         el('cb', 'CB', 11, 6, 0, { state: M }),
@@ -769,7 +775,7 @@ path. Always. It’s a theorem: through any network of polarized rotaries and tw
 the token (always opposite in sign to the control, thanks to flux conservation)
 exactly <b>retraces the control’s route</b>. Catch the boomerang at TOKEN — you’ll
 need one biased circulator on the inbound line to do even that.`,
-      hint: 'L → circulator → polarized rotary → K1. The token retraces to the circulator — which, being biased (not polarity-reversible), finally breaks the symmetry and deflects it to TOKEN.',
+      hint: 'L → circulator → polarized rotary → C1. The token retraces to the circulator — which, being biased (not polarity-reversible), finally breaks the symmetry and deflects it to TOKEN.',
       success: `So the obvious fix is provably impossible — polarity-reversible routers
 alone can never separate the token from the control line. THAT is why the rPS (or
 something genuinely new) is required, and why "replace the separators" sits unsolved

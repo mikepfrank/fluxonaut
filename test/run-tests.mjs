@@ -102,7 +102,7 @@ function buildCircuit(level, solution) {
   for (const e of (solution.place || [])) {
     const t = F.TYPES[e.type];
     elements.push({
-      id: e.id, type: e.type, x: e.x, y: e.y, rot: e.rot || 0,
+      id: e.id, type: e.type, x: e.x, y: e.y, rot: e.rot || 0, mir: !!e.mir,
       state: 'state' in e ? e.state : (t.states ? t.defaultState : null),
       cfg: e.cfg ? { ...e.cfg } : (t.config ? { ...t.config } : undefined),
     });

@@ -280,7 +280,7 @@
     ],
     states: [1, -1], defaultState: -1, stateIsPolarity: true, playerSettable: true,
     reversible: true, heatPerOp: 0, bipolarOnly: true,
-    portLabels: { K1: 'K1', K2: 'K2', D1: 'D1', D2: 'D2' },
+    portLabels: { K1: 'C1', K2: 'C2', D1: 'D1', D2: 'D2' },
     blurb: 'THE universal BARCS element (JJ Workshop ’25): a two-port memory cell (top rail) magnetically coupled to a reversible polarity filter (bottom rail). Control rule: match ⇒ reflect, mismatch ⇒ exchange (stored fluxon ejected out the same port). Data rule: a fluxon whose polarity MATCHES the stored state passes; otherwise it reflects. Fully reversible.',
     transition(port, pol, state) {
       if (port === 'K1' || port === 'K2') {
@@ -373,6 +373,7 @@
   // port keeps its logical name and routing. Geometrically distinct from rotate/mirror.
   // Implemented by trading the chosen bent port's slot with the type's naturally-bent
   // port (type.bentPort). Returns the port object whose GEOMETRY the given port uses.
+  // (Want the +/− on the straight line the other way round? Use mirror/flip.)
   function swappedPort(el, type, port) {
     const nb = type.bentPort;
     if (!nb) return port;
