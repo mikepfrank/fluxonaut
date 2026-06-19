@@ -143,7 +143,46 @@ circulator catches it, at a heat cost: a genuine open problem, walked by hand.
 
 **Sandbox** — every element, free build, save/load + JSON export/import.
 
-## 5. Engine
+## 5. Lab Notebook (pages unlocked per level)
+
+The **Lab Notebook** reveals a page or two as you reach each level. Pages open when a
+level is **entered** (not on completion), so the relevant lore is available while you
+solve it. *The real papers (go read them!)* is unlocked from the start. In total the
+25 levels reveal **31 level-tied pages** (six levels reveal two new pages); with the
+always-on references page that's **32 entries**. A page shared by two levels first
+appears at the earlier one — "(re-shown)" marks the repeat.
+
+| Level | Title | Lab Notebook page(s) unlocked |
+|---|---|---|
+| W1·1 | First Light | *Fluxons* · *Ballistic computing* |
+| W1·2 | Roundabout | *The Rotary* |
+| W1·3 | Tailgaters | *Why collisions are forbidden* · *Order, not timing* |
+| W1·4 | The One-Way Door | *State: the price of telling pulses apart* |
+| W1·5 | Three Ways | *Devices = reversible Mealy machines* |
+| W2·1 | Gatekeeper | *The Toggle Barrier (TCB)* |
+| W2·2 | The Sorting Office | *The Toggling Switch Gate* |
+| W2·3 | Merge Lanes | *Merging is a privilege, not a right* |
+| W2·4 | The Duplicator | *Copying without erasing* |
+| W2·5 | AND Finally | *AND, reversibly* · *Universality (the punchline of 2017)* |
+| W2·6 | Putting It Together | *The cost of garbage* · *AND, reversibly* & *Universality* (re-shown) |
+| W3·1 | Antifluxon | *Polarity: the free bit* · *Why superconductors?* |
+| W3·2 | Exchange Rate | *The Reversible Memory cell (a real chip)* |
+| W3·3 | Bucket Brigade | *The Ballistic Shift Register* |
+| W3·4 | The Sorter | *The Polarity Separator (and its bias bill)* · *Landauer's principle* |
+| W3·5 | Cold Sort | *The Polarized Rotary (theory ahead of hardware)* |
+| W3·6 | The Comparator | *Reading by asking* |
+| W3·7 | Waste Not | *Erasure vs. decomputation* |
+| W3·8 | The Bias Bill | *The Polarity Filter (biased)* · *Landauer's principle* (re-shown) |
+| W4·1 | The Reversible Barrier | *The reversible Polarity Filter (rPF)* |
+| W4·2 | The Controlled Barrier | *The Controlled Barrier (the universal element)* |
+| W4·3 | Round Trip Token | *The token loop & the logic window* |
+| W4·4 | The Switch Gate, For Real | *The Ressler–Feynman Switch Gate, asynchronously* · *The Circulator (the every-pass toll)* |
+| W4·5 | Beyond the Paper | *Where the published trail ends* |
+| W4·6 | The Boomerang Theorem | *The Boomerang Theorem* |
+
+Always available (not tied to a level): *The real papers (go read them!)* — the citations index.
+
+## 6. Engine
 
 - Continuous-time, **event-driven** core (no fixed logic timestep); rendering
   interpolates pulse positions per frame. Deterministic event ordering.
@@ -156,13 +195,13 @@ circulator catches it, at a heat cost: a genuine open problem, walked by hand.
   is deliberately *not* checked (asynchronous spirit), except where a level
   teaches exactly that.
 
-## 6. Future editions (out of scope for v1, per project direction)
+## 7. Future editions (out of scope for v1, per project direction)
 
 Fluxon viscosity/losses & signal-restoration stages; stochastic operation;
 error margins; JJ-circuit-level design mode; desktop/mobile ports; level editor
 sharing; quantum variant.
 
-## 7. Bibliography surfaced in-game
+## 8. Bibliography surfaced in-game
 
 ICRC 2017 (ABRC model & universality) · ASC 2018 (fluxon logic) · ISEC 2019 (RM cell)
 · US 11,289,156 (RM patent) · ASC 2022 (PFG/PS) · ICRC 2022 (BARCS classification)
