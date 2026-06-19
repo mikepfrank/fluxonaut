@@ -58,6 +58,13 @@ for (const id of Object.keys(F.TYPES)) {
   check('CB obeys flux-negation symmetry', fsym);
 }
 
+// Sandbox must offer EVERY defined element (placeable + I/O), so the free bench can
+// build anything. Guards against forgetting a newly-added element (e.g. rPF).
+console.log('\nSandbox palette coverage:');
+for (const id of Object.keys(F.TYPES)) {
+  check(`sandbox palette includes ${id}`, id in F.SANDBOX.palette, '(add it to SANDBOX.palette)');
+}
+
 // Dissipation consistency (Landauer / merge law). Heat is each device's OWN property
 // (which transitions dissipate depends on its physical implementation) — but one rule
 // is universal: whenever ≥2 transitions land on the same (port, polarity, state)

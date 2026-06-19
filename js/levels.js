@@ -814,7 +814,7 @@ because physics doesn’t take nights off.`,
     palette: {
       LAUNCHER: 6, DETECTOR: 6, REFLECTOR: 8, IREFLECTOR: 4, NOT: 8, ROTARY: 8,
       FD: 4, TCB: 4, TSG: 3, RM1: 4, RM2: 4, BSR: 6, PS: 4, PR3: 6, CIRC: 4,
-      PFG: 4, RPS: 4, CB: 3, EXHAUST: 4,
+      PFG: 4, RPF: 4, RPS: 4, CB: 3, DUP: 2, RDUP: 2, EXHAUST: 4,
     },
     cases: [],
     parElements: Infinity, parHeat: Infinity,
