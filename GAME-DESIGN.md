@@ -67,6 +67,8 @@ real-world implementation status shown in the Notebook.
 | Flipping Diode FD | 2 | dir | passes in forward dir (flips dir); reflects in reverse | ↺ / theoretical (ICRC'17) |
 | Toggling Controlled Barrier TCB | 3 (L,R,C) | open/closed | C: reflect & toggle; L/R: pass if open, reflect if closed | ↺ / theoretical (ICRC'17); universal with R |
 | TSG chip | 5 | up/down | toggling switch gate (earned macro of TCB+2R) | ↺ / construction from ICRC'17 Fig. 7 |
+| Duplicator DUP (×2) | 6 | 2 bits | data on X (then M, then 1) ⇒ two copies on XX; X absent ⇒ ¬X out. Out-of-order arrivals fault | ↺ (partial) / construction from ICRC'17 (Fig. 9) |
+| Reverse Duplicator rDUP | 6 | 2 bits | the duplicator run backward: two X copies (+ M, ¬X) ⇒ one X, regenerating the constant 1 (Bennett uncompute). Out-of-order arrivals fault | ↺ (partial) / construction from ICRC'17 |
 | RM cell (1/2-port) | 1–2 | ± | same polarity: reflect; opposite: exchange (exit **same** port) | ↺ / **simulated & fabricated; patented (US 11,289,156)** |
 | Ballistic Shift Register BSR | 2 | ± | pass through, swap polarity with state | ↺ / Osborn & Wustmann (arXiv:2201.12999) |
 | Polarity Filter PFG | 2 | bias ± | matching polarity pumped through (heat); mismatch reflects (free) | ⚠ heat/pump / **simulated (ASC'22)**, current-biased |
