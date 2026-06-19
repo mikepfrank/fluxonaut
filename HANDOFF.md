@@ -23,6 +23,35 @@ For future Claude sessions (or humans) continuing this project. State as of 2026
   on element icons, bottom-edge detector labels drawn beside the element, and
   per-segment pulse polarity so color flips at twists/RM/BSR (with a flash ring).
 
+## Pending — resume here (mid-session 2026-06-18)
+World 4 redesign is DONE and merged to `main` (pushed). Suite green 356 + 116. Open items:
+
+1. **w4l5 "Beyond the Paper" — add the self-reset case (NOT yet done; Michael asked).**
+   Mirror what w4l4 got: in its intro change "**same four schedules**" → "**same five
+   schedules**", and append a 5th case to its `cases` array:
+   `{ name: 'C=1 D=1; twice', inputs: [{launcher:'L_C',pol:P},{launcher:'L_D',pol:P},{launcher:'L_C',pol:P,dt:14},{launcher:'L_D',pol:P}], expect: { D_cout:[P,P], D_cd:[P,P], D_ncd:[] }, finalStates:{ cb:M } }`
+   w4l5 is the ZERO-heat version (rPS+PR3+RM2+NOT), so parHeat stays 0 (twice is still 0
+   heat). Re-run `node test/run-tests.mjs` to confirm; the w4l5 reference solution should
+   already pass it (same loop topology as w4l4). Compare to how w4l4's case was added.
+
+2. **Boomerang Theorem (w4l6) — analysis done, prose fix pending (Michael to discuss).**
+   Full verdict in `../notes/boomerang-theorem-analysis.md` (+ per-agent audit in
+   `../notes/world4-research/boomerang-*.md`). Bottom line: the narrow PR3+NOT theorem is
+   VALID; but the w4l6 **success text** + `boomerang` notebook OVER-CLAIM ("provably
+   impossible"). The unbiased ROTARY peels the token off **reversibly at zero heat**
+   (engine-verified) — the impossibility is a *realizability* gap (no JJ rotary), not logic,
+   and the real papers call it open *future work*. FIX = prose only (scope to PR3+twists, add
+   the realizability caveat, drop "provably impossible"); leave mechanics/solution alone.
+   Suggested rewordings are in the notes file. Likely why "players solved it": a ROTARY in
+   the Sandbox builds a free token loop (w4l6 itself is fine — palette `{CIRC:1}` forces it).
+
+3. **Deploy** — live Netlify site is still the OLD build. Regenerate the zip from `main` HEAD
+   (`git archive HEAD index.html README.md GAME-DESIGN.md css js -o ../netlify-zips/...zip`)
+   and drag it to Netlify. Zips live in non-repo `../netlify-zips/`.
+
+4. **`ps-physics-fix` branch** — merged into `main`; its remote is stale (6 behind). Harmless;
+   delete (local + remote) or leave, Michael's call.
+
 ## Architecture (see GAME-DESIGN.md and README.md first)
 
 - `js/elements.js` + `js/engine.js` + `js/levels.js` are DOM-free (Node-testable).
