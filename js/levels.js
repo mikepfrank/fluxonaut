@@ -723,10 +723,12 @@ The future is the next level.`,
         { name: 'C=0 D=1', inputs: [{ launcher: 'L_D', pol: P }], expect: { D_cout: [], D_cd: [], D_ncd: [P] }, finalStates: { cb: M } },
         { name: 'C=1 D=0', inputs: [{ launcher: 'L_C', pol: P }], expect: { D_cout: [P], D_cd: [], D_ncd: [] }, finalStates: { cb: M } },
         { name: 'C=0 D=0', inputs: [], expect: { D_cout: [], D_cd: [], D_ncd: [] }, finalStates: { cb: M } },
+        { name: 'C=1 D=1; twice', inputs: [{ launcher: 'L_C', pol: P }, { launcher: 'L_D', pol: P }, { launcher: 'L_C', pol: P, dt: 14 }, { launcher: 'L_D', pol: P }], expect: { D_cout: [P, P], D_cd: [P, P], D_ncd: [] }, finalStates: { cb: M } },
       ],
-      // parHeat 5 (was 8): under the corrected PF/PS physics, fluxons the separators
-      // REFLECT cost nothing; only the pumped-through passes dissipate.
-      parElements: 3, parHeat: 5,
+      // parHeat 10: only the biased PS cells + the circulator dissipate, and the heaviest
+      // case ("twice") runs two self-resetting cycles at 5 heat each. (Under the corrected
+      // physics, fluxons the separators merely REFLECT cost nothing.)
+      parElements: 3, parHeat: 10,
     },
 
     {
