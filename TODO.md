@@ -30,22 +30,38 @@ None are blockers; do not start a new version until playtesting is complete.
 ## Notes
 
 - Console was clean across the whole session; no engine/UI bugs observed.
-- Michael is playtesting all levels himself first (currently at W3-1 Antifluxon,
-  resumed after the Twist polarity-color fix). He will flag any high-priority
-  issues as he goes.
+- Michael is playtesting the 2026-06-20 build (Crossover feature, w2l6 planar
+  redesign, 100-seed certify gate, sandbox per-pulse launch timing) before the next
+  deploy. He will flag high-priority issues as he goes.
 
-## Planarity (no-crossing-wires) — open question (added 2026-06-14)
+## Element design — revisit the switch-gate (SG/TSG) symbol port ordering (added 2026-06-20)
 
-A 4th, optional star now rewards planar solutions (no crossing wires). An audit
-of the bundled reference solutions found 16/22 already planar; the Twist level
-(w3l1 Antifluxon) is planar — its conductor swap is internal to the element, not
-a drawn wire. These 6 reference solutions currently cross wires:
-w2l1 Gatekeeper (1), w2l3 Merge Lanes (1), w2l5 AND Finally (3),
-w4l3 Round Trip Token (1), w4l4 The Switch Gate For Real (1),
-w4l5 Beyond the Paper (1).
+Michael's observation: the toggling SG chip/block's I/O port ordering **on the symbol**
+doesn't match the port ordering of the corresponding circuit (from w2l1). This mismatch is
+likely a cause of the wire-crossing difficulties seen across World 2 — re-arranging the
+symbol's ports to match the actual circuit could reduce or eliminate the need for crossovers
+in other W2 levels (and bears directly on the duplicator-planarity question below).
 
-TODO: during playtest, determine which of these 6 actually have planar solutions
-(expected: most/all, since the BARCS research respected planarity except where
-explicitly studying Twist). Where a planar solution exists, update
-test/solutions.json so the reference solution earns the 4th star. Flag any that
-genuinely cannot be solved without a crossing.
+**BIG JOB — not now.** Moving port positions on the symbol forces a redesign of the
+reference solutions for many levels (every level that wires an SG/TSG), plus re-verifying
+robustness and regenerating renders. Do not start without a dedicated pass.
+
+## Planarity (no-crossing-wires) — RESOLVED (2026-06-20)
+
+Done. The crossing counter was found to under-count: it split each wire at every via/port-
+stub vertex, so a crossing landing exactly on one read as two harmless T-touches and was
+missed (a visibly-crossed layout could score "planar"). `engine.countCrossings` now
+collinear-merges first, and `run-tests` asserts every reference is 0-crossing. A `CROSS`
+(Crossover) element was added; a level that genuinely can't avoid a crossing is handed
+exactly enough crossovers. Final state — every reference 0-crossing, robust at the 100-seed
+certify gate + all jitter corners + a factor grid:
+- **Genuinely planar (no crossover):** every level except the two below — incl. w2l1, w2l3,
+  w2l6 (w2l6's fixed layout was rearranged: SG flipped on top, Dup/rDup lowered, inputs spread).
+- **Need crossovers:** w2l4 The Duplicator (×2), w2l5 AND Finally (×1).
+
+(The earlier 2026-06-14 audit above — "6 references cross wires" — was wrong twice over: it
+used the buggy counter, and it predated the World-4 PS rebuild. Superseded.)
+
+Open *academic* question (not urgent): is the switch-gate duplicator intrinsically non-planar,
+or only in its bolted-down layout? Strong evidence it needs ≥1 crossing as currently laid out,
+but no proof over all placements. The SG-symbol item above may be the lever that settles it.
