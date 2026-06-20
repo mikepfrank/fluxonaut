@@ -153,6 +153,11 @@ function testLevel(level, solution) {
   check(`element count ${placed} ≤ par ${level.parElements}`, placed <= level.parElements);
   check(`heat ${res.heatMax} ≤ par ${level.parHeat}`, res.heatMax <= level.parHeat, `(heat ${res.heatMax})`);
   checkGeometry(circuit);
+  // every reference must be a 4-star exemplar: zero wire crossings — either genuinely
+  // planar or with all forced crossings routed through Crossover gadgets. (countCrossings
+  // collinear-merges first, so a crossing can't hide on a via.)
+  const xings = F.engine.countCrossings(circuit);
+  check('reference is planar — 0 wire crossings', xings === 0, `(${xings} — route forced crossings through a Crossover)`);
   return res;
 }
 

@@ -321,10 +321,10 @@ version of a <b>Duplicator</b> can reduce the two A’s back to a single copy, p
       success: `Universal reversible computing, fully assembled: AND and all its garbage computed, then <i>uncomputed</i>, leaving one clean copy of A. That is the 2017 paper’s construction end to end — Landauer’s limit dodged, Bennett’s trick made physical.<br><br>Notice how complicated a construction this is just to get an <b>AND</b>! It suffices to show that asynchronous ballistic reversible computing is <i>universal</i> — but we’d really like to do logic without all those extra constant streams. In the next two worlds, we’ll figure out how to do that, using primitives we can implement in <i>actual</i> superconducting circuits!`,
       notebook: ['universality', 'and', 'garbage'],
       fixed: [
-        el('L_A', 'LAUNCHER', 1, 2), el('L_M', 'LAUNCHER', 1, 6), el('L_1', 'LAUNCHER', 1, 10), el('L_B', 'LAUNCHER', 1, 13),
-        el('dup', 'DUP', 4, 2), el('sg', 'TSG', 11, 6), el('rdup', 'RDUP', 20, 2),
-        el('D_nand', 'DETECTOR', 16, 5), el('D_and', 'DETECTOR', 16, 8),
-        el('D_A', 'DETECTOR', 25, 2), el('D_M', 'DETECTOR', 25, 4), el('D_1', 'DETECTOR', 25, 6),
+        el('L_B', 'LAUNCHER', 1, 2), el('L_A', 'LAUNCHER', 1, 7), el('L_M', 'LAUNCHER', 1, 9), el('L_1', 'LAUNCHER', 1, 12),
+        el('dup', 'DUP', 4, 7), el('sg', 'TSG', 7, 2, 2, { mir: true }), el('rdup', 'RDUP', 17, 7),
+        el('D_and', 'DETECTOR', 12, 2), el('D_nand', 'DETECTOR', 12, 3),
+        el('D_A', 'DETECTOR', 22, 7), el('D_M', 'DETECTOR', 22, 8), el('D_1', 'DETECTOR', 22, 9),
       ],
       labels: {
         L_A: 'A IN', L_M: 'M CTL', L_1: 'CONST 1', L_B: 'B IN', dup: 'Dup', sg: 'SG', rdup: 'rDup',
