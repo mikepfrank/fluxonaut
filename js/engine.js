@@ -17,11 +17,12 @@
 (function () {
   const F = (globalThis.FLUXON = globalThis.FLUXON || {});
 
-  const SPEED = 3.2;        // cells per second (sim time)
-  const MIN_GAP = 0.22;     // min separation between arrivals at one element (s)
-  // Physical scale for display: 1 cell ≈ 50 µm of LJJ; fluxons at ~c/30 ≈ 10 µm/ps
-  // ⇒ 5 ps per cell ⇒ one sim-second shows ≈ 16 ps of real time (slowdown ~6×10¹⁰).
-  const PS_PER_SEC = SPEED * 5;
+  // Internal time is in abstract sim-units; quote real durations in ps (SFQ scale).
+  // Physical scale: 1 cell ≈ 50 µm of LJJ; fluxons at ~c/30 ≈ 10 µm/ps ⇒ ~5 ps/cell
+  // ⇒ one sim-unit ≈ 16 ps (PS_PER_SEC); the game slows real time by ~6×10¹⁰.
+  const SPEED = 3.2;        // cells per sim-unit (1 cell ≈ 5 ps)
+  const MIN_GAP = 0.22;     // min arrival separation at one element ≈ 3.5 ps
+  const PS_PER_SEC = SPEED * 5;   // ps per sim-unit (= 16)
   const MAX_EVENTS = 30000;
   const MAX_TIME = 600;
 
@@ -345,7 +346,7 @@
   // --- level checking ----------------------------------------------------------
   // case spec: { name, inputs: [{launcher, pol, dt?}], expect: { detectorId: [pol,...] },
   //              finalStates?: {elId: state}, allowHeat?: bool }
-  // inputs are given in order; nominal gap GAP seconds, jittered by seeded RNG.
+  // inputs are given in order; nominal gap GAP ≈ 24 ps, jittered ×[0.7,1.5) by seeded RNG.
   const GAP = 1.5;
 
   function mulberry32(a) {
