@@ -110,6 +110,42 @@
     return Math.max(roundedPath(pts, CORNER_R).len, 0.25);
   }
 
+  // Merge consecutive collinear points so a straight run that happens to carry a via or
+  // port-stub vertex is ONE segment. Without this, a crossing landing exactly on such a
+  // vertex gets split into two T-touches and is missed by the interior-crossing test.
+  function collinearMerge(pts) {
+    const p = [];
+    for (const q of pts) if (!p.length || Math.abs(q.x - p[p.length - 1].x) > 1e-9 || Math.abs(q.y - p[p.length - 1].y) > 1e-9) p.push(q);
+    let i = 1;
+    while (i < p.length - 1) {
+      const a = p[i - 1], b = p[i], c = p[i + 1];
+      if ((Math.abs(a.y - b.y) < 1e-9 && Math.abs(b.y - c.y) < 1e-9) || (Math.abs(a.x - b.x) < 1e-9 && Math.abs(b.x - c.x) < 1e-9)) p.splice(i, 1);
+      else i++;
+    }
+    return p;
+  }
+  function _xsegs(pts) {
+    const m = collinearMerge(pts), o = [];
+    for (let i = 1; i < m.length; i++) { const a = m[i - 1], b = m[i]; if (Math.abs(a.x - b.x) < 1e-9 && Math.abs(a.y - b.y) < 1e-9) continue; o.push({ a, b, horiz: Math.abs(a.y - b.y) < 1e-9 }); }
+    return o;
+  }
+  // Count wire crossings used for the planarity star: an interior intersection of a
+  // horizontal run of one wire and a vertical run of another. Shared bend vertices and
+  // T-touches (an endpoint meeting another wire's interior) do NOT count — only genuine
+  // interior-interior crossings. Crossovers absorb a crossing (the two wires meet AT the
+  // gadget's ports, so neither has a free segment through the other).
+  function countCrossings(circuit) {
+    const ws = circuit.wires.map(w => _xsegs(wirePath(circuit, w)));
+    let n = 0;
+    for (let i = 0; i < ws.length; i++) for (let j = i + 1; j < ws.length; j++) for (const a of ws[i]) for (const b of ws[j]) {
+      if (a.horiz === b.horiz) continue;
+      const H = a.horiz ? a : b, V = a.horiz ? b : a;
+      const hx1 = Math.min(H.a.x, H.b.x), hx2 = Math.max(H.a.x, H.b.x), vy1 = Math.min(V.a.y, V.b.y), vy2 = Math.max(V.a.y, V.b.y);
+      if (V.a.x > hx1 + 1e-9 && V.a.x < hx2 - 1e-9 && H.a.y > vy1 + 1e-9 && H.a.y < vy2 - 1e-9) n++;
+    }
+    return n;
+  }
+
   function pointAlong(pts, d) {
     const rp = roundedPath(pts, CORNER_R);
     if (rp.len < 1e-9) return pts[pts.length - 1];
@@ -437,6 +473,6 @@
     return { pass, heatMax, perCase, usedEls: [...used] };
   }
 
-  F.engine = { SPEED, MIN_GAP, GAP, PS_PER_UNIT, CERTIFY_SEEDS, CORNER_R, portWorld, wirePath, pathLength, pointAlong, roundedPath, validate, simulate, buildInputs, runCase, certify, polSym };
+  F.engine = { SPEED, MIN_GAP, GAP, PS_PER_UNIT, CERTIFY_SEEDS, CORNER_R, portWorld, wirePath, pathLength, pointAlong, roundedPath, countCrossings, validate, simulate, buildInputs, runCase, certify, polSym };
   F.roundedPath = roundedPath; F.CORNER_R = CORNER_R;
 })();

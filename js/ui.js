@@ -72,8 +72,8 @@
   function h(tag, attrs, ...kids) {
     const e = document.createElement(tag);
     for (const k in (attrs || {})) {
-      if (k === 'onclick') e.addEventListener('click', attrs[k]);
-      else if (k === 'html') e.innerHTML = attrs[k];
+      if (k === 'html') e.innerHTML = attrs[k];
+      else if (k.startsWith('on') && typeof attrs[k] === 'function') e.addEventListener(k.slice(2).toLowerCase(), attrs[k]);
       else e.setAttribute(k, attrs[k]);
     }
     for (const kid of kids) if (kid != null) e.append(kid);
@@ -761,19 +761,7 @@
   // crossing itself). The twist element's internal crossing is part of its glyph,
   // not a drawn wire, so it is never counted.
   function countWireCrossings() {
-    const cir = { elements: app.elements };
-    const segs = [];
-    for (const w of app.wires) for (const s of pathSegs(E.wirePath(cir, w))) segs.push(s);
-    let n = 0;
-    for (let i = 0; i < segs.length; i++) for (let j = i + 1; j < segs.length; j++) {
-      const a = segs[i], b = segs[j];
-      if (a.horiz === b.horiz) continue;
-      const H = a.horiz ? a : b, V = a.horiz ? b : a;
-      const hx1 = Math.min(H.a.x, H.b.x), hx2 = Math.max(H.a.x, H.b.x);
-      const vy1 = Math.min(V.a.y, V.b.y), vy2 = Math.max(V.a.y, V.b.y);
-      if (V.a.x > hx1 + 1e-9 && V.a.x < hx2 - 1e-9 && H.a.y > vy1 + 1e-9 && H.a.y < vy2 - 1e-9) n++;
-    }
-    return n;
+    return E.countCrossings({ elements: app.elements, wires: app.wires });
   }
 
   function certify() {
