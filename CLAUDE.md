@@ -18,6 +18,13 @@ don't treat in-game text as ground truth.
 - Deploy: zip the runtime files only — `index.html README.md GAME-DESIGN.md css js`
   (e.g. `git archive HEAD`) — and drag the zip to Netlify.
 
+## Cost — subordinate models
+Subagents are expensive on Opus, and an Opus-heavy multi-agent session has burned
+Michael's weekly quota overnight. Default `Agent`/`Workflow` agents to **Sonnet**
+(**Haiku** for trivial mechanical passes); reserve **Opus** for synthesis or a
+genuinely hard search, and pass the `model:` option explicitly. Prefer doing light
+follow-up inline over spawning a subagent.
+
 ## Architecture (load order = index.html)
 - `js/elements.js` — element/device types; each is a reversible Mealy machine
   `transition(port, pol, state) -> {port, pol, state, heat, absorb}`. The biased
