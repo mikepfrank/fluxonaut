@@ -1043,6 +1043,21 @@
           ctx.fillStyle = R.polColor(pol); ctx.fill();
         });
       }
+      // detector readout (sandbox): the sequence of pulse types actually received
+      if (el.type === 'DETECTOR' && lv.sandbox) {
+        const got = app.trace ? (app.liveDetections[el.id] || []) : [];
+        got.forEach((d, k) => {
+          const x = (el.x + 0.5 + (k - (got.length - 1) / 2) * 0.46) * CELL, y = (el.y - 0.34) * CELL;
+          ctx.beginPath(); ctx.arc(x, y, 6.4, 0, 7);
+          ctx.fillStyle = lv.bipolar ? R.polColor(d.pol) : '#cdeeff'; ctx.fill();
+          ctx.strokeStyle = R.COL.ok; ctx.lineWidth = 1.4; ctx.stroke();
+          if (lv.bipolar) {
+            ctx.fillStyle = '#08131f'; ctx.font = '800 9px system-ui'; ctx.textBaseline = 'middle';
+            ctx.fillText(d.pol === -1 ? '−' : '+', x, y);
+            ctx.textBaseline = 'alphabetic'; ctx.font = '600 11px system-ui, sans-serif';
+          }
+        });
+      }
       // detector expectation chips
       if (el.type === 'DETECTOR' && !lv.sandbox && lv.cases.length) {
         const cs = lv.cases[app.caseIdx];
