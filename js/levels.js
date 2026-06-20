@@ -261,7 +261,7 @@ goes to its one fixed output port, end of story.
         el('D_mrec', 'DETECTOR', 20, 12),
       ],
       labels: { L_X: 'X IN', L_M: 'M CTL', L_1: 'CONST 1', D_out: 'OUT', D_notx: 'NOT-X', D_mrec: 'M OUT', tsgA: 'A', tsgB: 'B' },
-      palette: {},
+      palette: { CROSS: 2 },
       cases: [
         {
           name: 'X = 1', inputs: [
@@ -279,7 +279,7 @@ goes to its one fixed output port, end of story.
           finalStates: { tsgA: 'up', tsgB: 'up' },
         },
       ],
-      parElements: 0, parHeat: 0,
+      parElements: 2, parHeat: 0,
     },
 
     {
@@ -301,14 +301,14 @@ version of a <b>Duplicator</b> can reduce the two A’s back to a single copy, p
         el('D_a', 'DETECTOR', 20, 2), el('D_and', 'DETECTOR', 20, 8), el('D_nab', 'DETECTOR', 20, 11),
       ],
       labels: { L_A: 'A IN', L_B: 'B IN', D_a: 'A OUT', D_and: 'A·B', D_nab: '¬A·B' },
-      palette: { TSG: 1 },
+      palette: { TSG: 1, CROSS: 1 },
       cases: [
         { name: 'A=1 B=1', inputs: [{ launcher: 'L_A', pol: P }, { launcher: 'L_B', pol: P }, { launcher: 'L_A', pol: P }], expect: { D_a: [P, P], D_and: [P], D_nab: [] } },
         { name: 'A=1 B=0', inputs: [{ launcher: 'L_A', pol: P }, { launcher: 'L_A', pol: P }], expect: { D_a: [P, P], D_and: [], D_nab: [] } },
         { name: 'A=0 B=1', inputs: [{ launcher: 'L_B', pol: P }], expect: { D_a: [], D_and: [], D_nab: [P] } },
         { name: 'A=0 B=0', inputs: [], expect: { D_a: [], D_and: [], D_nab: [] } },
       ],
-      parElements: 1, parHeat: 0,
+      parElements: 2, parHeat: 0,
     },
 
     {
