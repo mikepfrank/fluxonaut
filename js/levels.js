@@ -250,10 +250,10 @@ goes to its one fixed output port, end of story.
 <br><br>This rig is wired-for-you EXCEPT the wires. Two switch gates do it. <b>A</b> is the copier; <b>B</b> is a multiplexer that feeds signals into A’s control line, steered by the <b>M</b> pulses.
 <br><br>If <b>X</b> arrives, it routes through B into A’s control: A flips, and the pulse leaves at <b>OUT</b> — copy #1. A is now flipped, so the <b>constant</b> pulse takes A’s other road, loops back through B into A’s control, flips A <i>back</i>, and exits <b>OUT</b> — copy #2. Two pulses out; A and B end exactly as they began.
 <br><br>No <b>X</b>? A never flips, so the constant pulse leaves on the <b>¬X</b> line instead — incidental “garbage” you could uncompute later with a mirror circuit.
-<br><br>There’s no clock: <b>order</b> is everything. X must reach A before the constant does — so keep the A↔B loop short. (8 wires.)`,
+<br><br>There’s no clock: <b>order</b> is everything. X must reach A before the constant does — so keep the A↔B loop short. A couple of wires can't help crossing here — drop a <b>Crossover</b> on each so they pass straight through without touching, keeping the board planar for the 4th star. (8 wires + 2 crossovers.)`,
       hint: 'Wire three paths (8 wires). Copy: CONST→A.I, then A.D loops to B.D, B.I→A.Ci, A.Co→OUT, A.U→¬X. Trigger: X→B.U. Mux control: M→B.Ci, B.Co→M OUT. Keep the A↔B loop short so the second copy returns in time.',
       success: 'X in, two X’s out — and both switches end exactly as they began. Copying without erasing, paid for with one constant pulse. (When X is absent you got ¬X — a NOT, for free.)',
-      notebook: ['copying'],
+      notebook: ['copying', 'crossover'],
       fixed: [
         el('L_X', 'LAUNCHER', 1, 2), el('L_M', 'LAUNCHER', 1, 6), el('L_1', 'LAUNCHER', 17, 2, 2),
         el('tsgB', 'TSG', 4, 2, 2), el('tsgA', 'TSG', 11, 2, 2),
@@ -293,9 +293,9 @@ low road: that pulse IS <b>A AND B</b>. If A didn’t, B exits the high road: th
 <br><br>One wrinkle: if A toggled the switch, something must toggle it back. The fix is pure Bennett — compute, then uncompute: the upstream circuit lends you A <i>twice</i>
 (e.g. by using a <b>Duplicator</b>). Catch both spent A’s at A OUT. Later, if needed, a reversed
 version of a <b>Duplicator</b> can reduce the two A’s back to a single copy, plus constant streams.`,
-      hint: 'A → Ci, spent A’s out Co → A OUT. B → I. D port → AND, U port → ¬A·B.',
+      hint: 'A → Ci, spent A’s out Co → A OUT. B → I. D port → AND, U port → ¬A·B. One crossing is unavoidable — route it through a Crossover for the planar star.',
       success: `AND plus NOT is everything — adders, CPUs, all of it. The 2017 paper proved exactly this construction universal: <i>asynchronous ballistic reversible computing can compute anything</i>. Worlds 3 and 4: making it real, in superconductors.`,
-      notebook: ['and', 'universality'],
+      notebook: ['and', 'universality', 'crossover'],
       fixed: [
         el('L_A', 'LAUNCHER', 1, 3), el('L_B', 'LAUNCHER', 1, 9),
         el('D_a', 'DETECTOR', 20, 2), el('D_and', 'DETECTOR', 20, 8), el('D_nab', 'DETECTOR', 20, 11),
@@ -942,6 +942,16 @@ reversible world's only consumable) is routed by the original's stored imprint, 
 the imprint is undone by the copy itself looping back — leaving the machinery
 exactly as found (ICRC'17, Fig. 9). When the original is absent, the constant exits
 the other way, computing ¬X for free. Fan-out, NOT, and self-cleanup, one circuit.`,
+    },
+    crossover: {
+      title: 'The Crossover (a wiring convenience)',
+      body: `Sometimes two signals must cross on a flat board with no room to route around.
+A <b>Crossover</b> lets them pass straight through each other — the horizontal pair and the
+vertical pair are carried independently, with no interaction and no heat. It isn't from the
+BARCS papers; it's a game gadget, but a buildable one: a via hopping one wire onto another
+metal layer (impedance-matched) does exactly this in a real circuit. Use it to earn the
+planarity star on levels where a crossing is genuinely forced — you're handed exactly as
+many as you need.`,
     },
     and: {
       title: 'AND, reversibly',

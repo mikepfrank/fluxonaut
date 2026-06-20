@@ -44,8 +44,10 @@ The simulation operates at the *abstract network level* of the ABRC model
    only on order of arrival — the central BARC asynchrony principle.
 4. **Reversibility is the prize.** Irreversible events emit visible **waste heat**
    (sparks + counter, flavor *kT ln 2*). Four per-level stars: ★ solve ·
-   ★★ proper build · ★★★ within heat par · ★★★★ planar (no wire crossings); a used
-   hint docks one. Heat sources: dumping a pulse into an exhaust / back into a
+   ★★ proper build · ★★★ within heat par · ★★★★ planar (no wire crossings) — a level
+   that genuinely can't avoid a crossing supplies exactly that many **Crossover** gadgets
+   to bridge them (currently only w2·4 ×2 and w2·5 ×1), so every level stays four-star-able;
+   a used hint docks one. Heat sources: dumping a pulse into an exhaust / back into a
    launcher; the **circulator** (a biased partial rotary) on *every* pass; and the
    biased **PS / PFG** only when they *pump* a fluxon through to a different port — a
    fluxon they merely reflect off a matching arm recoils elastically, for free.

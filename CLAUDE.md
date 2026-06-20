@@ -10,8 +10,8 @@ the domain authority on its physics/CS. Defer to him on conceptual correctness;
 don't treat in-game text as ground truth.
 
 ## Commands
-- Tests (keep green): `node test/run-tests.mjs` (356 checks) and
-  `node test/smoke-ui.mjs` (116 checks).
+- Tests (keep green): `node test/run-tests.mjs` (392 checks) and
+  `node test/smoke-ui.mjs` (117 checks).
 - Render reference solutions to `sols/*.png`: `node test/render-sols.mjs`
   (run `npm i` first — dev dep `@napi-rs/canvas`).
 - Re-route references to obey the wiring rules: `node test/route-solutions.mjs`.
@@ -40,7 +40,10 @@ follow-up inline over spawning a subagent.
 - `js/render.js` (canvas renderer), `js/ui.js` (app shell), `js/biblio.js` (refs).
 - `test/solutions.json` — the reference solution per level (test oracle).
   `test/run-tests.mjs` certifies them + a geometry guard (no through-element /
-  overlap / self-overlap; crossings are allowed but cost the planarity star).
+  overlap / self-overlap) + a planarity guard: every reference must be 0-crossing —
+  forced crossings are routed through `CROSS` (Crossover) gadgets. (In-game, a player's
+  crossings are allowed but cost the planarity star; `engine.countCrossings` collinear-
+  merges first, so a crossing can't hide on a via.)
 
 ## Conventions
 - Scoring: 4 stars = pass | proper-build | heat-par | planar. A hint docks one star.
@@ -59,6 +62,12 @@ follow-up inline over spawning a subagent.
   rebuilt for the real PS (w4l4 has a self-resetting "twice" case); PS/RPS gained
   the +/−/S bent-arm toggle; the sandbox offers every element (guard-tested);
   reference gallery regenerated. Suite green.
+- **Crossover feature** (2026-06-20): new `CROSS` element + a planarity-counter fix
+  (`engine.countCrossings` collinear-merges, so a crossing can't hide on a via). All
+  references are now 0-crossing — w2·4 (×2 Crossovers) and w2·5 (×1) genuinely need them;
+  w2·1 and w2·6 were re-derived planar (w2·6's fixed layout was rearranged). `certify` is a
+  shared 100-seed gate (`engine.CERTIFY_SEEDS`) for game + tests; run-tests asserts every
+  reference is planar; sandbox launchers gained per-pulse absolute launch times.
 - **Not yet deployed**: regenerate the deploy zip from `main` HEAD and drag it to
   Netlify (zips live in the non-repo `../netlify-zips/`).
 - Open thread: the bonus level w4l6 "The Boomerang Theorem" still wants a
