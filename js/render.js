@@ -378,6 +378,17 @@
           glyphText(ctx, 'A    B', 8, COL.dim, 0, 15);
           break;
         }
+        case 'CROSS': {
+          bodyRect(ctx, sz, { selected: opts.selected });
+          ctx.strokeStyle = '#9fd2ff'; ctx.lineWidth = 1.8; ctx.lineCap = 'round';
+          ctx.beginPath(); ctx.moveTo(-12, 0); ctx.lineTo(12, 0); ctx.stroke();   // one wire straight across
+          ctx.beginPath();                                                        // the other hops over it
+          ctx.moveTo(0, 12); ctx.lineTo(0, 4);
+          ctx.arc(0, 0, 4, Math.PI / 2, -Math.PI / 2, true);
+          ctx.lineTo(0, -12);
+          ctx.stroke();
+          break;
+        }
         default: {
           bodyRect(ctx, sz, { selected: opts.selected });
           glyphText(ctx, type.glyph || '?', 12);

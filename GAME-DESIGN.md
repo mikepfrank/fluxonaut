@@ -63,6 +63,7 @@ real-world implementation status shown in the Notebook.
 | Reflector (PR) | 1 | – | bounce back | ↺ / trivial (shorted line end) |
 | Inverting Reflector | 1 | – | bounce, flip polarity | ↺ / trivial (open line end) |
 | NOT twist | 2 | – | pass, flip polarity | ↺ / trivial (conductor half-twist) |
+| Crossover (bridge) | 4 | – | opposite ports pass straight through (A↔B, C↔D); two wires cross with no interaction | ↺ / **game gadget** (not in the papers); a via to another metal layer, impedance-matched |
 | Rotary R (CW/CCW) | 3 | – | cyclic port routing, polarity-blind | ↺ / *unary model device; polarity-blind version is an open implementation question* |
 | Flipping Diode FD | 2 | dir | passes in forward dir (flips dir); reflects in reverse | ↺ / theoretical (ICRC'17) |
 | Toggling Controlled Barrier TCB | 3 (L,R,C) | open/closed | C: reflect & toggle; L/R: pass if open, reflect if closed | ↺ / theoretical (ICRC'17); universal with R |
