@@ -19,10 +19,10 @@
 
   // Internal time is in abstract sim-units; quote real durations in ps (SFQ scale).
   // Physical scale: 1 cell ≈ 50 µm of LJJ; fluxons at ~c/30 ≈ 10 µm/ps ⇒ ~5 ps/cell
-  // ⇒ one sim-unit ≈ 16 ps (PS_PER_SEC); the game slows real time by ~6×10¹⁰.
+  // ⇒ one sim-unit ≈ 16 ps (PS_PER_UNIT); the game slows real time by ~6×10¹⁰.
   const SPEED = 3.2;        // cells per sim-unit (1 cell ≈ 5 ps)
   const MIN_GAP = 0.22;     // min arrival separation at one element ≈ 3.5 ps
-  const PS_PER_SEC = SPEED * 5;   // ps per sim-unit (= 16)
+  const PS_PER_UNIT = SPEED * 5;   // ps per sim-unit (= 16)
   const MAX_EVENTS = 30000;
   const MAX_TIME = 600;
 
@@ -291,7 +291,7 @@
         if (last !== undefined && ev.t - last < MIN_GAP) {
           ev.pulse.fate = 'fault'; ev.pulse.fateT = ev.t;
           fault(ev.t, 'async',
-            `Two fluxons reached the same ${type.name} only ${((ev.t - last) * PS_PER_SEC).toFixed(1)} ps apart. Asynchronous devices need clearly separated, non-overlapping arrivals — give them breathing room (the ORDER matters, the exact timing must not).`,
+            `Two fluxons reached the same ${type.name} only ${((ev.t - last) * PS_PER_UNIT).toFixed(1)} ps apart. Asynchronous devices need clearly separated, non-overlapping arrivals — give them breathing room (the ORDER matters, the exact timing must not).`,
             pp.x, pp.y);
           continue;
         }
@@ -431,6 +431,6 @@
     return { pass, heatMax, perCase, usedEls: [...used] };
   }
 
-  F.engine = { SPEED, MIN_GAP, GAP, PS_PER_SEC, CORNER_R, portWorld, wirePath, pathLength, pointAlong, roundedPath, validate, simulate, buildInputs, runCase, certify, polSym };
+  F.engine = { SPEED, MIN_GAP, GAP, PS_PER_UNIT, CORNER_R, portWorld, wirePath, pathLength, pointAlong, roundedPath, validate, simulate, buildInputs, runCase, certify, polSym };
   F.roundedPath = roundedPath; F.CORNER_R = CORNER_R;
 })();
