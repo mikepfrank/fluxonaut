@@ -316,14 +316,22 @@
       }, 'initial state: ' + stateLabel(el.state)));
     }
     if (app.level.sandbox && t.id === 'LAUNCHER') {
-      const pats = [[1], [1, 1], [1, 1, 1], [-1], [1, -1], [-1, 1], [1, -1, 1, -1], [1, 1, -1]];
-      el.pattern = el.pattern || [1];
+      const pulses = launcherPulses(el);
+      box.append(h('div', { class: 'insp-sub' }, 'launch schedule · t in units (1 ≈ 16 ps)'));
+      const list = h('div', { class: 'pulse-list' });
+      pulses.forEach((p, k) => {
+        list.append(h('div', { class: 'pulse-row' },
+          h('input', {
+            class: 'pulse-t', type: 'number', step: '0.5', min: '0', value: String(p.t),
+            oninput: (ev) => { const v = parseFloat(ev.target.value); if (!isNaN(v) && v >= 0) p.t = v; },
+          }),
+          h('button', { class: 'mini', title: 'flip polarity', onclick: () => { p.pol = -p.pol; SFX.toggle(); renderInspector(); } }, p.pol === 1 ? '+' : '−'),
+          h('button', { class: 'mini warn', title: 'remove pulse', onclick: () => { pulses.splice(k, 1); if (!pulses.length) pulses.push({ t: 1.5, pol: 1 }); renderInspector(); } }, '✕')));
+      });
+      box.append(list);
       box.append(h('button', {
-        class: 'mini', onclick: () => {
-          const i = pats.findIndex(p => JSON.stringify(p) === JSON.stringify(el.pattern));
-          el.pattern = pats[(i + 1) % pats.length]; renderInspector();
-        },
-      }, 'fires: ' + el.pattern.map(p => p === 1 ? '+' : '−').join(' ')));
+        class: 'mini', onclick: () => { const last = pulses.length ? pulses[pulses.length - 1].t : 0; pulses.push({ t: Math.round((last + 1.5) * 2) / 2, pol: 1 }); renderInspector(); },
+      }, '+ pulse'));
     }
     if (el.placed || (!el.locked && !F.TYPES[el.type].io)) {
       if (el.placed) box.append(h('button', { class: 'mini warn', onclick: () => deleteSelection() }, '✕ delete'));
@@ -581,17 +589,20 @@
     beginPlayback(r.trace, { pass: r.pass, reasons: r.reasons });
   }
 
+  // Sandbox launchers fire on an absolute schedule: each pulse is {t (units from start),
+  // pol}. Migrate the legacy {pattern:[pol,...]} form (an implicit 1.5-unit cadence).
+  function launcherPulses(el) {
+    if (!el.pulses) {
+      el.pulses = (el.pattern || [1]).map((pol, k) => ({ t: 1.5 * (k + 1), pol }));
+      delete el.pattern;
+    }
+    return el.pulses;
+  }
   function runSandbox() {
     const inputs = [];
-    let t = 0.6;
-    const launchers = app.elements.filter(e => e.type === 'LAUNCHER');
-    const maxLen = Math.max(0, ...launchers.map(l => (l.pattern || [1]).length));
-    for (let i = 0; i < maxLen; i++) {
-      for (const l of launchers) {
-        const pat = l.pattern || [1];
-        if (i < pat.length) { inputs.push({ t, launcher: l.id, pol: pat[i] }); t += 1.5; }
-      }
-    }
+    for (const l of app.elements.filter(e => e.type === 'LAUNCHER'))
+      for (const p of launcherPulses(l)) inputs.push({ t: p.t, launcher: l.id, pol: p.pol });
+    inputs.sort((a, b) => a.t - b.t);
     const trace = E.simulate(circuit(), inputs);
     beginPlayback(trace, null);
   }
@@ -1024,11 +1035,15 @@
         });
       }
       if (el.type === 'LAUNCHER' && lv.sandbox) {
-        const pat = el.pattern || [1];
-        pat.forEach((pol, k) => {
-          const x = (el.x + 0.5 + (k - (pat.length - 1) / 2) * 0.42) * CELL, y = (el.y - 0.32) * CELL;
-          ctx.beginPath(); ctx.arc(x, y, 5, 0, 7);
-          ctx.fillStyle = R.polColor(pol); ctx.fill();
+        const pulses = launcherPulses(el);
+        pulses.forEach((p, k) => {
+          const x = (el.x + 0.5 + (k - (pulses.length - 1) / 2) * 0.52) * CELL;
+          ctx.beginPath(); ctx.arc(x, (el.y - 0.46) * CELL, 5, 0, 7);
+          ctx.fillStyle = lv.bipolar ? R.polColor(p.pol) : '#cdeeff'; ctx.fill();
+          ctx.fillStyle = 'rgba(205,228,250,0.92)'; ctx.font = '700 8.5px system-ui, sans-serif';
+          ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.fillText(p.t.toFixed(1), x, (el.y - 0.2) * CELL);
+          ctx.textAlign = 'start'; ctx.textBaseline = 'alphabetic';
         });
       }
       // detector readout (sandbox): the sequence of pulse types actually received
