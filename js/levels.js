@@ -810,7 +810,7 @@ argument. Welcome to research.`,
 
   // ═══════════════════════════════ SANDBOX ════════════════════════════════════
   const SANDBOX = {
-    id: 'sandbox', world: 0, n: 0, title: 'Sandbox', size: { w: 26, h: 15 },
+    id: 'sandbox', world: 0, n: 0, title: 'Sandbox', size: { w: 38, h: 22 },
     bipolar: true, sandbox: true,
     intro: `Free bench time. Every element — including the conjectural ones — plus
 launchers and detectors you can program yourself (select a launcher to choose its

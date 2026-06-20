@@ -76,8 +76,12 @@ h1 { font-size: 54px; letter-spacing: 12px; font-weight: 200; color: #e8f4ff;
 #hud-heat b { color: var(--bad); } #hud-parts b { color: var(--text); }
 
 #game-main { display: flex; gap: 12px; padding: 12px; align-items: flex-start;
-  max-width: 1500px; margin: 0 auto; }
+  max-width: 1700px; margin: 0 auto; }
 #palette { width: 132px; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; }
+/* Sandbox: many devices -> multi-column grid with its own scrollbar, kept beside the board */
+#palette.sandbox { width: 340px; display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 7px; align-content: start; max-height: calc(100vh - 86px); overflow-y: auto;
+  position: sticky; top: 12px; padding-right: 4px; }
 .pal-item { background: var(--panel); border: 1px solid var(--edge); border-radius: 10px;
   padding: 7px; text-align: center; cursor: grab; transition: all .12s; }
 .pal-item:hover { border-color: var(--edge-hi); }
@@ -86,7 +90,7 @@ h1 { font-size: 54px; letter-spacing: 12px; font-weight: 200; color: #e8f4ff;
 .pal-count { font-size: 10px; color: var(--dim); }
 
 #board-wrap { flex: 1; min-width: 0; }
-#board { width: 100%; max-width: 1100px; display: block; border: 1px solid var(--edge);
+#board { width: 100%; max-width: 1280px; display: block; border: 1px solid var(--edge);
   border-radius: 12px; background: #0a111e; cursor: crosshair;
   box-shadow: 0 8px 40px rgba(0,0,0,.45), inset 0 0 80px rgba(40,80,140,.05); }
 #case-tabs { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }

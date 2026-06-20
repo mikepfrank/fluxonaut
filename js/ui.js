@@ -223,6 +223,7 @@
     pal.innerHTML = '';
     const keys = Object.keys(lv.palette || {});
     pal.classList.toggle('hidden', keys.length === 0);
+    pal.classList.toggle('sandbox', !!lv.sandbox);
     for (const k of keys) {
       const t = F.TYPES[k];
       const item = h('div', { class: 'pal-item', 'data-type': k, title: t.blurb },
