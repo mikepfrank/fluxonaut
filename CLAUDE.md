@@ -5,7 +5,7 @@ reversible computing). Vanilla JS, **no build system** — `index.html` loads th
 scripts directly. Deployed at https://fluxonaut.netlify.app . Repo:
 github.com/mikepfrank/fluxonaut (this folder is `fluxon-game/`).
 
-The author, **Michael Frank**, wrote the 2017 paper the game dramatizes — he is
+The author, **Michael Frank**, wrote the 2017 paper (and other references) the game dramatizes — he is
 the domain authority on its physics/CS. Defer to him on conceptual correctness;
 don't treat in-game text as ground truth.
 
