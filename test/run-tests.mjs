@@ -145,8 +145,9 @@ function checkGeometry(circuit){
 function testLevel(level, solution) {
   console.log(`Level ${level.id} — ${level.title}:`);
   const circuit = buildCircuit(level, solution);
-  const res = F.engine.certify(circuit, level.cases, [0, 1, 2, 3, 4, 5, 6], { optional: level.optionalDetectors || [] });
-  check('certify passes (all cases × 7 seeds)', res.pass,
+  const seeds = Array.from({ length: F.engine.CERTIFY_SEEDS }, (_, i) => i);
+  const res = F.engine.certify(circuit, level.cases, seeds, { optional: level.optionalDetectors || [] });
+  check(`certify passes (all cases × ${seeds.length} seeds)`, res.pass,
     res.perCase.filter(c => !c.pass).map(c => `\n      case "${c.name}": ${c.reasons.join('; ')}`).join(''));
   const placed = (solution.place || []).length;
   check(`element count ${placed} ≤ par ${level.parElements}`, placed <= level.parElements);

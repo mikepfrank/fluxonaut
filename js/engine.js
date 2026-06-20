@@ -25,6 +25,12 @@
   const PS_PER_UNIT = SPEED * 5;   // ps per sim-unit (= 16)
   const MAX_EVENTS = 30000;
   const MAX_TIME = 600;
+  // Certify samples this many seeded jitter draws per case (seed 0 = nominal, the rest
+  // scaled ×[0.7,1.5)). The in-game Certify and the test harness share this one count,
+  // so a solution that passes in the game passes in the tests and vice-versa. Reference
+  // solutions are verified robust (0 fails) well beyond this bar (random + every jitter
+  // corner + a factor grid); 100 is the agreed in-product gate.
+  const CERTIFY_SEEDS = 100;
 
   // --- geometry --------------------------------------------------------------
   function portWorld(el, type, portName) {
@@ -412,7 +418,7 @@
 
   // Certify: all cases × seeds. Returns {pass, heatMax, perCase:[{name,pass,reasons,heat}]}
   function certify(circuit, cases, seeds, opts) {
-    seeds = seeds || [0, 1, 2, 3, 4];
+    seeds = seeds || Array.from({ length: CERTIFY_SEEDS }, (_, i) => i);
     const perCase = [];
     let pass = true, heatMax = 0;
     const used = new Set();   // element ids a fluxon reaches (utilization check)
@@ -431,6 +437,6 @@
     return { pass, heatMax, perCase, usedEls: [...used] };
   }
 
-  F.engine = { SPEED, MIN_GAP, GAP, PS_PER_UNIT, CORNER_R, portWorld, wirePath, pathLength, pointAlong, roundedPath, validate, simulate, buildInputs, runCase, certify, polSym };
+  F.engine = { SPEED, MIN_GAP, GAP, PS_PER_UNIT, CERTIFY_SEEDS, CORNER_R, portWorld, wirePath, pathLength, pointAlong, roundedPath, validate, simulate, buildInputs, runCase, certify, polSym };
   F.roundedPath = roundedPath; F.CORNER_R = CORNER_R;
 })();

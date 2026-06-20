@@ -75,7 +75,7 @@ for (const level of F.LEVELS) {
   const elements = baseElements(lv, routed); let w2 = 0; const wires = [];
   for (const pw of keptPre) wires.push({ id: 'pw' + (w2++), a: { el: pw.a[0], port: pw.a[1] }, b: { el: pw.b[0], port: pw.b[1] }, via: pw.via || [] });
   for (const w of newWires) wires.push({ id: 'w' + (w2++), a: { el: w[0][0], port: w[0][1] }, b: { el: w[1][0], port: w[1][1] }, via: w[2] || [] });
-  const circuit = { elements, wires }; const res = E.certify(circuit, lv.cases, [0, 1, 2, 3, 4, 5, 6], { optional: lv.optionalDetectors || [] });
+  const circuit = { elements, wires }; const res = E.certify(circuit, lv.cases, Array.from({ length: E.CERTIFY_SEEDS }, (_, i) => i), { optional: lv.optionalDetectors || [] });
   const ws = wires.map(w => segsOf(E.wirePath(circuit, w))); let thr = 0, ov = 0, self = 0, xc = 0;
   for (let wi = 0; wi < wires.length; wi++) for (const r of boxList) { let f = false; for (const sg of ws[wi]) if (segRect(sg.a.x, sg.a.y, sg.b.x, sg.b.y, r) > 0.05) f = true; if (f) { thr++; break; } }
   for (let i = 0; i < ws.length; i++) for (let j = i + 1; j < ws.length; j++) { let f = false; for (const a of ws[i]) for (const b of ws[j]) if (segOv(a, b) > 0.15) f = true; if (f) ov++; }

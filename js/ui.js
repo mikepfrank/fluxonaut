@@ -780,7 +780,7 @@
     const lv = app.level;
     if (lv.sandbox) { runSandbox(); return; }
     stopPlayback();
-    const res = E.certify(circuit(), lv.cases, [0, 1, 2, 3, 4, 5, 6], { optional: lv.optionalDetectors || [] });
+    const res = E.certify(circuit(), lv.cases, Array.from({ length: E.CERTIFY_SEEDS }, (_, i) => i), { optional: lv.optionalDetectors || [] });
     app.certifyResult = res;
     const build = buildQuality(res);
     const crossings = countWireCrossings();
