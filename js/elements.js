@@ -251,7 +251,6 @@
     w: 1, h: 1,
     ports: [p('A', 0, 0.5, W), p('B', 1, 0.5, E), p('C', 0.5, 0, N), p('D', 0.5, 1, S)],
     states: null, reversible: true, heatPerOp: 0,
-    portLabels: { A: '↔', B: '↔', C: '↕', D: '↕' },
     blurb: 'A wire bridge: the horizontal pair (A↔B) and the vertical pair (C↔D) pass straight through and cross WITHOUT touching — two signals cross with no logical interaction and no heat. Not from the BARCS papers (a game gadget), but buildable in principle with a via to another metal layer, minding the impedance match.',
     transition(port, pol, state) {
       return { port: { A: 'B', B: 'A', C: 'D', D: 'C' }[port], pol, state };
