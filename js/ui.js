@@ -283,6 +283,9 @@
     if (!el) { box.classList.add('hidden'); return; }
     const t = F.TYPES[el.type];
     box.append(h('span', { class: 'insp-name' }, t.name + (el.locked ? ' 🔒' : '')));
+    if (t.transition && !t.io) {
+      box.append(h('button', { class: 'mini', title: 'show this device’s transition rule', onclick: () => openRuleModal(t, el.cfg) }, '🔍 rule'));
+    }
     if (!el.locked) {
       box.append(h('button', { class: 'mini', title: 'rotate (R)', onclick: () => rotateSelection() }, '⟳ rotate'));
       box.append(h('button', { class: 'mini', title: 'mirror (F)', onclick: () => { flipSelection(); renderInspector(); } }, '⇄ flip'));
@@ -339,6 +342,85 @@
     box.append(h('span', { class: 'insp-blurb' }, t.blurb));
   }
   function stateLabel(s) { return s === 1 ? '+' : s === -1 ? '−' : String(s); }
+
+  // ───────────── element "rule" inspector — the Mealy transition table ────────
+  // Enumerate every input syndrome (incoming polarity, entry port, initial state) and the
+  // output syndrome (final state, exit port, outgoing polarity) the element maps it to,
+  // each tagged with heat (0 = dissipationless — the reversible "right-of-way" lane).
+  function ruleRows(t, cfg) {
+    const rows = [];
+    for (const st of (t.states || [null])) for (const port of t.ports) for (const pol of [1, -1]) {
+      let r; try { r = t.transition(port.name, pol, st, cfg || t.config); } catch (e) { r = null; }
+      rows.push({ pol, port: port.name, st,
+        out: (r && !r.absorb) ? { st: r.state, port: r.port, pol: r.pol } : null,
+        absorb: !!(r && r.absorb), heat: (r && r.heat) || 0 });
+    }
+    return rows;
+  }
+  function _syn(t, kind, o) {
+    const ps = p => p === 1 ? '+' : '−', pt = p => (t.portLabels && t.portLabels[p]) || p, ss = s => s == null ? '∅' : stateLabel(s);
+    return kind === 'in' ? `( ${ps(o.pol)} , ${pt(o.port)} , ${ss(o.st)} )` : `( ${ss(o.st)} , ${pt(o.port)} , ${ps(o.pol)} )`;
+  }
+  // Lay the table out so lossless transitions are HORIZONTAL: group inputs by the output
+  // they yield, anchor each output to its dissipationless (heat-0) input, list the other
+  // (dissipative) inputs adjacent, and draw them as curved red "merges" into the shared
+  // output row — no output row repeated. Returns an inline SVG string.
+  function ruleSVG(t, cfg) {
+    const rows = ruleRows(t, cfg);
+    const groups = new Map(), extra = [];
+    for (const r of rows) {
+      if (!r.out) { extra.push(r); continue; }
+      const k = _syn(t, 'out', r.out);
+      if (!groups.has(k)) groups.set(k, { out: r.out, anchor: null, diss: [] });
+      const g = groups.get(k);
+      if (r.heat === 0 && !g.anchor) g.anchor = r; else g.diss.push(r);
+    }
+    for (const g of groups.values()) if (!g.anchor) g.anchor = g.diss.shift();   // all-dissipative output
+    const inRows = [], outRows = [];
+    for (const g of groups.values()) {
+      const dIdx = [];
+      for (const d of g.diss) { dIdx.push(inRows.length); inRows.push({ r: d, role: 'merge' }); }
+      const ai = inRows.length; inRows.push({ r: g.anchor, role: 'anchor' });
+      outRows.push({ out: g.out, ai, heat: g.anchor.heat, dIdx });
+    }
+    for (const e of extra) inRows.push({ r: e, role: e.absorb ? 'absorb' : 'fault' });
+    const hasMerges = outRows.some(o => o.dIdx.length);
+    const rowH = 28, top = 30, iR = 224, aL = 236, aR = 356, oL = 368, W = 560, H = top + inRows.length * rowH + 12;
+    const ym = i => top + i * rowH + rowH / 2;
+    let s = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" class="ttsvg">`;
+    s += `<defs><marker id="mab" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#5fa8ff"/></marker>`;
+    s += `<marker id="mar" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#ff6b6b"/></marker></defs>`;
+    s += `<text x="${iR}" y="16" text-anchor="end" class="th">input · (pol, port, state)</text>`;
+    s += `<text x="${oL}" y="16" text-anchor="start" class="th">output · (state, port, pol)</text>`;
+    inRows.forEach((row, i) => {
+      const y = ym(i), bad = row.role === 'fault' || row.role === 'absorb';
+      s += `<text x="${iR}" y="${y + 4}" text-anchor="end" class="${bad ? 'tf' : 'tt'}">${_syn(t, 'in', row.r)}</text>`;
+      if (row.role === 'fault') s += `<text x="${(aL + aR) / 2}" y="${y + 4}" text-anchor="middle" class="tf">↛ undefined</text>`;
+      if (row.role === 'absorb') s += `<text x="${(aL + aR) / 2}" y="${y + 4}" text-anchor="middle" class="tf">⊥ absorbed</text>`;
+    });
+    outRows.forEach(o => {
+      const y = ym(o.ai), blue = o.heat === 0;
+      s += `<text x="${oL}" y="${y + 4}" text-anchor="start" class="tt">${_syn(t, 'out', o.out)}</text>`;
+      s += `<line x1="${aL}" y1="${y}" x2="${aR}" y2="${y}" stroke="${blue ? '#5fa8ff' : '#ff6b6b'}" stroke-width="2.3" marker-end="url(#${blue ? 'mab' : 'mar'})"/>`;
+      for (const di of o.dIdx) {
+        const yd = ym(di), cx = (aL + aR) / 2;
+        s += `<path d="M ${aL} ${yd} C ${cx} ${yd}, ${cx} ${y}, ${aR} ${y}" fill="none" stroke="#ff6b6b" stroke-width="2" marker-end="url(#mar)"/>`;
+      }
+    });
+    return { svg: s + `</svg>`, hasMerges };
+  }
+  function openRuleModal(t, cfg) {
+    if (typeof document === 'undefined') return;
+    const { svg, hasMerges } = ruleSVG(t, cfg);
+    $('#modal').classList.remove('hidden');
+    const box = $('#modal-box'); box.innerHTML = '';
+    box.append(h('h2', {}, t.name + ' — transition rule'));
+    box.append(h('div', { class: 'rule-svg', html: svg }));
+    box.append(h('div', { class: 'rule-note', html: hasMerges
+      ? `<b class="cr">Conditionally reversible.</b> A red arrow is a <b>dissipative merge</b>: two distinct inputs collapse to one output, erasing a distinction and so shedding ≥ kT·ln2 of heat (Landauer). Like cars merging onto a highway — the blue lane has the right of way and flows free; the rest must brake to yield. That's the logic of <i>Generalized Reversible Computing</i> (2018).`
+      : `<b class="rv">Reversible.</b> Every input maps to its own distinct output — the map is injective, so the device runs free: nothing merged, nothing erased, no heat owed.` }));
+    box.append(h('div', { class: 'modal-btns' }, h('button', { class: 'big primary', onclick: closeModal }, 'Close')));
+  }
 
   // ───────────────────────── editing ops ─────────────────────────
   function startPlacing(typeId) {
@@ -1252,5 +1334,5 @@
   }
 
   // test/debug hooks (harmless in production)
-  F._ui = { app, boot, loadLevel, runCurrentCase, certify, advancePlayback, frame, showScreen, stopPlayback, buildLevelSelect, showNotebook, startPlacing, tryPlace, deleteSelection, finishWire };
+  F._ui = { app, boot, loadLevel, runCurrentCase, certify, advancePlayback, frame, showScreen, stopPlayback, buildLevelSelect, showNotebook, startPlacing, tryPlace, deleteSelection, finishWire, ruleSVG, openRuleModal };
 })();

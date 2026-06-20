@@ -115,6 +115,16 @@ h1 { font-size: 54px; letter-spacing: 12px; font-weight: 200; color: #e8f4ff;
 .pulse-row input.pulse-t { width: 56px; padding: 3px 6px; background: var(--bg, #0d1722);
   border: 1px solid var(--edge); color: #cde6ff; border-radius: 5px; font-size: 11.5px; }
 
+/* element transition-rule inspector (the 🔍 modal) */
+.rule-svg { overflow-x: auto; margin: 6px 0 2px; }
+.ttsvg { display: block; margin: 0 auto; max-width: 100%; }
+.ttsvg .th { fill: var(--dim); font: 600 11px system-ui, sans-serif; }
+.ttsvg .tt { fill: #d4ebff; font: 13px ui-monospace, "SF Mono", Menlo, monospace; }
+.ttsvg .tf { fill: #ff9d8a; font: 12px ui-monospace, Menlo, monospace; }
+.rule-note { font-size: 12.5px; line-height: 1.55; color: #cfe2f5; max-width: 600px; margin: 8px auto 2px; text-align: left; }
+.rule-note .cr { color: #ff8a7a; }
+.rule-note .rv { color: #7fc7ff; }
+
 /* persistent level briefing panel (full width, above the board) */
 #briefing { max-width: 1476px; margin: 12px auto 0; background: var(--panel);
   border: 1px solid var(--edge); border-radius: 10px; padding: 10px 16px; }

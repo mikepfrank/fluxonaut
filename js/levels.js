@@ -450,7 +450,7 @@ energy <i>every single time</i>. Watch the heat counter when you run —
 those embers are real entropy, the kind Landauer warned us about.<br><br>And it’s <i>logically</i> irreversible, too: once a fluxon leaves on an output arm, you can’t tell whether it passed straight through from the stem or merely bounced off that arm after arriving from the wrong direction. Two possible histories, one output — the map can’t be run backwards, and that erased information is the heat you just watched accrue.`,
       hint: 'IN → stem. + branch (marked +) → PLUS, − branch → MINUS.',
       success: 'It works — the real chips use it. But four sorted fluxons cost four puffs of waste heat. Surely physics permits better…',
-      notebook: ['ps', 'landauer'],
+      notebook: ['ps', 'landauer', 'condrev'],
       fixed: [
         el('L_in', 'LAUNCHER', 1, 6),
         el('D_p', 'DETECTOR', 20, 2), el('D_m', 'DETECTOR', 20, 10),
@@ -901,7 +901,7 @@ transition function f(input port &amp; pulse type, state) → (new state, output
 f must be <b>injective</b> (one-to-one), so distinct situations never merge. Merging
 would erase information, and erasure costs energy (see Landauer's principle).
 Every <b>reversible</b> element in this game satisfies exactly that condition; select
-any device to read its exact rule. (Later worlds add a few deliberately
+any device and tap its 🔍 to read its exact rule. (Later worlds add a few deliberately
 <b>irreversible</b> biased gates — the Polarity Filter, Separator, and Circulator —
 that break injectivity on purpose, and pay heat for it.) <i>Ref: ICRC'17, §II.13.</i>`,
     },
@@ -1046,6 +1046,20 @@ loophole (Bennett, 1973): computation doesn't <i>require</i> erasure. A reversib
 computer shuffles information without ever merging two states into one, so the
 Landauer tax never comes due. That loophole is the economic reason this entire
 research field — and this game — exists.`,
+    },
+    condrev: {
+      title: 'Conditional reversibility (merging lanes)',
+      body: `Most devices here are <b>unconditionally</b> reversible — injective for every
+input, so nothing is ever erased and no heat is owed. The biased gates (Polarity Filter,
+Separator, Circulator) are <b>conditionally</b> reversible instead: on some inputs they run
+free, but on others two distinct situations <i>merge</i> into one output — and a merge erases
+a distinction, so it must shed at least kT·ln2 (Landauer). Picture cars merging onto a
+highway: one incoming lane has the right of way and flows straight through (the lossless
+transition, drawn blue in the 🔍 rule), while every other lane feeding that same output must
+brake and yield, paying energy to squeeze in (the red merges). Reversibility, it turns out,
+isn't all-or-nothing — a device can be reversible exactly on the set of inputs you promise to
+feed it, and you only pay heat when you break that promise. That is the thesis of
+<i>Generalized Reversible Computing</i>. <i>Ref: GRC 2018 (arXiv:1806.10183).</i>`,
     },
     pr3: {
       title: 'The Polarized Rotary (theory ahead of hardware)',

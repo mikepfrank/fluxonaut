@@ -184,6 +184,22 @@ for (const lv of F.LEVELS.concat([F.SANDBOX])) {
   check('palette count decremented', U.app.paletteLeft.REFLECTOR === 0);
   tickFrames(2);}
 
+// element transition-rule inspector (the 🔍 modal): renders for every device
+{
+  let ok = true, detail = '';
+  for (const id of Object.keys(F.TYPES)) {
+    const t = F.TYPES[id];
+    if (!t.transition || t.io) continue;
+    try { const r = U.ruleSVG(t, t.config); if (!r || typeof r.svg !== 'string' || !r.svg.includes('<svg')) { ok = false; detail = id + ' bad svg'; } }
+    catch (e) { ok = false; detail = id + ': ' + e.message; }
+  }
+  check('rule inspector: ruleSVG renders for every device', ok, detail);
+  check('rule inspector: PFG is conditionally reversible (has merges)', U.ruleSVG(F.TYPES.PFG, F.TYPES.PFG.config).hasMerges === true);
+  check('rule inspector: a reversible device has no merges', U.ruleSVG(F.TYPES.ROTARY).hasMerges === false);
+  try { U.openRuleModal(F.TYPES.PFG, F.TYPES.PFG.config); check('rule inspector: modal opens without error', true); }
+  catch (e) { check('rule inspector: modal opens without error', false, e.message); }
+}
+
 console.log(`\n${nPass} passed, ${nFail} failed`);
 process.exit(nFail ? 1 : 0);
 
