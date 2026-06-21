@@ -200,6 +200,7 @@ for (const lv of F.LEVELS.concat([F.SANDBOX])) {
   check('rule inspector: W3-4 shows polarity', U.ruleSVG(F.TYPES.CROSS, null, true).svg.includes('input · (pol, port)'));
   check('rule inspector: stateful element keeps the state column', U.ruleSVG(F.TYPES.TCB, null, false).svg.includes('input · (port, state)'));
   { const c = U.ruleSVG(F.TYPES.CIRC); check('rule inspector: partial Circulator (faults + dissipative, no merges)', c.hasFaults && c.hasHeat && !c.hasMerges); }
+  { const d = U.ruleSVG(F.TYPES.DUP); check('rule inspector: partial chip DUP flagged (faults, reversible)', d.hasFaults && !d.hasHeat && !d.hasMerges); }
   try { U.openRuleModal(F.TYPES.PFG, F.TYPES.PFG.config); check('rule inspector: modal opens without error', true); }
   catch (e) { check('rule inspector: modal opens without error', false, e.message); }
 }

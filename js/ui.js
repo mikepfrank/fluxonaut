@@ -427,7 +427,7 @@
     else if (hasHeat) note = hasFaults
       ? `<b class="cr">Partial (conditionally reversible) logical functionality, but a dissipative implementation</b> — only the cases shown are defined; every other input is undefined.`
       : `<b class="cr">Dissipative implementation.</b> The logic is injective (reversible in principle), but this device pays heat on every pass.`;
-    else if (hasFaults) note = `<b class="rv">Reversible</b> on its defined inputs — injective and free; other arrival orders are undefined (they fault).`;
+    else if (hasFaults) note = `<b class="rv">Partial function — reversible where defined.</b> Each defined arrival maps to its own output (injective, no heat); other arrival orders are left undefined and fault.`;
     else note = `<b class="rv">Reversible.</b> Every input maps to its own distinct output — the map is injective, so the device runs free: nothing merged, nothing erased, no heat owed.`;
     box.append(h('div', { class: 'rule-note', html: note }));
     box.append(h('div', { class: 'modal-btns' }, h('button', { class: 'big primary', onclick: closeModal }, 'Close')));
