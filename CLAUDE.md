@@ -11,7 +11,7 @@ don't treat in-game text as ground truth.
 
 ## Commands
 - Tests (keep green): `node test/run-tests.mjs` (386 checks) and
-  `node test/smoke-ui.mjs` (127 checks).
+  `node test/smoke-ui.mjs` (128 checks).
 - Render reference solutions to `sols/*.png`: `node test/render-sols.mjs`
   (run `npm i` first — dev dep `@napi-rs/canvas`).
 - Re-route references to obey the wiring rules: `node test/route-solutions.mjs`.

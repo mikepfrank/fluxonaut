@@ -655,11 +655,19 @@
   }
   function revalidateWires() {
     const cir = { elements: app.elements };
-    for (const w of app.wires) {
-      if (pathLegal(E.wirePath(cir, w), w.id)) { w.bad = false; continue; }
-      const via = rerouteVia(w);
-      if (via) { w.via = via; w.bad = false; } else w.bad = true;
+    // Reroute illegal wires to a fixpoint: moving one wire out of the way frees the obstacle
+    // that was blocking another, so a single ordered pass over-flags them (a wire judged
+    // before its neighbour reroutes would stay red even once the overlap is gone).
+    let changed = true, guard = 0;
+    while (changed && guard++ < app.wires.length + 2) {
+      changed = false;
+      for (const w of app.wires) {
+        if (pathLegal(E.wirePath(cir, w), w.id)) continue;
+        const via = rerouteVia(w);
+        if (via && JSON.stringify(via) !== JSON.stringify(w.via)) { w.via = via; changed = true; }
+      }
     }
+    for (const w of app.wires) w.bad = !pathLegal(E.wirePath(cir, w), w.id);   // flag only what's still illegal once settled
   }
 
   // ───────────────────────── geometry / hit testing ─────────────────────────

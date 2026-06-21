@@ -199,6 +199,25 @@ for (const lv of F.LEVELS.concat([F.SANDBOX])) {
   check('wire reroute: a wire forced through an obstacle is auto-rerouted (not left bad)', w.bad === false && w.via.length > 0);
 }
 
+// wire reroute: mutual overlap — rerouting one wire frees the other, no stale red (fixpoint)
+{
+  const lv = F.LEVELS.find(l => l.size && l.size.w >= 20 && l.size.h >= 9) || F.LEVELS[0];
+  U.loadLevel(lv);
+  U.app.elements = [
+    { id: 'aL', type: 'LAUNCHER', x: 1, y: 2, rot: 0, state: null, placed: true },
+    { id: 'aD', type: 'DETECTOR', x: 18, y: 2, rot: 0, state: null, placed: true },
+    { id: 'bL', type: 'LAUNCHER', x: 1, y: 7, rot: 0, state: null, placed: true },
+    { id: 'bD', type: 'DETECTOR', x: 18, y: 7, rot: 0, state: null, placed: true },
+  ];
+  // both wires jammed onto the same y=7.5 lane → they overlap
+  U.app.wires = [
+    { id: 'aw', a: { el: 'aL', port: 'A' }, b: { el: 'aD', port: 'A' }, via: [{ x: 3, y: 7.5 }, { x: 17, y: 7.5 }] },
+    { id: 'bw', a: { el: 'bL', port: 'A' }, b: { el: 'bD', port: 'A' }, via: [] },
+  ];
+  U.revalidateWires();
+  check('wire reroute: mutual overlap resolved — neither wire left bad', U.app.wires.every(w => w.bad === false));
+}
+
 // element transition-rule inspector (the 🔍 modal): renders for every device
 {
   let ok = true, detail = '';
