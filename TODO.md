@@ -46,6 +46,18 @@ in other W2 levels (and bears directly on the duplicator-planarity question belo
 reference solutions for many levels (every level that wires an SG/TSG), plus re-verifying
 robustness and regenerating renders. Do not start without a dedicated pass.
 
+## Level design — w4l6: also offer the Polarity Separator (PS) on the palette (added 2026-06-21)
+
+Michael's note: the irreversible PS would ALSO break the boomerang in w4l6 — it routes the
+ejected − fluxon around the loop by polarity. That's in fact how the real RFSG test chip (the
+one taped out) did it: a polarity-blind (unconditional) reversible rotary wasn't implementable,
+so they used the PS. Adding `PS` to w4l6's palette (alongside the theoretical unconditional
+ROTARY it now uses) would generalize the lesson — the boomerang can be broken
+reversibly-but-theoretically (the rotary) OR irreversibly-but-really (the PS, real silicon's
+actual choice). Probably also enrich w4l6's intro/success to name the PS as the real-chip path
+(they currently cite the dissipative circulator as the irreversible fallback). Not urgent —
+when doing it, verify the PS solution certifies + is robust, and regenerate the render.
+
 ## Planarity (no-crossing-wires) — RESOLVED (2026-06-20)
 
 Done. The crossing counter was found to under-count: it split each wire at every via/port-
