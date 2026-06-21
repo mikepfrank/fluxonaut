@@ -621,6 +621,45 @@
     SFX.wire();
   }
 
+  // ─── keep wires legal when an element is dragged ───────────────────────────
+  // After a move, a connected (or newly-overlapped) wire can fold, overlap another wire, or
+  // pass through an element. Re-validate every wire; auto-reroute an illegal one to the
+  // shortest legal path (router-lite: direct, the two L-elbows, then a U-detour through each
+  // clear row/column lane), else flag it sticky-red until the player redraws it.
+  function portPos(end) { const el = app.elements.find(e => e.id === end.el); return E.portWorld(el, F.TYPES[el.type], end.port); }
+  function pathLegal(pts, ignoreId) {
+    return !polylineHasReversal(pts) && !pathSelfOverlaps(pts) && !wireOverlapsExisting(pts, ignoreId) && !wireCrossesElements(pts);
+  }
+  function rerouteVia(w) {
+    const cir = { elements: app.elements }, a = portPos(w.a), b = portPos(w.b), lv = app.level;
+    // leave each port one cell along its outward normal, so a detour can't graze its own endpoint
+    const ax = a.x + (a.ox || 0), ay = a.y + (a.oy || 0), bx = b.x + (b.ox || 0), by = b.y + (b.oy || 0);
+    const cands = [
+      [],
+      [{ x: ax, y: ay }, { x: bx, y: by }],
+      [{ x: ax, y: ay }, { x: bx, y: ay }, { x: bx, y: by }],
+      [{ x: ax, y: ay }, { x: ax, y: by }, { x: bx, y: by }],
+    ];
+    for (let r = 0; r < lv.size.h; r++) cands.push([{ x: ax, y: ay }, { x: ax, y: r + 0.5 }, { x: bx, y: r + 0.5 }, { x: bx, y: by }]);
+    for (let c = 0; c < lv.size.w; c++) cands.push([{ x: ax, y: ay }, { x: c + 0.5, y: ay }, { x: c + 0.5, y: by }, { x: bx, y: by }]);
+    let best = null, bestLen = Infinity;
+    for (const via of cands) {
+      const pts = E.wirePath(cir, { a: w.a, b: w.b, via });
+      if (!pathLegal(pts, w.id)) continue;
+      const len = E.pathLength(pts);
+      if (len < bestLen) { bestLen = len; best = via; }
+    }
+    return best;
+  }
+  function revalidateWires() {
+    const cir = { elements: app.elements };
+    for (const w of app.wires) {
+      if (pathLegal(E.wirePath(cir, w), w.id)) { w.bad = false; continue; }
+      const via = rerouteVia(w);
+      if (via) { w.via = via; w.bad = false; } else w.bad = true;
+    }
+  }
+
   // ───────────────────────── geometry / hit testing ─────────────────────────
   let canvas, ctx;
   function sizeCanvas() {
@@ -1024,7 +1063,7 @@
     const cir = circuit();
     for (const w of app.wires) {
       const pts = E.wirePath(cir, w);
-      R.drawWire(ctx, pts, { selected: app.selection && app.selection.kind === 'wire' && app.selection.id === w.id });
+      R.drawWire(ctx, pts, { selected: app.selection && app.selection.kind === 'wire' && app.selection.id === w.id, bad: w.bad });
     }
     // wiring preview
     if (app.mode === 'wiring' && app.wiring) {
@@ -1271,7 +1310,7 @@
   }
 
   function onMouseUp() {
-    if (app.mode === 'dragging') { app.mode = 'idle'; app.dragEl = null; }
+    if (app.mode === 'dragging') { revalidateWires(); app.mode = 'idle'; app.dragEl = null; }
   }
 
   function onContextMenu(ev) {
@@ -1345,5 +1384,5 @@
   }
 
   // test/debug hooks (harmless in production)
-  F._ui = { app, boot, loadLevel, runCurrentCase, certify, advancePlayback, frame, showScreen, stopPlayback, buildLevelSelect, showNotebook, startPlacing, tryPlace, deleteSelection, finishWire, ruleSVG, openRuleModal };
+  F._ui = { app, boot, loadLevel, runCurrentCase, certify, advancePlayback, frame, showScreen, stopPlayback, buildLevelSelect, showNotebook, startPlacing, tryPlace, deleteSelection, finishWire, ruleSVG, openRuleModal, revalidateWires };
 })();

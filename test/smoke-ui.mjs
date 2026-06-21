@@ -184,6 +184,21 @@ for (const lv of F.LEVELS.concat([F.SANDBOX])) {
   check('palette count decremented', U.app.paletteLeft.REFLECTOR === 0);
   tickFrames(2);}
 
+// wire auto-reroute: a wire forced through an obstacle by a move is rerouted, not broken
+{
+  const lv = F.LEVELS.find(l => l.size && l.size.w >= 14 && l.size.h >= 6) || F.LEVELS[0];
+  U.loadLevel(lv);
+  U.app.elements = [
+    { id: 'rL', type: 'LAUNCHER', x: 1, y: 3, rot: 0, state: null, placed: true },
+    { id: 'rD', type: 'DETECTOR', x: 12, y: 3, rot: 0, state: null, placed: true },
+    { id: 'rR', type: 'REFLECTOR', x: 6, y: 3, rot: 0, state: null, placed: true },
+  ];
+  U.app.wires = [{ id: 'rw', a: { el: 'rL', port: 'A' }, b: { el: 'rD', port: 'A' }, via: [] }];
+  U.revalidateWires();
+  const w = U.app.wires[0];
+  check('wire reroute: a wire forced through an obstacle is auto-rerouted (not left bad)', w.bad === false && w.via.length > 0);
+}
+
 // element transition-rule inspector (the 🔍 modal): renders for every device
 {
   let ok = true, detail = '';

@@ -49,11 +49,11 @@
     opts = opts || {};
     ctx.lineJoin = 'round'; ctx.lineCap = 'round';
     traceWire(ctx, pts);
-    ctx.strokeStyle = opts.selected ? 'rgba(127,180,232,0.32)' : 'rgba(60,100,150,0.28)';
+    ctx.strokeStyle = opts.bad ? 'rgba(255,92,105,0.30)' : opts.selected ? 'rgba(127,180,232,0.32)' : 'rgba(60,100,150,0.28)';
     ctx.lineWidth = 7;
     ctx.stroke();
     traceWire(ctx, pts);
-    ctx.strokeStyle = opts.preview ? (opts.bad ? 'rgba(255,92,105,0.95)' : 'rgba(127,180,232,0.8)') : (opts.selected ? COL.wireSel : COL.wireCore);
+    ctx.strokeStyle = opts.bad ? 'rgba(255,92,105,0.97)' : opts.preview ? 'rgba(127,180,232,0.8)' : (opts.selected ? COL.wireSel : COL.wireCore);
     ctx.lineWidth = 2;
     if (opts.preview) ctx.setLineDash([6, 5]);
     ctx.stroke();
