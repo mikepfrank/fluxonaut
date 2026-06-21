@@ -307,7 +307,7 @@
         class: 'mini', title: 'which arm bends out (orthogonal to the other two)', onclick: () => {
           el.cfg = el.cfg || {};
           const cyc = t.bentCycle, i = cyc.indexOf(el.cfg.bent || t.bentPort);
-          el.cfg.bent = cyc[(i + 1) % cyc.length]; SFX.toggle(); renderInspector();
+          el.cfg.bent = cyc[(i + 1) % cyc.length]; SFX.toggle(); revalidateWires(); renderInspector();
         },
       }, 'bent arm: ' + (lab[cur] || cur)));
     }
@@ -481,6 +481,7 @@
     if (!el || el.locked) return;
     el.rot = ((el.rot || 0) + 1) % 4;
     SFX.place();
+    revalidateWires();   // moved ports can fold/cross the connected wires
   }
 
   function flipSelection() {
@@ -491,6 +492,7 @@
     if (!el || el.locked) return;
     el.mir = !el.mir;
     SFX.place();
+    revalidateWires();   // moved ports can fold/cross the connected wires
   }
 
   function deleteSelection() {
