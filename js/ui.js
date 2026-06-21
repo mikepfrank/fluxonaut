@@ -284,7 +284,8 @@
     const t = F.TYPES[el.type];
     box.append(h('span', { class: 'insp-name' }, t.name + (el.locked ? ' 🔒' : '')));
     if (t.transition && !t.io) {
-      box.append(h('button', { class: 'mini', title: 'show this device’s transition rule', onclick: () => openRuleModal(t, el.cfg) }, '🔍 rule'));
+      const showPol = !!(app.level && (app.level.sandbox || (app.level.world || 0) >= 3));   // polarity is introduced in World 3
+      box.append(h('button', { class: 'mini', title: 'show this device’s transition rule', onclick: () => openRuleModal(t, el.cfg, showPol) }, '🔍 rule'));
     }
     if (!el.locked) {
       box.append(h('button', { class: 'mini', title: 'rotate (R)', onclick: () => rotateSelection() }, '⟳ rotate'));
@@ -347,9 +348,9 @@
   // Enumerate every input syndrome (incoming polarity, entry port, initial state) and the
   // output syndrome (final state, exit port, outgoing polarity) the element maps it to,
   // each tagged with heat (0 = dissipationless — the reversible "right-of-way" lane).
-  function ruleRows(t, cfg) {
+  function ruleRows(t, cfg, showPol) {
     const rows = [];
-    for (const st of (t.states || [null])) for (const port of t.ports) for (const pol of [1, -1]) {
+    for (const st of (t.states || [null])) for (const port of t.ports) for (const pol of (showPol ? [1, -1] : [1])) {
       let r; try { r = t.transition(port.name, pol, st, cfg || t.config); } catch (e) { r = null; }
       rows.push({ pol, port: port.name, st,
         out: (r && !r.absorb) ? { st: r.state, port: r.port, pol: r.pol } : null,
@@ -357,20 +358,22 @@
     }
     return rows;
   }
-  function _syn(t, kind, o) {
-    const ps = p => p === 1 ? '+' : '−', pt = p => (t.portLabels && t.portLabels[p]) || p, ss = s => s == null ? '∅' : stateLabel(s);
-    return kind === 'in' ? `( ${ps(o.pol)} , ${pt(o.port)} , ${ss(o.st)} )` : `( ${ss(o.st)} , ${pt(o.port)} , ${ps(o.pol)} )`;
+  function _syn(t, kind, o, showPol) {
+    const ps = p => p === 1 ? '+' : '−', pt = p => (t.portLabels && t.portLabels[p]) || p, parts = [];
+    if (kind === 'in') { if (showPol) parts.push(ps(o.pol)); parts.push(pt(o.port)); if (o.st != null) parts.push(stateLabel(o.st)); }
+    else { if (o.st != null) parts.push(stateLabel(o.st)); parts.push(pt(o.port)); if (showPol) parts.push(ps(o.pol)); }
+    return `( ${parts.join(' , ')} )`;
   }
   // Lay the table out so lossless transitions are HORIZONTAL: group inputs by the output
   // they yield, anchor each output to its dissipationless (heat-0) input, list the other
   // (dissipative) inputs adjacent, and draw them as curved red "merges" into the shared
   // output row — no output row repeated. Returns an inline SVG string.
-  function ruleSVG(t, cfg) {
-    const rows = ruleRows(t, cfg);
+  function ruleSVG(t, cfg, showPol = true) {
+    const rows = ruleRows(t, cfg, showPol);
     const groups = new Map(), extra = [];
     for (const r of rows) {
       if (!r.out) { extra.push(r); continue; }
-      const k = _syn(t, 'out', r.out);
+      const k = _syn(t, 'out', r.out, showPol);
       if (!groups.has(k)) groups.set(k, { out: r.out, anchor: null, diss: [] });
       const g = groups.get(k);
       if (r.heat === 0 && !g.anchor) g.anchor = r; else g.diss.push(r);
@@ -384,23 +387,23 @@
       outRows.push({ out: g.out, ai, heat: g.anchor.heat, dIdx });
     }
     for (const e of extra) inRows.push({ r: e, role: e.absorb ? 'absorb' : 'fault' });
-    const hasMerges = outRows.some(o => o.dIdx.length);
+    const hasMerges = outRows.some(o => o.dIdx.length), stateful = !!t.states;
     const rowH = 28, top = 30, iR = 224, aL = 236, aR = 356, oL = 368, W = 560, H = top + inRows.length * rowH + 12;
     const ym = i => top + i * rowH + rowH / 2;
     let s = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" class="ttsvg">`;
     s += `<defs><marker id="mab" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#5fa8ff"/></marker>`;
     s += `<marker id="mar" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#ff6b6b"/></marker></defs>`;
-    s += `<text x="${iR}" y="16" text-anchor="end" class="th">input · (pol, port, state)</text>`;
-    s += `<text x="${oL}" y="16" text-anchor="start" class="th">output · (state, port, pol)</text>`;
+    s += `<text x="${iR}" y="16" text-anchor="end" class="th">input · (${showPol ? 'pol, ' : ''}port${stateful ? ', state' : ''})</text>`;
+    s += `<text x="${oL}" y="16" text-anchor="start" class="th">output · (${stateful ? 'state, ' : ''}port${showPol ? ', pol' : ''})</text>`;
     inRows.forEach((row, i) => {
       const y = ym(i), bad = row.role === 'fault' || row.role === 'absorb';
-      s += `<text x="${iR}" y="${y + 4}" text-anchor="end" class="${bad ? 'tf' : 'tt'}">${_syn(t, 'in', row.r)}</text>`;
+      s += `<text x="${iR}" y="${y + 4}" text-anchor="end" class="${bad ? 'tf' : 'tt'}">${_syn(t, 'in', row.r, showPol)}</text>`;
       if (row.role === 'fault') s += `<text x="${(aL + aR) / 2}" y="${y + 4}" text-anchor="middle" class="tf">↛ undefined</text>`;
       if (row.role === 'absorb') s += `<text x="${(aL + aR) / 2}" y="${y + 4}" text-anchor="middle" class="tf">⊥ absorbed</text>`;
     });
     outRows.forEach(o => {
       const y = ym(o.ai), blue = o.heat === 0;
-      s += `<text x="${oL}" y="${y + 4}" text-anchor="start" class="tt">${_syn(t, 'out', o.out)}</text>`;
+      s += `<text x="${oL}" y="${y + 4}" text-anchor="start" class="tt">${_syn(t, 'out', o.out, showPol)}</text>`;
       s += `<line x1="${aL}" y1="${y}" x2="${aR}" y2="${y}" stroke="${blue ? '#5fa8ff' : '#ff6b6b'}" stroke-width="2.3" marker-end="url(#${blue ? 'mab' : 'mar'})"/>`;
       for (const di of o.dIdx) {
         const yd = ym(di), cx = (aL + aR) / 2;
@@ -409,9 +412,9 @@
     });
     return { svg: s + `</svg>`, hasMerges };
   }
-  function openRuleModal(t, cfg) {
+  function openRuleModal(t, cfg, showPol = true) {
     if (typeof document === 'undefined') return;
-    const { svg, hasMerges } = ruleSVG(t, cfg);
+    const { svg, hasMerges } = ruleSVG(t, cfg, showPol);
     $('#modal').classList.remove('hidden');
     const box = $('#modal-box'); box.innerHTML = '';
     box.append(h('h2', {}, t.name + ' — transition rule'));
