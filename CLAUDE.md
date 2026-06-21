@@ -31,10 +31,13 @@ follow-up inline over spawning a subagent.
   filter/separator (PFG, PS) and the circulator (CIRC) are irreversible; PFG/PS
   dissipate only when they PUMP a fluxon through (reflections are free). `rPF` is
   the reversible, unpowered filter — the CB's data rail, standalone. Partial chips
-  (DUP/RDUP) fault on out-of-order arrivals. PS/RPS have a `cfg.bent` (+/−/S) that
+  (DUP/RDUP) fault on out-of-order arrivals; `CIRC` is likewise **partial** (only the
+  +-routes A→B and B→C are defined — its real chip design was never finalized). PS/RPS have a `cfg.bent` (+/−/S) that
   picks which arm exits orthogonally — geometry only, distinct from rotate/mirror.
 - `js/engine.js` — deterministic event-driven simulator + `certify` (runs each
-  case under 7 jitter seeds; **order must hold, exact timing must not**).
+  case under 100 jitter seeds — `CERTIFY_SEEDS`, shared by game + tests;
+  **order must hold, exact timing must not**). `engine.countCrossings` = the
+  collinear-merged planarity counter; `ui.js` builds the 🔍 transition-table inspector.
 - `js/levels.js` — `LEVELS`, `SANDBOX`, `NOTEBOOK`: fixed elements, palette,
   cases (inputs + expected detector catches), par counts, intro/hint/success.
 - `js/render.js` (canvas renderer), `js/ui.js` (app shell), `js/biblio.js` (refs).
@@ -68,10 +71,19 @@ follow-up inline over spawning a subagent.
   w2·1 and w2·6 were re-derived planar (w2·6's fixed layout was rearranged). `certify` is a
   shared 100-seed gate (`engine.CERTIFY_SEEDS`) for game + tests; run-tests asserts every
   reference is planar; sandbox launchers gained per-pulse absolute launch times.
-- **Not yet deployed**: regenerate the deploy zip from `main` HEAD and drag it to
-  Netlify (zips live in the non-repo `../netlify-zips/`).
-- Open thread: the bonus level w4l6 "The Boomerang Theorem" still wants a
-  standalone review. See `TODO.md` for UX-friction items and the planarity audit.
+- **Inspector + editor UX** (2026-06-21): a 🔍 on any selected device opens its Mealy
+  transition table — lossless transitions horizontal (blue), dissipative merges curved
+  (red), partial devices flagged; new `condrev` notebook page + GRC 2018 in the biblio.
+  `CIRC` is now partial, so w4l6 was reworked around the theoretical unconditional ROTARY
+  (text reframed: the boomerang needs *unconditional directionality* — reversible-theoretical
+  vs the real dissipative circulator). Dragging/rotating/flipping a wired element now
+  auto-reroutes its wires to a legal path (sticky-red if none exists).
+- **Deployed** 2026-06-21 from `main` (`bb55734`) → https://fluxonaut.netlify.app . To
+  redeploy: rebuild the runtime zip in `../netlify-zips/` (`git archive HEAD …`) and drag it
+  to Netlify.
+- Open threads: w4l6 "The Boomerang Theorem" still wants a standalone review; `TODO.md` has
+  the SG-symbol port-ordering revisit, the "also offer PS on w4l6's palette" idea, and the
+  UX-friction items.
 
 ## Folder layout
 This git repo is `fluxon-game/`. Its PARENT (`C:\Users\MikeFrank\BARCS\`) also
