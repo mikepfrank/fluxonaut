@@ -1845,7 +1845,7 @@
     "place": [
       {
         "id": "circ",
-        "type": "CIRC",
+        "type": "ROTARY",
         "x": 4,
         "y": 6
       }

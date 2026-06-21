@@ -388,6 +388,8 @@
     }
     for (const e of extra) inRows.push({ r: e, role: e.absorb ? 'absorb' : 'fault' });
     const hasMerges = outRows.some(o => o.dIdx.length), stateful = !!t.states;
+    const hasHeat = rows.some(r => r.heat > 0), faultRows = extra.filter(e => !e.absorb);
+    const hasFaults = faultRows.length > 0, allAbsorb = outRows.length === 0 && extra.length > 0 && faultRows.length === 0;
     const rowH = 28, top = 30, iR = 224, aL = 236, aR = 356, oL = 368, W = 560, H = top + inRows.length * rowH + 12;
     const ym = i => top + i * rowH + rowH / 2;
     let s = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" class="ttsvg">`;
@@ -410,18 +412,24 @@
         s += `<path d="M ${aL} ${yd} C ${cx} ${yd}, ${cx} ${y}, ${aR} ${y}" fill="none" stroke="#ff6b6b" stroke-width="2" marker-end="url(#mar)"/>`;
       }
     });
-    return { svg: s + `</svg>`, hasMerges };
+    return { svg: s + `</svg>`, hasMerges, hasHeat, hasFaults, allAbsorb };
   }
   function openRuleModal(t, cfg, showPol = true) {
     if (typeof document === 'undefined') return;
-    const { svg, hasMerges } = ruleSVG(t, cfg, showPol);
+    const { svg, hasMerges, hasHeat, hasFaults, allAbsorb } = ruleSVG(t, cfg, showPol);
     $('#modal').classList.remove('hidden');
     const box = $('#modal-box'); box.innerHTML = '';
     box.append(h('h2', {}, t.name + ' — transition rule'));
     box.append(h('div', { class: 'rule-svg', html: svg }));
-    box.append(h('div', { class: 'rule-note', html: hasMerges
-      ? `<b class="cr">Conditionally reversible.</b> A red arrow is a <b>dissipative merge</b>: two distinct inputs collapse to one output, erasing a distinction and so shedding ≥ kT·ln2 of heat (Landauer). Like cars merging onto a highway — the blue lane has the right of way and flows free; the rest must brake to yield. That's the logic of <i>Generalized Reversible Computing</i> (2018).`
-      : `<b class="rv">Reversible.</b> Every input maps to its own distinct output — the map is injective, so the device runs free: nothing merged, nothing erased, no heat owed.` }));
+    let note;
+    if (allAbsorb) note = `<b class="cr">Erasure.</b> Every input is swallowed into heat — nothing comes back out. The most irreversible operation there is.`;
+    else if (hasMerges) note = `<b class="cr">Conditionally reversible.</b> A red arrow is a <b>dissipative merge</b>: two distinct inputs collapse to one output, erasing a distinction and so shedding ≥ kT·ln2 of heat (Landauer). Like cars merging onto a highway — the blue lane has the right of way and flows free; the rest must brake to yield. That's the logic of <i>Generalized Reversible Computing</i> (2018).`;
+    else if (hasHeat) note = hasFaults
+      ? `<b class="cr">Partial (conditionally reversible) logical functionality, but a dissipative implementation</b> — only the cases shown are defined; every other input is undefined.`
+      : `<b class="cr">Dissipative implementation.</b> The logic is injective (reversible in principle), but this device pays heat on every pass.`;
+    else if (hasFaults) note = `<b class="rv">Reversible</b> on its defined inputs — injective and free; other arrival orders are undefined (they fault).`;
+    else note = `<b class="rv">Reversible.</b> Every input maps to its own distinct output — the map is injective, so the device runs free: nothing merged, nothing erased, no heat owed.`;
+    box.append(h('div', { class: 'rule-note', html: note }));
     box.append(h('div', { class: 'modal-btns' }, h('button', { class: 'big primary', onclick: closeModal }, 'Close')));
   }
 

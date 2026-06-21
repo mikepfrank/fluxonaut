@@ -772,22 +772,28 @@ without one — the BARCS bibliography in the Notebook tells you exactly who to 
       bonus: true,
       bipolar: true,
       intro: `A bonus puzzle for the theoretically brave. Obvious idea: why conjure a
-hypothetical rPS when the reversible Polarized Rotary might route the token loop?
-<br><br>Try it — the left rotary is wired in for you. Send the control. Then add some
+hypothetical rPS when a reversible rotary might route the token loop?
+<br><br>Try it — the left polarized rotary is wired in for you. Send the control. Then add some
 more polarized rotaries and twists to the path and see if any arrangement lets the
 token slip free of the control line.
 <br><br>You’ll find the evicted token comes straight back along the control’s own
 path. Always. It’s a theorem: through any network of polarized rotaries and twists,
 the token (always opposite in sign to the control, thanks to flux conservation)
-exactly <b>retraces the control’s route</b>. Catch the boomerang at TOKEN — you’ll
-need one biased circulator on the inbound line to do even that.`,
-      hint: 'L → circulator → polarized rotary → C1. The token retraces to the circulator — which, being biased (not polarity-reversible), finally breaks the symmetry and deflects it to TOKEN.',
+exactly <b>retraces the control’s route</b> — a polarized rotary sends + and − in
+<i>opposite</i> directions, so the return simply undoes the trip. To catch the boomerang
+at TOKEN you need a router that sends BOTH polarities the SAME way: an <b>unconditional
+rotary</b> on the inbound line breaks the pairing. (Reversibly that rotary is still only
+theoretical — in real silicon you fall back to the dissipative circulator.)`,
+      hint: 'L → rotary → polarized rotary → C1. The token retraces to the rotary — which, sending + and − the SAME way (not in opposite directions, the way a polarized rotary does), breaks the inverse-pairing and deflects the token to TOKEN. Reversibly that rotary is still only theoretical — real silicon falls back to the biased, dissipative circulator for the same job.',
       success: `So with polarized rotaries and twists alone, the token can’t be peeled
-off the control line — every such network just sends it straight back, exactly as you
-proved by trying. Only a biased element, like the circulator you used, breaks that
-symmetry, and it pays for the privilege in heat. THAT gap — a reversible, unpowered
-separator (the rPS, or something genuinely new) — is what "replace the separators"
-means, and why it sits unsolved in the literature. You’ve just walked the actual
+off the control line — each polarized rotary routes + and − as <i>inverse</i> permutations,
+so every such network just sends the token straight back, exactly as you proved by trying.
+What breaks the symmetry is a router that treats both polarities the SAME — the
+<b>unconditional rotary</b> you placed. You did it reversibly, on paper. But no JJ circuit
+for a reversible unconditional rotary has ever been demonstrated, so real designs fall back
+to the biased <b>circulator</b> — same routing, paid for in heat. THAT gap — a reversible,
+unpowered unconditional router (the rPS, or something genuinely new) — is what "replace the
+separators" means, and why it sits unsolved in the literature. You’ve just walked the actual
 argument. Welcome to research.`,
       notebook: ['boomerang'],
       fixed: [
@@ -800,7 +806,7 @@ argument. Welcome to research.`,
         { a: ['pr', 'C'], b: ['cb', 'K1'], via: [] },
       ],
       labels: { L_C: 'C IN', D_tok: 'TOKEN', cb: 'CB', pr: 'PR' },
-      palette: { CIRC: 1, PR3: 1, NOT: 2 },
+      palette: { ROTARY: 1, PR3: 1, NOT: 2 },
       cases: [
         { name: 'throw it', inputs: [{ launcher: 'L_C', pol: P }], expect: { D_tok: [M] }, finalStates: { cb: P } },
       ],

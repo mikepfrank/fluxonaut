@@ -10,8 +10,8 @@ the domain authority on its physics/CS. Defer to him on conceptual correctness;
 don't treat in-game text as ground truth.
 
 ## Commands
-- Tests (keep green): `node test/run-tests.mjs` (392 checks) and
-  `node test/smoke-ui.mjs` (124 checks).
+- Tests (keep green): `node test/run-tests.mjs` (386 checks) and
+  `node test/smoke-ui.mjs` (125 checks).
 - Render reference solutions to `sols/*.png`: `node test/render-sols.mjs`
   (run `npm i` first — dev dep `@napi-rs/canvas`).
 - Re-route references to obey the wiring rules: `node test/route-solutions.mjs`.

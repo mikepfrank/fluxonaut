@@ -227,11 +227,15 @@
   def({
     id: 'CIRC', name: 'Circulator (biased)', glyph: 'C↻',
     w: 1, h: 1, ports: PORTS3.map(q => ({ ...q })),
-    states: null, reversible: false, heatPerOp: 1, bipolarOnly: true,
+    states: null, reversible: false, heatPerOp: 1, bipolarOnly: true, partial: true,
     portLabels: { A: 'A', B: 'B', C: 'C' },
-    blurb: 'The "partial rotary" from the real RFSG chip: routes pulses clockwise regardless of polarity, using DC bias currents — which dissipate a little on every pass. (JJ Workshop ’25.)',
+    blurb: 'The "partial rotary" from the real RFSG chip. Its final lab design was never settled, so only two routes are taken as known-good: a + fluxon A→B and B→C, each dissipating a little (DC-biased). Every other case is left undefined. (JJ Workshop ’25.)',
     transition(port, pol, state) {
-      return { port: cyc(ORDER_CW, port, 1), pol, state, heat: 1 };
+      // PARTIAL: only these two transitions are known to work on the (unfinalized) circuit.
+      // Everything else is deliberately undefined — do NOT assume CW cycling holds in general.
+      if (pol === 1 && port === 'A') return { port: 'B', pol: 1, state, heat: 1 };
+      if (pol === 1 && port === 'B') return { port: 'C', pol: 1, state, heat: 1 };
+      return null;
     },
   });
 
