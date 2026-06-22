@@ -53,7 +53,7 @@
     mode: 'idle',             // idle | placing | wiring | dragging
     placing: null,            // {type, rot, mir}
     wiring: null,             // {from:{el,port}, via:[], mouse:{x,y}}
-    hoverPort: null,
+    hoverPort: null, hoverWire: null,
     mouse: { x: 0, y: 0 },
     paletteLeft: {},          // counts remaining
     caseIdx: 0,
@@ -732,6 +732,13 @@
     }
     return null;
   }
+  // A wire's propagation delay (ps) and physical length (µm) from its routed path. The delay is the
+  // same length/SPEED the simulator uses for timing; µm comes from the fixed fluxon velocity.
+  function wireDelayInfo(w) {
+    const cells = E.pathLength(E.wirePath(circuit(), w));
+    const ps = cells * E.PS_PER_UNIT / E.SPEED;
+    return { cells, ps, um: ps * E.UM_PER_PS };
+  }
   function distToSeg(x, y, a, b) {
     const dx = b.x - a.x, dy = b.y - a.y;
     const L2 = dx * dx + dy * dy;
@@ -1210,6 +1217,15 @@
     R.drawParticles(ctx, app.particles, performance.now() / 1000);
     app.particles = app.particles.filter(p => (performance.now() / 1000 - p.t0) < p.life);
 
+    // wire delay tooltip (hover)
+    if (app.hoverWire && app.mouseRaw) {
+      const w = app.wires.find(x => x.id === app.hoverWire);
+      if (w) {
+        const info = wireDelayInfo(w);
+        R.drawWireTip(ctx, app.mouseRaw.x * CELL, app.mouseRaw.y * CELL, `${info.ps.toFixed(1)} ps  ·  ${Math.round(info.um)} µm`);
+      }
+    }
+
     // banner
     drawBanner();
   }
@@ -1358,6 +1374,9 @@
     app.mouse = { x: Math.round(m.x * 2) / 2, y: Math.round(m.y * 2) / 2 };
     app.mouseRaw = m;
     app.hoverPort = portAt(m.x, m.y);
+    // hover a wire (when idle, not aiming at a port) → show its delay tooltip
+    const hw = (app.mode === 'idle' && !app.hoverPort) ? wireAt(m.x, m.y) : null;
+    app.hoverWire = hw ? hw.id : null;
     if (app.mode === 'dragging' && app.dragEl) {
       const t = F.TYPES[app.dragEl.type], sz = F.rotatedSize(t, app.dragEl.rot || 0);
       const gx = Math.round(m.x - app.dragOff.x), gy = Math.round(m.y - app.dragOff.y);
@@ -1556,6 +1575,7 @@
     $('#modal').addEventListener('click', ev => { if (ev.target.id === 'modal') closeModal(); });
 
     canvas.addEventListener('mousemove', onMouseMove);
+    canvas.addEventListener('mouseleave', () => { app.hoverPort = null; app.hoverWire = null; });
     canvas.addEventListener('mousedown', onMouseDown);
     window.addEventListener('mouseup', onMouseUp);
     canvas.addEventListener('contextmenu', onContextMenu);
@@ -1571,5 +1591,5 @@
 
   // test/debug hooks (harmless in production)
   F._ui = { app, boot, loadLevel, runCurrentCase, certify, advancePlayback, frame, showScreen, stopPlayback, buildLevelSelect, showNotebook, startPlacing, tryPlace, deleteSelection, finishWire, ruleSVG, openRuleModal, revalidateWires, playFailingSeed, drawBanner, togglePlay, resetBoard, flagWiresGrazedBy,
-    toggleReverse, seekTo, reverseFloor, showReverseBarrier };
+    toggleReverse, seekTo, reverseFloor, showReverseBarrier, wireDelayInfo };
 })();

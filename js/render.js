@@ -111,6 +111,25 @@
     ctx.closePath();
   }
 
+  // hover tooltip for a wire — its propagation delay + physical length. (px,py) = cursor in canvas px.
+  function drawWireTip(ctx, px, py, text) {
+    ctx.save();
+    ctx.font = '600 12px system-ui, sans-serif';
+    const pad = 7, tw = ctx.measureText(text).width, bw = tw + pad * 2, bh = 22;
+    let bx = px + 16, by = py - bh - 8;                 // float up-right of the cursor...
+    const cw = ctx.canvas.width, ch = ctx.canvas.height;
+    if (bx + bw > cw - 4) bx = px - bw - 16;            // ...flipping near the right/top edges
+    if (by < 4) by = py + 14;
+    bx = Math.max(4, Math.min(bx, cw - bw - 4));
+    by = Math.max(4, Math.min(by, ch - bh - 4));
+    roundRect(ctx, bx, by, bw, bh, 6);
+    ctx.fillStyle = 'rgba(10,17,30,0.93)'; ctx.fill();
+    ctx.strokeStyle = 'rgba(127,180,232,0.55)'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.fillStyle = COL.text; ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
+    ctx.fillText(text, bx + pad, by + bh / 2 + 0.5);
+    ctx.restore();
+  }
+
   function bodyRect(ctx, sz, opts) {
     const w = sz.w * CELL - 8, h = sz.h * CELL - 8;
     roundRect(ctx, -w / 2, -h / 2, w, h, 9);
@@ -428,5 +447,5 @@
     }
   }
 
-  F.render = { drawBoard, drawWire, drawPulse, drawElement, drawParticles, drawPorts, polColor, CELL, COL };
+  F.render = { drawBoard, drawWire, drawPulse, drawElement, drawParticles, drawPorts, drawWireTip, polColor, CELL, COL };
 })();

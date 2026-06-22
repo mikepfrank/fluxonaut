@@ -23,6 +23,7 @@
   const SPEED = 3.2;        // cells per sim-unit (1 cell ≈ 5 ps)
   const MIN_GAP = 0.22;     // min arrival separation at one element ≈ 3.5 ps
   const PS_PER_UNIT = SPEED * 5;   // ps per sim-unit (= 16)
+  const UM_PER_PS = 10;     // fluxon velocity ~c/30 ≈ 10 µm/ps (⇒ 50 µm/cell); wire length = delay × this
   const MAX_EVENTS = 30000;
   const MAX_TIME = 600;
   // Certify samples this many seeded jitter draws per case (seed 0 = nominal, the rest
@@ -505,6 +506,6 @@
     return { pass, heatMax, perCase, usedEls: [...used] };
   }
 
-  F.engine = { SPEED, MIN_GAP, GAP, PS_PER_UNIT, CERTIFY_SEEDS, CORNER_R, portWorld, wirePath, pathLength, pointAlong, roundedPath, countCrossings, validate, simulate, buildInputs, runCase, certify, polSym };
+  F.engine = { SPEED, MIN_GAP, GAP, PS_PER_UNIT, UM_PER_PS, CERTIFY_SEEDS, CORNER_R, portWorld, wirePath, pathLength, pointAlong, roundedPath, countCrossings, validate, simulate, buildInputs, runCase, certify, polSym };
   F.roundedPath = roundedPath; F.CORNER_R = CORNER_R;
 })();

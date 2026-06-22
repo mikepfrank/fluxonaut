@@ -237,6 +237,25 @@ for (const lv of F.LEVELS.concat([F.SANDBOX])) {
   check('drop-on-wire: the grazed wire is NOT rerouted (via preserved)', JSON.stringify(w.via) === viaBefore);
 }
 
+// wire delay tooltip: propagation delay (ps) + physical length (µm) from the routed path
+{
+  const lv = F.LEVELS.find(l => l.size && l.size.w >= 10 && l.size.h >= 5) || F.LEVELS[0];
+  U.loadLevel(lv);
+  U.app.elements = [
+    { id: 'L', type: 'LAUNCHER', x: 1, y: 3, rot: 0, state: null, placed: true },
+    { id: 'D', type: 'DETECTOR', x: 8, y: 3, rot: 0, state: null, placed: true },
+  ];
+  U.app.wires = [{ id: 'w', a: { el: 'L', port: 'A' }, b: { el: 'D', port: 'A' }, via: [] }];
+  const info = U.wireDelayInfo(U.app.wires[0]);
+  const cells = F.engine.pathLength(F.engine.wirePath({ elements: U.app.elements }, U.app.wires[0]));
+  check('wire tooltip: delay = pathLength × PS_PER_UNIT / SPEED', Math.abs(info.ps - cells * F.engine.PS_PER_UNIT / F.engine.SPEED) < 1e-9);
+  check('wire tooltip: length = delay × fluxon velocity (UM_PER_PS = 10)', F.engine.UM_PER_PS === 10 && Math.abs(info.um - info.ps * 10) < 1e-9);
+  check('wire tooltip: a real wire reports a positive delay', info.ps > 0 && info.cells > 0);
+  // a detoured (longer) wire reports a larger delay — the whole point of the readout
+  U.app.wires = [{ id: 'w', a: { el: 'L', port: 'A' }, b: { el: 'D', port: 'A' }, via: [{ x: 4, y: 1 }] }];
+  check('wire tooltip: a longer (detoured) wire has a larger delay', U.wireDelayInfo(U.app.wires[0]).ps > info.ps);
+}
+
 // element transition-rule inspector (the 🔍 modal): renders for every device
 {
   let ok = true, detail = '';
