@@ -58,6 +58,19 @@ actual choice). Probably also enrich w4l6's intro/success to name the PS as the 
 (they currently cite the dissipative circulator as the irreversible fallback). Not urgent —
 when doing it, verify the PS solution certifies + is robust, and regenerate the render.
 
+## Level design — w2l4: loosen the Duplicator's timing constraints (added 2026-06-21)
+
+Play-test 2026-06-21: w2l4 The Duplicator is too timing-touchy under the 100-seed certify gate.
+The player has to match the Const-1→A.I and A.D→B.D / B.I→Ci.A wire lengths almost exactly to
+pass every fuzzed seed — frustrating trial-and-error. The instant-replay aid (shipped 2026-06-21)
+makes the failing seed *watchable*, and dropping a part on a wire now flags it red instead of
+silently mis-connecting — but neither loosens the constraint itself.
+
+Refine the level's design to widen the timing margin. **Michael has specific ideas — revisit with
+him before changing anything.** NOT the right fix: globally loosening the certify jitter (that
+weakens every level's robustness guarantee). The fix belongs in this level's layout / element
+choice / par counts, keeping the shared 100-seed gate intact.
+
 ## Planarity (no-crossing-wires) — RESOLVED (2026-06-20)
 
 Done. The crossing counter was found to under-count: it split each wire at every via/port-
