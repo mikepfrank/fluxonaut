@@ -452,23 +452,26 @@
   function polSym(p) { return p === 1 ? '+' : p === -1 ? '−' : String(p); }
   function stSym(s) { return s === 1 ? '+' : s === -1 ? '−' : String(s); }
 
-  // Certify: all cases × seeds. Returns {pass, heatMax, perCase:[{name,pass,reasons,heat}]}
+  // Certify: all cases × seeds. Returns {pass, heatMax, perCase:[{name,pass,reasons,heat,failSeed}]}
+  // failSeed = the first seed that failed this case (-1 if it passed). Seed 0 is the nominal,
+  // un-jittered timing, so failSeed>0 means "passed nominal but a fuzzed run broke it" — exactly
+  // the situation the in-game instant-replay button reproduces for the player.
   function certify(circuit, cases, seeds, opts) {
     seeds = seeds || Array.from({ length: CERTIFY_SEEDS }, (_, i) => i);
     const perCase = [];
     let pass = true, heatMax = 0;
     const used = new Set();   // element ids a fluxon reaches (utilization check)
     for (const cs of cases) {
-      let cPass = true, reasons = [], heat = 0;
+      let cPass = true, reasons = [], heat = 0, failSeed = -1;
       for (const seed of seeds) {
         const r = runCase(circuit, cs, seed, opts);
         heat = Math.max(heat, r.trace.heat);
         if (seed === seeds[0]) for (const a of r.trace.arrivals) used.add(a.el);
-        if (!r.pass) { cPass = false; reasons = r.reasons; break; }
+        if (!r.pass) { cPass = false; reasons = r.reasons; failSeed = seed; break; }
       }
       heatMax = Math.max(heatMax, heat);
       if (!cPass) pass = false;
-      perCase.push({ name: cs.name, pass: cPass, reasons, heat });
+      perCase.push({ name: cs.name, pass: cPass, reasons, heat, failSeed });
     }
     return { pass, heatMax, perCase, usedEls: [...used] };
   }

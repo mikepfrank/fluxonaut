@@ -239,6 +239,53 @@ for (const lv of F.LEVELS.concat([F.SANDBOX])) {
   catch (e) { check('rule inspector: modal opens without error', false, e.message); }
 }
 
+// instant replay of a failed fuzzed seed — debugging aid for timing-sensitive puzzles
+{
+  const lv = F.LEVELS.find(l => l.id === 'w2l4') || F.LEVELS.find(l => l.cases && l.cases.length > 0);
+  U.loadLevel(lv);   // (the engine-level failSeed contract is asserted in run-tests.mjs)
+
+  // playFailingSeed arms the replay and drives the normal playback path
+  U.playFailingSeed(0, 3);
+  check('replay: playFailingSeed arms app.replay (caseIdx + seed)',
+    U.app.replay && U.app.replay.caseIdx === 0 && U.app.replay.seed === 3, JSON.stringify(U.app.replay));
+  check('replay: playFailingSeed starts playback (trace set, case selected)', !!U.app.trace && U.app.caseIdx === 0);
+
+  // the flashing strip above the board reflects the armed seed
+  U.drawBanner();
+  check('replay: banner reflects the armed run number', U.app._replaySig === 'R3|' + U.app.replay.caseName);
+  check('replay: banner DOM text names the run', document.querySelector('#replay-banner').textContent.includes('#3'));
+
+  // ANY edit drops the replay — stopPlayback is the common funnel (drag/wire/delete/case-switch/re-certify)
+  U.stopPlayback(); U.drawBanner();
+  check('replay: an edit clears the replay flag', U.app.replay === null);
+  check('replay: banner hidden once cleared', U.app._replaySig === '');
+
+  // in-place edits (rotate/flip/config) route through revalidateWires, not stopPlayback — clear too
+  U.playFailingSeed(0, 5);
+  U.revalidateWires();
+  check('replay: in-place edit (revalidateWires) also clears the replay', U.app.replay === null);
+
+  // re-watch: after the run ends, pressing play restarts the SAME seed, not the nominal timing
+  U.playFailingSeed(0, 7);
+  let guard = 0; while (U.app.playing && guard++ < 20000) U.advancePlayback(0.05);
+  U.togglePlay();
+  check('replay: re-watch keeps the same seed (#7), not nominal', U.app.replay && U.app.replay.seed === 7, JSON.stringify(U.app.replay));
+
+  // Reset keeps the replay armed so the same run can be watched more than once
+  U.playFailingSeed(0, 11);
+  U.resetBoard();
+  check('replay: Reset preserves the armed replay (does not clear it)', U.app.replay && U.app.replay.seed === 11, JSON.stringify(U.app.replay));
+  check('replay: Reset stops the run (trace cleared)', !U.app.trace);
+  U.drawBanner();
+  check('replay: banner still shown after Reset', U.app._replaySig === 'R11|' + U.app.replay.caseName);
+  U.togglePlay();   // pressing Run after a Reset re-watches the same seed, not nominal
+  check('replay: Run after Reset re-watches the same seed (#11)', U.app.replay && U.app.replay.seed === 11 && !!U.app.trace, JSON.stringify(U.app.replay));
+
+  // a genuine edit after a Reset still drops the replay
+  U.stopPlayback();
+  check('replay: an edit after Reset still clears the replay', U.app.replay === null);
+}
+
 console.log(`\n${nPass} passed, ${nFail} failed`);
 process.exit(nFail ? 1 : 0);
 

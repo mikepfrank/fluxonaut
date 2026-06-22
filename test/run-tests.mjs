@@ -149,6 +149,8 @@ function testLevel(level, solution) {
   const res = F.engine.certify(circuit, level.cases, seeds, { optional: level.optionalDetectors || [] });
   check(`certify passes (all cases × ${seeds.length} seeds)`, res.pass,
     res.perCase.filter(c => !c.pass).map(c => `\n      case "${c.name}": ${c.reasons.join('; ')}`).join(''));
+  // a passing case reports failSeed === -1 (the field the instant-replay button keys on)
+  check('every passing case reports failSeed = -1', res.perCase.every(c => c.failSeed === -1));
   const placed = (solution.place || []).length;
   check(`element count ${placed} ≤ par ${level.parElements}`, placed <= level.parElements);
   check(`heat ${res.heatMax} ≤ par ${level.parHeat}`, res.heatMax <= level.parHeat, `(heat ${res.heatMax})`);
@@ -187,6 +189,9 @@ console.log('\nFault rules:');
   const r = F.engine.runCase(circuit, level.cases[0], 0);
   check('w1l3 as shipped faults (collision/async)', !r.pass && r.trace.fault &&
     (r.trace.fault.kind === 'collision' || r.trace.fault.kind === 'async'), r.trace.fault && r.trace.fault.kind);
+  // certify on a failing circuit must report the offending seed (the instant-replay key), not -1
+  const cr = F.engine.certify(circuit, level.cases, [0, 1, 2, 3], {});
+  check('certify records failSeed ≥ 0 on a failing case', cr.perCase.some(c => !c.pass && c.failSeed >= 0));
 }
 {
   // open port fault

@@ -155,6 +155,7 @@
     app.paletteLeft = { ...(lv.palette || {}) };
     app.selection = null; app.mode = 'idle'; app.placing = null; app.wiring = null;
     app.caseIdx = 0; app.trace = null; app.playing = false; app.runResult = null; app.certifyResult = null;
+    app.replay = null;                       // {caseIdx, seed, caseName} while an instant replay is armed
     app.caseDone = {}; app._tabSig = null;
     app.hintShown = false; app.hintUsed = false;
     app.particles = []; app.banner = null;
@@ -457,6 +458,7 @@
       locked: false, stateLocked: false, placed: true,
     };
     app.elements.push(el);
+    app.replay = null;   // placing a new element changes the circuit — drop any armed replay
     app.paletteLeft[app.placing.type]--;
     SFX.place();
     if (app.paletteLeft[app.placing.type] <= 0) { app.mode = 'idle'; app.placing = null; }
@@ -654,6 +656,7 @@
     return best;
   }
   function revalidateWires() {
+    app.replay = null;   // in-place edits (rotate/flip/drag-end/config) land here, not stopPlayback
     const cir = { elements: app.elements };
     // Reroute illegal wires to a fixpoint: moving one wire out of the way frees the obstacle
     // that was blocking another, so a single ordered pass over-flags them (a wire judged
@@ -777,6 +780,7 @@
   }
 
   function stopPlayback() {
+    app.replay = null;   // edits / case-switch / re-certify all funnel here — drop the replay banner
     app.trace = null; app.playing = false; app.playT = 0; app.banner = null; app.runResult = null;
     app.liveStates = new Map(app.elements.map(e => [e.id, e.state]));
     app.particles = [];
@@ -958,10 +962,19 @@
       { const warn = buildWarning(build); if (warn) box.append(warn); }
       if (lv.success) box.append(h('p', { class: 'story', html: lv.success }));
     } else {
-      for (const c of res.perCase) {
-        box.append(h('div', { class: 'case-res ' + (c.pass ? 'ok' : 'bad') },
-          h('b', {}, (c.pass ? '✓ ' : '✗ ') + c.name), c.pass ? '' : h('div', { class: 'reasons' }, c.reasons.join(' · '))));
-      }
+      res.perCase.forEach((c, ci) => {
+        const block = h('div', { class: 'case-res ' + (c.pass ? 'ok' : 'bad') },
+          h('b', {}, (c.pass ? '✓ ' : '✗ ') + c.name),
+          c.pass ? '' : h('div', { class: 'reasons' }, c.reasons.join(' · ')));
+        // fuzzed-only failure (passed nominal, broke under timing wobble) → let the player watch
+        // that exact randomized run. (failSeed 0 = nominal failed; the regular ▶ Run shows that.)
+        if (!c.pass && c.failSeed > 0) {
+          block.append(h('button', { class: 'mini replay-btn',
+            onclick: () => { closeModal(); playFailingSeed(ci, c.failSeed); } },
+            `⟳ Watch instant replay (run #${c.failSeed})`));
+        }
+        box.append(block);
+      });
       { const warn = buildWarning(build); if (warn) box.append(warn); }
       if (lv.hint) box.append(h('p', { class: 'hint', html: '💡 ' + lv.hint }));
     }
@@ -1255,6 +1268,18 @@
   }
 
   function drawBanner() {
+    // instant-replay strip above the board — stays up (flashing) until the circuit is edited
+    const rb = $('#replay-banner');
+    if (rb) {
+      const rsig = app.replay ? 'R' + app.replay.seed + '|' + app.replay.caseName : '';
+      if (rsig !== app._replaySig) {
+        app._replaySig = rsig;
+        if (app.replay) {
+          rb.classList.remove('hidden');
+          rb.textContent = `⟳ Instant replay of randomized run #${app.replay.seed} — case “${app.replay.caseName}”`;
+        } else { rb.classList.add('hidden'); rb.textContent = ''; }
+      }
+    }
     const el = $('#banner');
     if (!el) return;                       // (stubbed DOM in tests has no banner node)
     const b = app.banner;
@@ -1349,9 +1374,47 @@
     else if (ev.key === ' ') { ev.preventDefault(); togglePlay(); }
   }
 
+  // Instant replay: re-run the exact randomized timing of a fuzzed seed that failed
+  // certification, so the player can watch what went wrong. runCase(cs, seed) rebuilds that
+  // seed's jittered launch times deterministically; the normal playback/HUD machinery shows it.
+  function playFailingSeed(caseIdx, seed) {
+    const lv = app.level;
+    if (!lv || !lv.cases || !lv.cases[caseIdx]) return;
+    app.caseIdx = caseIdx;
+    stopPlayback();                                      // reset trace + clear the prior replay flag
+    buildCaseTabs();                                     // highlight the case being replayed
+    const cs = lv.cases[caseIdx];
+    const r = E.runCase(circuit(), cs, seed, { optional: lv.optionalDetectors || [] });
+    app.replay = { caseIdx, seed, caseName: cs.name };   // (re)arm AFTER stopPlayback nulled it
+    beginPlayback(r.trace, { pass: r.pass, reasons: r.reasons });
+  }
+  function replayCurrent() {
+    const rep = app.replay;                              // capture before playFailingSeed's stopPlayback clears it
+    if (rep) playFailingSeed(rep.caseIdx, rep.seed);
+    else runCurrentCase();
+  }
+
+  // Reset stops the run but KEEPS any armed instant-replay, so the same fuzzed run can be watched
+  // again (press Run / space to replay it). Editing the circuit still drops the replay (those paths
+  // call stopPlayback directly, which nulls app.replay without restoring it).
+  function resetBoard() {
+    const rep = app.replay;
+    stopPlayback();
+    app.replay = rep;
+  }
+
   function togglePlay() {
-    if (!app.trace) runCurrentCase();
-    else { app.playing = !app.playing; if (app.playing && app.banner) { stopPlayback(); runCurrentCase(); } }
+    if (!app.trace) {
+      if (app.replay) replayCurrent();        // a Reset left a replay armed → re-watch that seed, not nominal
+      else runCurrentCase();
+    }
+    else {
+      app.playing = !app.playing;
+      if (app.playing && app.banner) {        // the run had ended — pressing play restarts it...
+        if (app.replay) replayCurrent();      // ...re-watching the same fuzzed seed, not nominal
+        else { stopPlayback(); runCurrentCase(); }
+      }
+    }
     updateHud();
   }
 
@@ -1363,7 +1426,7 @@
     $('#btn-start').addEventListener('click', () => { showScreen('levels'); });
     $('#btn-levels').addEventListener('click', () => { showScreen('levels'); });
     $('#btn-run').addEventListener('click', togglePlay);
-    $('#btn-reset').addEventListener('click', stopPlayback);
+    $('#btn-reset').addEventListener('click', resetBoard);
     $('#btn-certify').addEventListener('click', certify);
     $('#btn-story').addEventListener('click', () => showStory(app.level.title, app.level.intro));
     $('#btn-hint').addEventListener('click', () => { app.hintShown = !app.hintShown; if (app.hintShown) app.hintUsed = true; renderHintBar(); });
@@ -1394,5 +1457,5 @@
   }
 
   // test/debug hooks (harmless in production)
-  F._ui = { app, boot, loadLevel, runCurrentCase, certify, advancePlayback, frame, showScreen, stopPlayback, buildLevelSelect, showNotebook, startPlacing, tryPlace, deleteSelection, finishWire, ruleSVG, openRuleModal, revalidateWires };
+  F._ui = { app, boot, loadLevel, runCurrentCase, certify, advancePlayback, frame, showScreen, stopPlayback, buildLevelSelect, showNotebook, startPlacing, tryPlace, deleteSelection, finishWire, ruleSVG, openRuleModal, revalidateWires, playFailingSeed, drawBanner, togglePlay, resetBoard };
 })();
