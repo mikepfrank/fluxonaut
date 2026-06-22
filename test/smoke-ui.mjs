@@ -305,6 +305,71 @@ for (const lv of F.LEVELS.concat([F.SANDBOX])) {
   check('replay: an edit after Reset still clears the replay', U.app.replay === null);
 }
 
+// reverse playback: seek-by-time, rewind to the last merge (or the start), and the teaching modal
+{
+  const lv = F.LEVELS.find(l => l.cases && l.cases.length) || F.LEVELS[0];
+  U.loadLevel(lv);
+  U.app.elements = [
+    { id: 'X', type: 'REFLECTOR', x: 1, y: 1, rot: 0, state: 0, placed: true },
+    { id: 'DET', type: 'DETECTOR', x: 5, y: 1, rot: 0, state: null, placed: true },
+  ];
+  U.app.flipEvents = [];
+  U.app.trace = {
+    tEnd: 4, heat: 0, heatEvents: [], arrivals: [], backflows: 0, pulses: [], finalStates: {},
+    stateChanges: [{ t: 1, el: 'X', from: 0, to: 1 }],
+    detections: { DET: [{ t: 2, pol: 1 }] },
+    barriers: [{ t: 3, el: 'X', elType: 'PS', elName: 'Polarity Separator (biased)', kind: 'merge',
+      out: { port: 'P', pol: 1, state: null },
+      priors: [{ port: 'S', pol: 1, state: null }, { port: 'M', pol: 1, state: null }] }],
+  };
+  // seekTo is a pure function of time
+  U.seekTo(3.5);
+  check('reverse: seekTo applies state changes up to T', U.app.liveStates.get('X') === 1 && U.app.liveDetections.DET.length === 1);
+  U.seekTo(0.5);
+  check('reverse: seekTo before the change restores the initial state', U.app.liveStates.get('X') === 0 && U.app.liveDetections.DET.length === 0);
+  // the floor is the last barrier AT OR BEFORE the current position
+  U.app.playT = 4;
+  check('reverse: reverseFloor = the last barrier at/before playT', U.reverseFloor() === 3);
+  U.app.playT = 2;   // the merge at t=3 is still in the future from here → must not count
+  check('reverse: a not-yet-reached barrier does not set the floor', U.reverseFloor() === 0);
+
+  // rewinding halts exactly at the merge floor and opens the teaching modal
+  U.app.playT = 4; U.app.playing = true; U.app.playDir = -1; U.app.speed = 1;
+  let guard = 0; while (U.app.playing && guard++ < 1000) U.advancePlayback(0.1);
+  check('reverse: playback halts at the merge floor', Math.abs(U.app.playT - 3) < 1e-6 && !U.app.playing);
+  check('reverse: barrier modal is populated (lists prior states)', document.querySelector('#modal-box').children.length > 0);
+
+  // a dissipative sink (exhaust) is also a hard reverse barrier, with its own explanation
+  U.app.trace.barriers = [{ t: 2, el: 'X', elType: 'EXHAUST', elName: 'Exhaust', kind: 'absorb', absorbed: { port: 'A', pol: 1 } }];
+  U.app.playT = 4;
+  check('reverse: an exhaust dissipation sets the reverse floor', U.reverseFloor() === 2);
+  U.app.playing = true; U.app.playDir = -1;
+  guard = 0; while (U.app.playing && guard++ < 1000) U.advancePlayback(0.1);
+  check('reverse: rewind halts at the exhaust', Math.abs(U.app.playT - 2) < 1e-6 && !U.app.playing);
+
+  // regression — reflect-into-launcher: pausing BEFORE an irreversible event and reversing must
+  // rewind freely to the start, not pop the barrier for an event that hasn't happened yet
+  U.app.trace.barriers = [{ t: 9, el: 'L', elType: 'LAUNCHER', elName: 'Launcher', kind: 'absorb', absorbed: { port: 'A', pol: 1 } }];
+  U.app.playT = 5; U.app.playing = true; U.app.playDir = -1;   // paused at 5; the backflow is not until t=9
+  guard = 0; while (U.app.playing && guard++ < 1000) U.advancePlayback(0.1);
+  check('reverse: a future barrier does not block rewind (reflect-into-launcher bug)', Math.abs(U.app.playT) < 1e-6 && !U.app.playing);
+  U.app.playT = 10;   // once the backflow IS behind you, it sets the floor again
+  check('reverse: a barrier already behind playT sets the floor', U.reverseFloor() === 9);
+
+  // with no barriers the run rewinds all the way to the initial state
+  U.app.trace.barriers = [];
+  U.app.playT = 4; U.app.playing = true; U.app.playDir = -1;
+  guard = 0; while (U.app.playing && guard++ < 1000) U.advancePlayback(0.1);
+  check('reverse: a fully reversible run rewinds to t=0', Math.abs(U.app.playT) < 1e-6 && !U.app.playing);
+
+  // ◀ / ▶ flip the play direction
+  U.app.playT = 2; U.app.playing = true; U.app.playDir = 1;
+  U.toggleReverse();
+  check('reverse: ◀ switches a forward run to reverse', U.app.playDir === -1 && U.app.playing);
+  U.togglePlay();
+  check('reverse: ▶ switches a reverse run back to forward', U.app.playDir === 1 && U.app.playing);
+}
+
 console.log(`\n${nPass} passed, ${nFail} failed`);
 process.exit(nFail ? 1 : 0);
 

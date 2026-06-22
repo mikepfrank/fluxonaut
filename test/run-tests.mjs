@@ -264,5 +264,39 @@ console.log('\nFault rules:');
   check('twisted pulse detected with flipped polarity', t.detections.D.length === 1 && t.detections.D[0].pol === -1);
 }
 
+// reverse-playback barriers: many-to-one merges (PS/PFG) and dissipative sinks (exhaust) halt rewind
+console.log('\nReverse-playback barriers:');
+{
+  const refBarriers = (id) => {
+    const level = F.LEVELS.find(l => l.id === id), sol = SOLUTIONS[id];
+    if (!level || !sol) return null;
+    const circuit = buildCircuit(level, sol);
+    let all = [];
+    for (const cs of level.cases) all = all.concat(F.engine.runCase(circuit, cs, 0, { optional: level.optionalDetectors || [] }).trace.barriers);
+    return all;
+  };
+  const ps = refBarriers('w4l4');   // Switch Gate — Polarity Separator
+  check('PS run records many-to-one merge barriers (w4l4)', ps && ps.some(b => b.kind === 'merge'), ps && ps.length);
+  check('every merge barrier lists ≥2 possible prior states', ps && ps.filter(b => b.kind === 'merge').every(b => b.priors.length >= 2));
+  const pfg = refBarriers('w3l8'); // Bias Bill — Polarity Filter
+  check('PFG run records merge barriers (w3l8)', pfg && pfg.some(b => b.kind === 'merge'), pfg && pfg.length);
+  const rev = refBarriers('w1l1'); // World 1 — reversible, ends at a detector → no barriers
+  check('a reversible run ending at a detector records no barriers (w1l1)', rev && rev.length === 0, rev && rev.length);
+
+  // a fluxon dissipated at an exhaust is a reverse barrier; a detector (remembered output) is not
+  const exhaustC = { elements: [
+    { id: 'L', type: 'LAUNCHER', x: 1, y: 3, rot: 0, state: null },
+    { id: 'X', type: 'EXHAUST', x: 8, y: 3, rot: 0, state: null }],
+    wires: [{ id: 'w1', a: { el: 'L', port: 'A' }, b: { el: 'X', port: 'A' }, via: [] }] };
+  const exB = F.engine.simulate(exhaustC, [{ t: 0.5, launcher: 'L', pol: 1 }]).barriers;
+  check('exhaust dissipation is a reverse barrier (kind=absorb)', exB.some(b => b.kind === 'absorb' && b.elType === 'EXHAUST'), JSON.stringify(exB));
+  const detectC = { elements: [
+    { id: 'L', type: 'LAUNCHER', x: 1, y: 3, rot: 0, state: null },
+    { id: 'D', type: 'DETECTOR', x: 8, y: 3, rot: 0, state: null }],
+    wires: [{ id: 'w1', a: { el: 'L', port: 'A' }, b: { el: 'D', port: 'A' }, via: [] }] };
+  const detTr = F.engine.simulate(detectC, [{ t: 0.5, launcher: 'L', pol: 1 }]);
+  check('a detector is NOT a reverse barrier (remembered output line)', detTr.barriers.length === 0 && detTr.detections.D.length === 1);
+}
+
 console.log(`\n${nPass} passed, ${nFail} failed`);
 process.exit(nFail ? 1 : 0);

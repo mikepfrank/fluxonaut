@@ -190,8 +190,27 @@
   //   backflows: n,
   //   pulses: [{id,pol,segs:[{wire,fromA,t0,t1,len}],fate,fateT}],
   //   stateChanges: [{t,el,from,to}], arrivals: [{t,el,port,pol}],
+  //   barriers: points where reverse simulation can't proceed (the reverse playback halts here):
+  //     {t,el,elType,elName,kind:'merge',  out:{port,pol,state}, priors:[{port,pol,state}]}  many-to-one (PS/PFG)
+  //     {t,el,elType,elName,kind:'absorb', absorbed:{port,pol}}                              dissipated at a sink
   //   finalStates: {elId: state}
   // }
+  // A 'merge' barrier is a many-to-one transition: ≥2 distinct inputs (port,pol,state) produce the
+  // same output, so reverse simulation can't recover which one happened — the irreversibility of
+  // PS/PFG. (CIRC dissipates but is 1-to-1, so it is NOT a merge.) An 'absorb' barrier is a fluxon
+  // dissipated at a sink (exhaust/backflow): turned to heat and not remembered, so it can't be
+  // re-emitted on rewind. A detector is NOT a barrier — it records its fluxon and spits it back.
+  function mergePriors(type, cfg, out) {
+    const priors = [];
+    for (const st of (type.states || [null]))
+      for (const port of (type.ports || []))
+        for (const pol of [1, -1]) {
+          let r; try { r = type.transition(port.name, pol, st, cfg); } catch (e) { r = null; }
+          if (r && !r.absorb && r.port === out.port && r.pol === out.pol && r.state === out.state)
+            priors.push({ port: port.name, pol, state: st });
+        }
+    return priors;
+  }
   function simulate(circuit, inputs, opts) {
     opts = opts || {};
     const val = validate(circuit);
@@ -213,7 +232,7 @@
 
     const trace = {
       ok: true, fault: null, tEnd: 0, heat: 0, heatEvents: [],
-      detections: {}, backflows: 0, pulses: [], stateChanges: [], arrivals: [],
+      detections: {}, backflows: 0, pulses: [], stateChanges: [], arrivals: [], barriers: [],
       finalStates: {},
     };
     for (const e of circuit.elements) if (F.TYPES[e.type].id === 'DETECTOR') trace.detections[e.id] = [];
@@ -346,6 +365,12 @@
           fault(ev.t, 'undefined', `${type.name} has no defined behavior for that arrival — this should never happen.`, pp.x, pp.y);
           continue;
         }
+        // record a many-to-one merge (irreversible step) so reverse playback knows where to halt
+        if (res.port && !res.absorb) {
+          const out = { port: res.port, pol: res.pol, state: res.state };
+          const priors = mergePriors(type, el.cfg || type.config, out);
+          if (priors.length >= 2) trace.barriers.push({ t: ev.t, el: ev.el, elType: type.id, elName: type.name, kind: 'merge', out, priors });
+        }
         if (res.heat) {
           trace.heat += res.heat;
           // Spark at the EXIT port: for these biased devices the cost is realized as the
@@ -360,13 +385,17 @@
         }
         if (res.absorb) {
           if (res.detect) {
+            // a detector is a remembered output line — it records the arrival and re-emits it on
+            // rewind, so it is NOT a reverse barrier.
             trace.detections[ev.el].push({ t: ev.t, pol: ev.pol });
             ev.pulse.fate = 'detected'; ev.pulse.fateT = ev.t; ev.pulse.detector = ev.el;
-          } else if (res.backflow) {
-            trace.backflows++;
-            ev.pulse.fate = 'backflow'; ev.pulse.fateT = ev.t;
           } else {
-            ev.pulse.fate = 'exhausted'; ev.pulse.fateT = ev.t;
+            // a dissipative sink (exhaust / backflow) turns the fluxon to heat and keeps no record
+            // of it, so reverse simulation has nothing to re-emit — a hard reverse barrier.
+            trace.barriers.push({ t: ev.t, el: ev.el, elType: type.id, elName: type.name, kind: 'absorb', absorbed: { port: ev.port, pol: ev.pol } });
+            if (res.backflow) { trace.backflows++; ev.pulse.fate = 'backflow'; }
+            else { ev.pulse.fate = 'exhausted'; }
+            ev.pulse.fateT = ev.t;
           }
           continue;
         }

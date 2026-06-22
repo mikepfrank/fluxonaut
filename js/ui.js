@@ -58,7 +58,7 @@
     paletteLeft: {},          // counts remaining
     caseIdx: 0,
     // playback
-    trace: null, playT: 0, playing: false, speed: 1, playCase: 0,
+    trace: null, playT: 0, playing: false, speed: 1, playCase: 0, playDir: 1,   // playDir −1 = reverse
     evCursor: { state: 0, heat: 0, det: 0, arr: 0 },
     liveStates: new Map(), liveDetections: {},
     particles: [],
@@ -265,7 +265,8 @@
     for (const k of Object.keys(app.paletteLeft)) {
       const n = $('#pal-count-' + k); if (n) n.textContent = '×' + app.paletteLeft[k];
     }
-    $('#btn-run').textContent = app.playing ? '❚❚ Pause' : '▶ Run';
+    $('#btn-run').textContent = (app.playing && app.playDir > 0) ? '❚❚ Pause' : '▶ Run';
+    { const rev = $('#btn-rev'); if (rev) rev.textContent = (app.playing && app.playDir < 0) ? '❚❚ Pause' : '◀ Reverse'; }
   }
 
   // ───────────────────────── inspector ─────────────────────────
@@ -772,6 +773,7 @@
     app.trace = trace;
     app.playT = 0;
     app.playing = true;
+    app.playDir = 1;
     app.playCase = app.caseIdx;
     app.evCursor = { state: 0, heat: 0, det: 0, arr: 0, flip: 0 };
     // polarity-flip events: where a pulse's polarity changes between segments
@@ -797,9 +799,51 @@
 
   function stopPlayback() {
     app.replay = null;   // edits / case-switch / re-certify all funnel here — drop the replay banner
-    app.trace = null; app.playing = false; app.playT = 0; app.banner = null; app.runResult = null;
+    app.trace = null; app.playing = false; app.playT = 0; app.playDir = 1; app.banner = null; app.runResult = null;
     app.liveStates = new Map(app.elements.map(e => [e.id, e.state]));
     app.particles = [];
+    updateHud();
+  }
+
+  // Set all display state (element states, detector lights, event cursors) to exactly time T —
+  // a pure function of T, with no SFX/particles. This is the primitive reverse playback and
+  // scrubbing rely on; forward playback keeps its own incremental path for the spawn-on-cross FX.
+  function seekTo(T) {
+    const tr = app.trace; if (!tr) return;
+    app.playT = T;
+    app.liveStates = new Map(app.elements.map(e => [e.id, e.state]));   // initial states ...
+    let si = 0;
+    for (; si < tr.stateChanges.length && tr.stateChanges[si].t <= T; si++) app.liveStates.set(tr.stateChanges[si].el, tr.stateChanges[si].to);
+    app.liveDetections = {};
+    for (const det of Object.keys(tr.detections)) {
+      const all = tr.detections[det], live = [];
+      for (let i = 0; i < all.length && all[i].t <= T; i++) live.push(all[i]);
+      app.liveDetections[det] = live;
+    }
+    const upTo = arr => { let i = 0; while (i < arr.length && arr[i].t <= T) i++; return i; };
+    app.evCursor = { state: si, arr: upTo(tr.arrivals), heat: upTo(tr.heatEvents), det: 0, flip: upTo(app.flipEvents || []) };
+  }
+
+  // The earliest time reverse playback can rewind to from the current position: the last irreversible
+  // step that has ALREADY happened (barrier at t ≤ playT), or 0 if none has yet. A barrier still in
+  // the future (t > playT) hasn't occurred from here, so it must not block rewinding — e.g. pausing a
+  // reflect-into-launcher run mid-flight and reversing should rewind freely to the start.
+  function reverseFloor() {
+    const b = app.trace && app.trace.barriers;
+    if (!b || !b.length) return 0;
+    let mx = 0; for (const x of b) if (x.t <= app.playT + 1e-9 && x.t > mx) mx = x.t;
+    return mx;
+  }
+
+  function advanceReverse(dt) {
+    const floor = reverseFloor();
+    app.playT -= dt * app.speed;
+    if (app.playT <= floor) {                 // hit the barrier (or the start) — stop there
+      seekTo(floor); app.playing = false;
+      if (floor > 0) showReverseBarrier(floor);
+      updateHud(); return;
+    }
+    seekTo(app.playT);
     updateHud();
   }
 
@@ -813,6 +857,7 @@
   function advancePlayback(dt) {
     const tr = app.trace;
     if (!tr || !app.playing) return;
+    if (app.playDir < 0) { advanceReverse(dt); return; }
     app.playT += dt * app.speed;
     const T = app.playT;
     // state changes
@@ -1419,19 +1464,70 @@
     app.replay = rep;
   }
 
-  function togglePlay() {
+  function togglePlay() {                      // ▶ — play / pause / restart, FORWARD
     if (!app.trace) {
-      if (app.replay) replayCurrent();        // a Reset left a replay armed → re-watch that seed, not nominal
+      if (app.replay) replayCurrent();         // a Reset left a replay armed → re-watch that seed, not nominal
       else runCurrentCase();
+      updateHud(); return;
     }
-    else {
-      app.playing = !app.playing;
-      if (app.playing && app.banner) {        // the run had ended — pressing play restarts it...
-        if (app.replay) replayCurrent();      // ...re-watching the same fuzzed seed, not nominal
-        else { stopPlayback(); runCurrentCase(); }
-      }
+    if (app.playing && app.playDir > 0) { app.playing = false; updateHud(); return; }   // pause forward
+    app.playDir = 1;
+    if (app.banner) {                          // the run had ended — restart from the top...
+      if (app.replay) replayCurrent();         // ...re-watching the same fuzzed seed, not nominal
+      else { stopPlayback(); runCurrentCase(); }
+    } else {
+      app.playing = true;                      // resume forward, or switch over from reverse
     }
     updateHud();
+  }
+
+  function toggleReverse() {                    // ◀ — play / pause, REVERSE (toward the initial state)
+    if (!app.trace) return;
+    if (app.playing && app.playDir < 0) { app.playing = false; updateHud(); return; }   // pause reverse
+    const floor = reverseFloor();
+    if (app.playT <= floor + 1e-9) {            // already as far back as we're allowed to go
+      seekTo(floor);
+      if (floor > 0) showReverseBarrier(floor); // re-explain why it can't go further
+      updateHud(); return;
+    }
+    app.banner = null;                          // drop the forward end-banner while rewinding
+    app.playDir = -1;
+    app.playing = true;
+    updateHud();
+  }
+
+  function fmtSyn(s, dir) {
+    const pol = s.pol > 0 ? '+' : '−';
+    return `a ${pol} fluxon ${dir === 'out' ? 'leaving' : 'entering'} port ${s.port}${s.state != null ? `, state ${s.state}` : ''}`;
+  }
+  // The teaching moment: reverse playback stopped at an irreversible step — either a many-to-one
+  // merge (no unique inverse) or a fluxon dissipated at a sink (nothing to re-emit).
+  function showReverseBarrier(t) {
+    const tr = app.trace; if (!tr) return;
+    const here = tr.barriers.filter(b => Math.abs(b.t - t) < 1e-6);
+    const m = $('#modal'); if (!m) return;
+    m.classList.remove('hidden');
+    const box = $('#modal-box'); box.innerHTML = '';
+    box.append(h('h2', { class: 'bad' }, '◀ Reverse blocked — an irreversible step'));
+    box.append(h('p', { class: 'story', html: `Rewinding reached a step the simulation can't undo:` }));
+    for (const b of here) {
+      if (b.kind === 'absorb') {
+        box.append(h('p', {}, h('b', {}, `${b.elName}: ${fmtSyn(b.absorbed, 'in')} was dissipated here.`)));
+        box.append(h('p', { class: 'story', html:
+          `A sink like this turns the fluxon into heat and keeps <b>no record</b> of it, so the reverse simulation has nothing to send back out. (A detector is different — it remembers its fluxon and re-emits it on rewind.)` }));
+      } else {
+        box.append(h('p', {}, h('b', {}, `${b.elName} — output ${fmtSyn(b.out, 'out')} could have come from any of:`)));
+        const ul = h('ul', { class: 'priors' });
+        for (const p of b.priors) ul.append(h('li', {}, fmtSyn(p, 'in')));
+        box.append(ul);
+        box.append(h('p', { class: 'story', html: `From the present state we <b>can't tell which past actually happened</b>.` }));
+      }
+    }
+    box.append(h('p', { class: 'story', html:
+      `That lost information is the irreversibility — each erased bit sheds ≥ kT·ln2 of heat (Landauer). Reversible elements never merge, and detectors remember their inputs, so a run built only from those rewinds all the way back to the start.` }));
+    const row = h('div', { class: 'modal-btns' });
+    row.append(h('button', { class: 'big primary', onclick: closeModal }, 'Got it'));
+    box.append(row);
   }
 
   // ───────────────────────── boot ─────────────────────────
@@ -1442,6 +1538,7 @@
     $('#btn-start').addEventListener('click', () => { showScreen('levels'); });
     $('#btn-levels').addEventListener('click', () => { showScreen('levels'); });
     $('#btn-run').addEventListener('click', togglePlay);
+    { const rev = $('#btn-rev'); if (rev) rev.addEventListener('click', toggleReverse); }
     $('#btn-reset').addEventListener('click', resetBoard);
     $('#btn-certify').addEventListener('click', certify);
     $('#btn-story').addEventListener('click', () => showStory(app.level.title, app.level.intro));
@@ -1473,5 +1570,6 @@
   }
 
   // test/debug hooks (harmless in production)
-  F._ui = { app, boot, loadLevel, runCurrentCase, certify, advancePlayback, frame, showScreen, stopPlayback, buildLevelSelect, showNotebook, startPlacing, tryPlace, deleteSelection, finishWire, ruleSVG, openRuleModal, revalidateWires, playFailingSeed, drawBanner, togglePlay, resetBoard, flagWiresGrazedBy };
+  F._ui = { app, boot, loadLevel, runCurrentCase, certify, advancePlayback, frame, showScreen, stopPlayback, buildLevelSelect, showNotebook, startPlacing, tryPlace, deleteSelection, finishWire, ruleSVG, openRuleModal, revalidateWires, playFailingSeed, drawBanner, togglePlay, resetBoard, flagWiresGrazedBy,
+    toggleReverse, seekTo, reverseFloor, showReverseBarrier };
 })();

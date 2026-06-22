@@ -162,6 +162,8 @@ h1 { font-size: 54px; letter-spacing: 12px; font-weight: 200; color: #e8f4ff;
 .story { line-height: 1.62; font-size: 14px; color: #cfe2f5; }
 .story b { color: #fff; }
 .story i { color: #9fc6ea; }
+#modal-box .priors { margin: 4px 0 12px; padding-left: 22px; color: #e7d0ff; font-size: 13.5px; line-height: 1.6; }
+#modal-box .priors li { margin: 2px 0; }
 .hint { margin-top: 12px; color: var(--gold); font-size: 13px; line-height: 1.5; }
 .stars-big { font-size: 34px; color: var(--gold); letter-spacing: 8px; margin: 6px 0 10px; }
 .why { font-size: 13px; color: var(--dim); line-height: 1.7; margin-bottom: 8px; }
