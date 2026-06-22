@@ -16,9 +16,10 @@ None are blockers; do not start a new version until playtesting is complete.
    after placing, auto-select the placed element; and/or enlarge the body hit area
    relative to port hit areas.
 
-3. **No feedback on wire-length timing.** Delay-tuning puzzles (e.g. W2-1
-   Gatekeeper) are pure trial and error. Add the planned "how a wire's length sets
-   timing" visual hint, or minimally a picosecond-delay tooltip/readout per wire.
+3. **Wire-length timing feedback — per-wire readout DONE (2026-06-22).** Hovering a wire
+   now shows its delay (ps) and physical length (µm) — the "minimally a per-wire readout"
+   ask. Still open (optional): the fuller inline "how a wire's length sets timing" hint,
+   e.g. a live delay annotation shown along the wire while routing.
 
 4. **Fault banner can cover the top row of the board** (e.g. hides the reflector
    in W1-3 Tailgaters). Reposition, auto-fade, or push the board down.
