@@ -10,13 +10,14 @@ the domain authority on its physics/CS. Defer to him on conceptual correctness;
 don't treat in-game text as ground truth.
 
 ## Commands
-- Tests (keep green): `node test/run-tests.mjs` (412 checks) and
-  `node test/smoke-ui.mjs` (144 checks).
+- Tests (keep green): `node test/run-tests.mjs` (418 checks) and
+  `node test/smoke-ui.mjs` (157 checks).
 - Render reference solutions to `sols/*.png`: `node test/render-sols.mjs`
   (run `npm i` first — dev dep `@napi-rs/canvas`).
 - Re-route references to obey the wiring rules: `node test/route-solutions.mjs`.
-- Deploy: zip the runtime files only — `index.html README.md GAME-DESIGN.md css js`
-  (e.g. `git archive HEAD`) — and drag the zip to Netlify.
+- Deploy: zip the runtime files only — `index.html css js`
+  (e.g. `git archive HEAD index.html css js`) — and drag the zip to Netlify.
+  (No `.md` — nothing in the game loads or links to them; they're repo docs only.)
 
 ## Cost — subordinate models
 Subagents are expensive on Opus, and an Opus-heavy multi-agent session has burned
@@ -85,9 +86,16 @@ follow-up inline over spawning a subagent.
   seed; the banner clears on any edit but Reset keeps it armed so the run can be re-watched.
   Separately, dropping a new part onto/grazing an existing wire now flags that wire sticky-red
   (no reroute — its timing is preserved) so the player deletes + redraws it deliberately.
-- **Deployed** 2026-06-21 from `main` (`8ebbbf5`) → https://fluxonaut.netlify.app . To
-  redeploy: rebuild the runtime zip in `../netlify-zips/` (`git archive HEAD …`) and drag it
-  to Netlify.
+- **Reverse playback** (2026-06-21): a ◀ Reverse control rewinds a run toward its initial state
+  (fluxon position is a pure function of time, so paths retrace; `ui.seekTo(T)` derives states +
+  detector lights at any T). The engine records `trace.barriers` — `kind:'merge'` (many-to-one
+  PS/PFG transition, lists the ambiguous prior states) and `kind:'absorb'` (a fluxon dissipated at
+  an exhaust/backflow sink). Rewind halts at the latest barrier **at or before** the current time,
+  opening a teaching modal; a detector is NOT a barrier (it remembers + re-emits), so a run of only
+  reversible elements ending at detectors rewinds fully. CIRC dissipates but is 1-to-1 → not a barrier.
+- **Deployed** 2026-06-21 from `main` (`cdac1cb`) → https://fluxonaut.netlify.app . To
+  redeploy: rebuild the runtime zip in `../netlify-zips/` (`git archive HEAD index.html css js`)
+  and drag it to Netlify.
 - Open threads: w4l6 "The Boomerang Theorem" still wants a standalone review; `TODO.md` has
   the w2l4 timing-constraint loosening (play-test friction — Michael has ideas), the SG-symbol
   port-ordering revisit, the "also offer PS on w4l6's palette" idea, and the UX-friction items.
