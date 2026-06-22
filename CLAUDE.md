@@ -10,8 +10,8 @@ the domain authority on its physics/CS. Defer to him on conceptual correctness;
 don't treat in-game text as ground truth.
 
 ## Commands
-- Tests (keep green): `node test/run-tests.mjs` (386 checks) and
-  `node test/smoke-ui.mjs` (128 checks).
+- Tests (keep green): `node test/run-tests.mjs` (412 checks) and
+  `node test/smoke-ui.mjs` (144 checks).
 - Render reference solutions to `sols/*.png`: `node test/render-sols.mjs`
   (run `npm i` first — dev dep `@napi-rs/canvas`).
 - Re-route references to obey the wiring rules: `node test/route-solutions.mjs`.
@@ -36,7 +36,8 @@ follow-up inline over spawning a subagent.
   picks which arm exits orthogonally — geometry only, distinct from rotate/mirror.
 - `js/engine.js` — deterministic event-driven simulator + `certify` (runs each
   case under 100 jitter seeds — `CERTIFY_SEEDS`, shared by game + tests;
-  **order must hold, exact timing must not**). `engine.countCrossings` = the
+  **order must hold, exact timing must not**; records the first failing seed per case →
+  the in-game instant replay). `engine.countCrossings` = the
   collinear-merged planarity counter; `ui.js` builds the 🔍 transition-table inspector.
 - `js/levels.js` — `LEVELS`, `SANDBOX`, `NOTEBOOK`: fixed elements, palette,
   cases (inputs + expected detector catches), par counts, intro/hint/success.
@@ -78,12 +79,18 @@ follow-up inline over spawning a subagent.
   (text reframed: the boomerang needs *unconditional directionality* — reversible-theoretical
   vs the real dissipative circulator). Dragging/rotating/flipping a wired element now
   auto-reroutes its wires to a legal path (sticky-red if none exists).
-- **Deployed** 2026-06-21 from `main` (`bb55734`) → https://fluxonaut.netlify.app . To
+- **Instant replay + drop-on-wire flag** (2026-06-21): a fuzzed-timing certification failure now
+  offers a "Watch instant replay (run #N)" button that re-plays that exact seed's jittered timing
+  on the board — flashing banner, normal play/pause/speed; `certify` records the first failing
+  seed; the banner clears on any edit but Reset keeps it armed so the run can be re-watched.
+  Separately, dropping a new part onto/grazing an existing wire now flags that wire sticky-red
+  (no reroute — its timing is preserved) so the player deletes + redraws it deliberately.
+- **Deployed** 2026-06-21 from `main` (`8ebbbf5`) → https://fluxonaut.netlify.app . To
   redeploy: rebuild the runtime zip in `../netlify-zips/` (`git archive HEAD …`) and drag it
   to Netlify.
 - Open threads: w4l6 "The Boomerang Theorem" still wants a standalone review; `TODO.md` has
-  the SG-symbol port-ordering revisit, the "also offer PS on w4l6's palette" idea, and the
-  UX-friction items.
+  the w2l4 timing-constraint loosening (play-test friction — Michael has ideas), the SG-symbol
+  port-ordering revisit, the "also offer PS on w4l6's palette" idea, and the UX-friction items.
 
 ## Folder layout
 This git repo is `fluxon-game/`. Its PARENT (`C:\Users\MikeFrank\BARCS\`) also
