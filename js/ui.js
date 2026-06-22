@@ -459,6 +459,7 @@
     };
     app.elements.push(el);
     app.replay = null;   // placing a new element changes the circuit — drop any armed replay
+    flagWiresGrazedBy(el);   // landed on an existing wire? flag it red (no reroute — keep its timing)
     app.paletteLeft[app.placing.type]--;
     SFX.place();
     if (app.paletteLeft[app.placing.type] <= 0) { app.mode = 'idle'; app.placing = null; }
@@ -605,6 +606,21 @@
       for (const s of segs) if (segRectOverlapLen(s, el.x, el.y, el.x + sz.w, el.y + sz.h) > 0.05) return true;
     }
     return false;
+  }
+
+  // A part dropped onto / grazing an existing wire doesn't connect to it, and rerouting would wreck
+  // the wire's hand-tuned timing — so flag the grazed wire sticky-red (no reroute) so the player
+  // knows to delete + redraw it deliberately (e.g. through a Crossover dropped on a crossing).
+  function flagWiresGrazedBy(el) {
+    const sz = F.rotatedSize(F.TYPES[el.type], el.rot || 0);
+    const cir = { elements: app.elements };
+    let n = 0;
+    for (const w of app.wires) {
+      if (w.bad) continue;                                // already flagged — leave it
+      const segs = pathSegs(E.wirePath(cir, w));
+      if (segs.some(s => segRectOverlapLen(s, el.x, el.y, el.x + sz.w, el.y + sz.h) > 0.05)) { w.bad = true; n++; }
+    }
+    return n;
   }
 
   function finishWire(to) {
@@ -1457,5 +1473,5 @@
   }
 
   // test/debug hooks (harmless in production)
-  F._ui = { app, boot, loadLevel, runCurrentCase, certify, advancePlayback, frame, showScreen, stopPlayback, buildLevelSelect, showNotebook, startPlacing, tryPlace, deleteSelection, finishWire, ruleSVG, openRuleModal, revalidateWires, playFailingSeed, drawBanner, togglePlay, resetBoard };
+  F._ui = { app, boot, loadLevel, runCurrentCase, certify, advancePlayback, frame, showScreen, stopPlayback, buildLevelSelect, showNotebook, startPlacing, tryPlace, deleteSelection, finishWire, ruleSVG, openRuleModal, revalidateWires, playFailingSeed, drawBanner, togglePlay, resetBoard, flagWiresGrazedBy };
 })();

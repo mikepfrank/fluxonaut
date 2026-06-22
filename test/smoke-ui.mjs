@@ -218,6 +218,25 @@ for (const lv of F.LEVELS.concat([F.SANDBOX])) {
   check('wire reroute: mutual overlap resolved — neither wire left bad', U.app.wires.every(w => w.bad === false));
 }
 
+// drop-on-wire: a NEW part placed onto an existing wire flags it red, but does NOT reroute it
+{
+  const lv = F.LEVELS.find(l => l.size && l.size.w >= 14 && l.size.h >= 6) || F.LEVELS[0];
+  U.loadLevel(lv);
+  U.app.elements = [
+    { id: 'gL', type: 'LAUNCHER', x: 1, y: 3, rot: 0, state: null, placed: true },
+    { id: 'gD', type: 'DETECTOR', x: 12, y: 3, rot: 0, state: null, placed: true },
+  ];
+  U.app.wires = [{ id: 'gw', a: { el: 'gL', port: 'A' }, b: { el: 'gD', port: 'A' }, via: [] }];
+  const viaBefore = JSON.stringify(U.app.wires[0].via);
+  U.app.paletteLeft = { REFLECTOR: 1 };
+  U.startPlacing('REFLECTOR');
+  U.tryPlace(6, 3);   // drop it right on the straight wire between L and D
+  const w = U.app.wires[0];
+  check('drop-on-wire: the part was actually placed (not rejected)', U.app.elements.some(e => e.type === 'REFLECTOR' && e.placed));
+  check('drop-on-wire: a part dropped on a wire flags it sticky-red', w.bad === true);
+  check('drop-on-wire: the grazed wire is NOT rerouted (via preserved)', JSON.stringify(w.via) === viaBefore);
+}
+
 // element transition-rule inspector (the 🔍 modal): renders for every device
 {
   let ok = true, detail = '';
