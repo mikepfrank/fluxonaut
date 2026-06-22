@@ -11,7 +11,7 @@ don't treat in-game text as ground truth.
 
 ## Commands
 - Tests (keep green): `node test/run-tests.mjs` (418 checks) and
-  `node test/smoke-ui.mjs` (157 checks).
+  `node test/smoke-ui.mjs` (161 checks).
 - Render reference solutions to `sols/*.png`: `node test/render-sols.mjs`
   (run `npm i` first — dev dep `@napi-rs/canvas`).
 - Re-route references to obey the wiring rules: `node test/route-solutions.mjs`.
@@ -93,7 +93,11 @@ follow-up inline over spawning a subagent.
   an exhaust/backflow sink). Rewind halts at the latest barrier **at or before** the current time,
   opening a teaching modal; a detector is NOT a barrier (it remembers + re-emits), so a run of only
   reversible elements ending at detectors rewinds fully. CIRC dissipates but is 1-to-1 → not a barrier.
-- **Deployed** 2026-06-21 from `main` (`cdac1cb`) → https://fluxonaut.netlify.app . To
+- **Wire delay tooltip** (2026-06-22): hovering a wire (idle, not over a port) shows its propagation
+  delay + physical length, e.g. "53.9 ps · 539 µm". Delay = routed `pathLength × PS_PER_UNIT / SPEED`
+  (the exact length the simulator times by); length = delay × `engine.UM_PER_PS` (= 10, the documented
+  ~c/30 ≈ 10 µm/ps ⇒ 50 µm/cell). Canvas-drawn (`render.drawWireTip`); addresses TODO #3's per-wire readout.
+- **Deployed** 2026-06-22 from `main` (`e76ff43`) → https://fluxonaut.netlify.app . To
   redeploy: rebuild the runtime zip in `../netlify-zips/` (`git archive HEAD index.html css js`)
   and drag it to Netlify.
 - Open threads: w4l6 "The Boomerang Theorem" still wants a standalone review; `TODO.md` has
