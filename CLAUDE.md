@@ -11,7 +11,7 @@ don't treat in-game text as ground truth.
 
 ## Commands
 - Tests (keep green): `node test/run-tests.mjs` (418 checks) and
-  `node test/smoke-ui.mjs` (161 checks).
+  `node test/smoke-ui.mjs` (164 checks).
 - Render reference solutions to `sols/*.png`: `node test/render-sols.mjs`
   (run `npm i` first — dev dep `@napi-rs/canvas`).
 - Re-route references to obey the wiring rules: `node test/route-solutions.mjs`.
@@ -97,7 +97,13 @@ follow-up inline over spawning a subagent.
   delay + physical length, e.g. "53.9 ps · 539 µm". Delay = routed `pathLength × PS_PER_UNIT / SPEED`
   (the exact length the simulator times by); length = delay × `engine.UM_PER_PS` (= 10, the documented
   ~c/30 ≈ 10 µm/ps ⇒ 50 µm/cell). Canvas-drawn (`render.drawWireTip`); addresses TODO #3's per-wire readout.
-- **Deployed** 2026-06-22 from `main` (`e76ff43`) → https://fluxonaut.netlify.app . To
+- **Pre-roll skip** (2026-06-23): the first fluxon launches ~1.9 sim-units in (`buildInputs` adds a
+  GAP before the first input), so Run used to crawl across a blank board first (worse at low speed).
+  Forward playback now starts/resumes just before the first launch — `app.playStart = firstT − 0.2`,
+  seeded in `beginPlayback` and enforced as a snap in `advancePlayback`'s forward branch (so fresh
+  run, resume, and reverse-then-play are all instant). Forward-only: reverse still reaches the empty
+  `t=0` start. View-only — trace/timing/certification untouched.
+- **Deployed** 2026-06-23 from `main` (`9952541`) → https://fluxonaut.netlify.app . To
   redeploy: rebuild the runtime zip in `../netlify-zips/` (`git archive HEAD index.html css js`)
   and drag it to Netlify.
 - Open threads: w4l6 "The Boomerang Theorem" still wants a standalone review; `TODO.md` has
