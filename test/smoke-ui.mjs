@@ -256,6 +256,22 @@ for (const lv of F.LEVELS.concat([F.SANDBOX])) {
   check('wire tooltip: a longer (detoured) wire has a larger delay', U.wireDelayInfo(U.app.wires[0]).ps > info.ps);
 }
 
+// playback skips the empty pre-roll: starts just before the first launch, not at t=0
+{
+  const lv = F.LEVELS.find(l => l.cases && l.cases.length) || F.LEVELS[0];
+  U.loadLevel(lv);
+  const base = { tEnd: 5, heat: 0, heatEvents: [], arrivals: [], backflows: 0, finalStates: {}, stateChanges: [], detections: {}, barriers: [] };
+  const launchAt19 = { ...base, pulses: [{ id: 1, pol: 1, segs: [{ wire: 'w', fromA: true, t0: 1.9, t1: 3.0, len: 3 }] }] };
+  U.beginPlayback(launchAt19, null);
+  check('playback skips dead pre-roll: starts ~0.2 before the first launch (not t=0)', Math.abs(U.app.playT - 1.7) < 1e-9);
+  // resuming FORWARD from inside the pre-roll (e.g. after reversing back to the start) also skips it
+  U.app.playT = 0; U.app.playing = true; U.app.playDir = 1;   // pretend we reversed to t=0, then pressed play
+  U.advancePlayback(0.05);
+  check('playback: forward from the pre-roll snaps past it (reverse-then-play has no lag)', U.app.playT >= 1.7 - 1e-9);
+  U.beginPlayback({ ...base, pulses: [] }, null);   // no pulses → nothing to skip to
+  check('playback with no pulses starts at t=0', U.app.playT === 0);
+}
+
 // element transition-rule inspector (the 🔍 modal): renders for every device
 {
   let ok = true, detail = '';

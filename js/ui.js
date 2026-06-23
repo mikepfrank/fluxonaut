@@ -58,7 +58,7 @@
     paletteLeft: {},          // counts remaining
     caseIdx: 0,
     // playback
-    trace: null, playT: 0, playing: false, speed: 1, playCase: 0, playDir: 1,   // playDir −1 = reverse
+    trace: null, playT: 0, playStart: 0, playing: false, speed: 1, playCase: 0, playDir: 1,   // playDir −1 = reverse
     evCursor: { state: 0, heat: 0, det: 0, arr: 0 },
     liveStates: new Map(), liveDetections: {},
     particles: [],
@@ -778,7 +778,15 @@
 
   function beginPlayback(trace, result) {
     app.trace = trace;
-    app.playT = 0;
+    // Skip the empty pre-roll: the first fluxon doesn't launch until ~1.9 sim-units in, and playback
+    // advances at a speed-scaled rate — so starting at t=0 made Run feel laggy (worse at low speed)
+    // while the clock crawled across a blank board. Start just before the first launch instead. This
+    // is view-only; the trace/timing/certification are untouched. (No event precedes the first launch,
+    // so the zeroed cursors below stay correct.)
+    let firstT = Infinity;
+    for (const p of trace.pulses) if (p.segs.length) firstT = Math.min(firstT, p.segs[0].t0);
+    app.playStart = isFinite(firstT) ? Math.max(0, firstT - 0.2) : 0;   // forward floor: just before the first launch
+    app.playT = app.playStart;
     app.playing = true;
     app.playDir = 1;
     app.playCase = app.caseIdx;
@@ -806,7 +814,7 @@
 
   function stopPlayback() {
     app.replay = null;   // edits / case-switch / re-certify all funnel here — drop the replay banner
-    app.trace = null; app.playing = false; app.playT = 0; app.playDir = 1; app.banner = null; app.runResult = null;
+    app.trace = null; app.playing = false; app.playT = 0; app.playStart = 0; app.playDir = 1; app.banner = null; app.runResult = null;
     app.liveStates = new Map(app.elements.map(e => [e.id, e.state]));
     app.particles = [];
     updateHud();
@@ -865,6 +873,10 @@
     const tr = app.trace;
     if (!tr || !app.playing) return;
     if (app.playDir < 0) { advanceReverse(dt); return; }
+    // Forward playback never dwells in the empty pre-roll — whether starting fresh OR resuming after
+    // a reverse-to-start. (Reverse may still descend below playStart to reach the true initial state;
+    // the pre-roll has no events, so the zeroed cursors stay correct after this snap.)
+    if (app.playT < app.playStart) app.playT = app.playStart;
     app.playT += dt * app.speed;
     const T = app.playT;
     // state changes
@@ -1591,5 +1603,5 @@
 
   // test/debug hooks (harmless in production)
   F._ui = { app, boot, loadLevel, runCurrentCase, certify, advancePlayback, frame, showScreen, stopPlayback, buildLevelSelect, showNotebook, startPlacing, tryPlace, deleteSelection, finishWire, ruleSVG, openRuleModal, revalidateWires, playFailingSeed, drawBanner, togglePlay, resetBoard, flagWiresGrazedBy,
-    toggleReverse, seekTo, reverseFloor, showReverseBarrier, wireDelayInfo };
+    toggleReverse, seekTo, reverseFloor, showReverseBarrier, wireDelayInfo, beginPlayback };
 })();
