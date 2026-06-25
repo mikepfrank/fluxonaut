@@ -405,6 +405,65 @@ for (const lv of F.LEVELS.concat([F.SANDBOX])) {
   check('reverse: ▶ switches a reverse run back to forward', U.app.playDir === 1 && U.app.playing);
 }
 
+// arrow-key transport: ↑/↓ nudge speed, →/← set play direction (no pause-toggle)
+{
+  const lv = F.LEVELS.find(l => l.cases && l.cases.length) || F.LEVELS[0];
+  U.loadLevel(lv);
+  // ↑/↓ nudge speed within the slider's [0.5, 6] range and clamp at the ends
+  U.app.speed = 1; U.nudgeSpeed(0.5);   check('arrows: ↑ raises speed a notch', U.app.speed === 1.5);
+  U.nudgeSpeed(-0.5);                    check('arrows: ↓ lowers speed a notch', U.app.speed === 1);
+  U.app.speed = 6;  U.nudgeSpeed(0.5);   check('arrows: speed clamps at max (6)', U.app.speed === 6);
+  U.app.speed = 0.5; U.nudgeSpeed(-0.5); check('arrows: speed clamps at min (0.5)', U.app.speed === 0.5);
+  // →/← set direction; with a trace mid-run, ← reverses and → goes forward
+  const base = { tEnd: 5, heat: 0, heatEvents: [], arrivals: [], backflows: 0, finalStates: {}, stateChanges: [], detections: {}, barriers: [] };
+  U.beginPlayback({ ...base, pulses: [{ id: 1, pol: 1, segs: [{ wire: 'w', fromA: true, t0: 1.9, t1: 3.0, len: 3 }] }] }, null);
+  U.app.playT = 3;
+  U.playReverse();  check('arrows: ← enters reverse play', U.app.playDir === -1 && U.app.playing);
+  U.playForward();  check('arrows: → enters forward play', U.app.playDir === 1 && U.app.playing);
+  U.playForward();  check('arrows: → again STAYS forward (no pause, unlike Space)', U.app.playDir === 1 && U.app.playing);
+  U.togglePlay();   check('transport: ▶ button pauses when going forward', !U.app.playing);
+  // spacebar = play/pause that REMEMBERS direction: pause keeps the direction, resume continues it
+  U.app.playT = 3; U.playReverse();  check('space: reverse is playing', U.app.playDir === -1 && U.app.playing);
+  U.spaceBar();     check('space: pauses reverse — direction preserved', !U.app.playing && U.app.playDir === -1);
+  U.spaceBar();     check('space: RESUMES reverse (not forward)', U.app.playing && U.app.playDir === -1);
+  U.spaceBar();     check('space: pauses reverse again', !U.app.playing && U.app.playDir === -1);
+  // forward is likewise remembered
+  U.app.playT = 2; U.playForward();  check('space: forward is playing', U.app.playDir === 1 && U.app.playing);
+  U.spaceBar();     check('space: pauses forward', !U.app.playing && U.app.playDir === 1);
+  U.spaceBar();     check('space: resumes forward', U.app.playing && U.app.playDir === 1);
+  // at the fully-rewound start, "resume reverse" would dead-end → falls back to forward
+  U.app.playT = 0; U.app.playing = false; U.app.playDir = -1;
+  U.spaceBar();     check('space: at the rewound start, falls back to forward (no dead stop)', U.app.playing && U.app.playDir === 1);
+}
+
+// when a movable element is selected, arrows nudge IT one grid cell instead of driving playback
+{
+  const lv = F.LEVELS.find(l => l.size && l.size.w >= 14 && l.size.h >= 8) || F.LEVELS[0];
+  U.loadLevel(lv);
+  U.app.elements = [
+    { id: 'A', type: 'REFLECTOR', x: 5, y: 5, rot: 0, state: null, placed: true, locked: false },
+    { id: 'B', type: 'REFLECTOR', x: 9, y: 5, rot: 0, state: null, placed: true, locked: false },
+    { id: 'C', type: 'REFLECTOR', x: 0, y: 0, rot: 0, state: null, placed: true, locked: true },
+  ];
+  U.app.wires = [];
+  const A = () => U.app.elements.find(e => e.id === 'A');
+  // the gate: an unlocked selected element is the nudge target; nothing/locked is not
+  U.app.selection = { kind: 'el', id: 'A' };  check('nudge gate: an unlocked selected element is nudgable', U.selectedEl() && U.selectedEl().id === 'A');
+  U.app.selection = { kind: 'el', id: 'C' };  check('nudge gate: a locked selected element is NOT nudgable', U.selectedEl() === null);
+  U.app.selection = null;                     check('nudge gate: nothing selected is not nudgable', U.selectedEl() === null);
+  // a clear nudge moves the element one cell; the edge and other elements block it
+  U.app.selection = { kind: 'el', id: 'A' };
+  U.nudgeSelected(0, -1);                     check('nudge: moves a selected element one cell into open space', A().x === 5 && A().y === 4);
+  A().x = 0; A().y = 3; U.nudgeSelected(-1, 0); check('nudge: the board edge blocks the move', A().x === 0 && A().y === 3);
+  A().x = 8; A().y = 5; U.nudgeSelected(1, 0);  check('nudge: another element blocks the move', A().x === 8 && A().y === 5);
+  U.app.selection = { kind: 'el', id: 'C' }; U.nudgeSelected(1, 0); check('nudge: a locked element never moves', U.app.elements.find(e => e.id === 'C').x === 0);
+  // onKey routes the arrow: nudge when a part is selected, transport otherwise
+  const ev = k => ({ key: k, preventDefault() {} });
+  A().x = 5; A().y = 5; U.app.selection = { kind: 'el', id: 'A' };
+  U.onKey(ev('ArrowUp'));   check('nudge: onKey sends ↑ to a nudge when a part is selected', A().y === 4);
+  U.app.selection = null; U.app.speed = 2; U.onKey(ev('ArrowUp')); check('nudge: onKey sends ↑ to speed when nothing is selected', U.app.speed === 2.5);
+}
+
 console.log(`\n${nPass} passed, ${nFail} failed`);
 process.exit(nFail ? 1 : 0);
 

@@ -1463,7 +1463,12 @@
       closeModal();
     }
     else if (ev.key === 'Delete' || ev.key === 'Backspace') { stopPlayback(); deleteSelection(); }
-    else if (ev.key === ' ') { ev.preventDefault(); togglePlay(); }
+    else if (ev.key === ' ') { ev.preventDefault(); spaceBar(); }
+    // Arrows nudge a selected movable element; otherwise they drive playback (speed / direction).
+    else if (ev.key === 'ArrowUp') { ev.preventDefault(); if (selectedEl()) nudgeSelected(0, -1); else nudgeSpeed(0.5); }
+    else if (ev.key === 'ArrowDown') { ev.preventDefault(); if (selectedEl()) nudgeSelected(0, 1); else nudgeSpeed(-0.5); }
+    else if (ev.key === 'ArrowRight') { ev.preventDefault(); if (selectedEl()) nudgeSelected(1, 0); else playForward(); }
+    else if (ev.key === 'ArrowLeft') { ev.preventDefault(); if (selectedEl()) nudgeSelected(-1, 0); else playReverse(); }
   }
 
   // Instant replay: re-run the exact randomized timing of a fuzzed seed that failed
@@ -1495,26 +1500,37 @@
     app.replay = rep;
   }
 
-  function togglePlay() {                      // ▶ — play / pause / restart, FORWARD
+  // Go to (or remain in) FORWARD play — the → arrow, and the engine of togglePlay (▶ / Space).
+  function playForward() {
     if (!app.trace) {
       if (app.replay) replayCurrent();         // a Reset left a replay armed → re-watch that seed, not nominal
       else runCurrentCase();
       updateHud(); return;
     }
-    if (app.playing && app.playDir > 0) { app.playing = false; updateHud(); return; }   // pause forward
     app.playDir = 1;
     if (app.banner) {                          // the run had ended — restart from the top...
       if (app.replay) replayCurrent();         // ...re-watching the same fuzzed seed, not nominal
       else { stopPlayback(); runCurrentCase(); }
     } else {
-      app.playing = true;                      // resume forward, or switch over from reverse
+      app.playing = true;                      // (re)start forward, or switch over from reverse
     }
     updateHud();
   }
+  function togglePlay() {                       // ▶ button — playForward, but pause if already going forward
+    if (app.trace && app.playing && app.playDir > 0) { app.playing = false; updateHud(); return; }
+    playForward();
+  }
+  // Spacebar — play/pause that remembers direction. Pausing keeps app.playDir, so resume continues
+  // the SAME way: reverse if there's still room to rewind, otherwise forward (never a dead stop).
+  function spaceBar() {
+    if (app.trace && app.playing) { app.playing = false; updateHud(); return; }   // pause; keep the direction
+    if (app.trace && app.playDir < 0 && app.playT > reverseFloor() + 1e-9) playReverse();   // resume reverse
+    else playForward();                                                                       // else play forward
+  }
 
-  function toggleReverse() {                    // ◀ — play / pause, REVERSE (toward the initial state)
+  // Go to (or remain in) REVERSE play (toward the initial state) — the ← arrow, and the engine of ◀.
+  function playReverse() {
     if (!app.trace) return;
-    if (app.playing && app.playDir < 0) { app.playing = false; updateHud(); return; }   // pause reverse
     const floor = reverseFloor();
     if (app.playT <= floor + 1e-9) {            // already as far back as we're allowed to go
       seekTo(floor);
@@ -1525,6 +1541,38 @@
     app.playDir = -1;
     app.playing = true;
     updateHud();
+  }
+  function toggleReverse() {                     // ◀ — playReverse, but pause if already reversing
+    if (app.trace && app.playing && app.playDir < 0) { app.playing = false; updateHud(); return; }
+    playReverse();
+  }
+
+  // Up/Down arrows nudge playback speed one notch within the #speed slider's range.
+  function nudgeSpeed(delta) {
+    const MIN = 0.5, MAX = 6, STEP = 0.5;       // match the #speed slider in index.html
+    app.speed = Math.max(MIN, Math.min(MAX, Math.round((app.speed + delta) / STEP) * STEP));
+    const sl = $('#speed'); if (sl) sl.value = app.speed;
+    const lbl = $('#speed-label'); if (lbl) lbl.textContent = app.speed + '×';
+  }
+
+  // The selected element if it's movable (an unlocked placed device) — the arrow-nudge target, else null.
+  function selectedEl() {
+    const sel = app.selection;
+    if (!sel || sel.kind !== 'el') return null;
+    const el = app.elements.find(e => e.id === sel.id);
+    return (el && !el.locked) ? el : null;     // el.locked also gates dragging — same rule
+  }
+  // Nudge the selected element one grid cell, unless the board edge / another element is in the way.
+  function nudgeSelected(dx, dy) {
+    const el = selectedEl();
+    if (!el) return;
+    const sz = F.rotatedSize(F.TYPES[el.type], el.rot || 0), lv = app.level;
+    const gx = el.x + dx, gy = el.y + dy;
+    if (gx < 0 || gy < 0 || gx + sz.w > lv.size.w || gy + sz.h > lv.size.h) return;   // edge of the board
+    if (overlapsAny(gx, gy, sz, el.id)) return;                                        // another element in the way
+    el.x = gx; el.y = gy;
+    SFX.place();
+    revalidateWires();   // moved ports → reroute its wires (sticky-red if no legal path), like a drag
   }
 
   function fmtSyn(s, dir) {
@@ -1603,5 +1651,6 @@
 
   // test/debug hooks (harmless in production)
   F._ui = { app, boot, loadLevel, runCurrentCase, certify, advancePlayback, frame, showScreen, stopPlayback, buildLevelSelect, showNotebook, startPlacing, tryPlace, deleteSelection, finishWire, ruleSVG, openRuleModal, revalidateWires, playFailingSeed, drawBanner, togglePlay, resetBoard, flagWiresGrazedBy,
-    toggleReverse, seekTo, reverseFloor, showReverseBarrier, wireDelayInfo, beginPlayback };
+    toggleReverse, seekTo, reverseFloor, showReverseBarrier, wireDelayInfo, beginPlayback,
+    playForward, playReverse, nudgeSpeed, selectedEl, nudgeSelected, onKey, spaceBar };
 })();
