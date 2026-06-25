@@ -11,7 +11,7 @@ don't treat in-game text as ground truth.
 
 ## Commands
 - Tests (keep green): `node test/run-tests.mjs` (418 checks) and
-  `node test/smoke-ui.mjs` (164 checks).
+  `node test/smoke-ui.mjs` (189 checks).
 - Render reference solutions to `sols/*.png`: `node test/render-sols.mjs`
   (run `npm i` first — dev dep `@napi-rs/canvas`).
 - Re-route references to obey the wiring rules: `node test/route-solutions.mjs`.
@@ -103,7 +103,14 @@ follow-up inline over spawning a subagent.
   seeded in `beginPlayback` and enforced as a snap in `advancePlayback`'s forward branch (so fresh
   run, resume, and reverse-then-play are all instant). Forward-only: reverse still reaches the empty
   `t=0` start. View-only — trace/timing/certification untouched.
-- **Deployed** 2026-06-23 from `main` (`9952541`) → https://fluxonaut.netlify.app . To
+- **Arrow-key transport + nudge** (2026-06-25): ↑/↓ nudge playback speed a notch (clamped to the slider's
+  0.5–6×); →/← go to forward/reverse play (non-toggling). When a movable (unlocked) element is selected,
+  the arrows instead nudge IT one grid cell (blocked only by the board edge or another element; its wires
+  reroute after, like a drag). Space is a direction-remembering play/pause — pause keeps `app.playDir`,
+  resume continues it (reverse stays reverse), falling back to forward only when reverse is exhausted.
+  `togglePlay`/`toggleReverse` now wrap shared `playForward`/`playReverse` primitives so the ▶/◀ buttons
+  stay direction-specific (`spaceBar` is the neutral play/pause).
+- **Deployed** 2026-06-25 from `main` (`4a89b31`) → https://fluxonaut.netlify.app . To
   redeploy: rebuild the runtime zip in `../netlify-zips/` (`git archive HEAD index.html css js`)
   and drag it to Netlify.
 - Open threads: w4l6 "The Boomerang Theorem" still wants a standalone review; `TODO.md` has
