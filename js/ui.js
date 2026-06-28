@@ -1503,6 +1503,7 @@
 
   // Go to (or remain in) FORWARD play — the → arrow, and the engine of togglePlay (▶ / Space).
   function playForward() {
+    if (app.selection) { app.selection = null; renderInspector(); }   // never leave an element selected during a run — arrow keys would nudge it and skew the timing
     if (!app.trace) {
       if (app.replay) replayCurrent();         // a Reset left a replay armed → re-watch that seed, not nominal
       else runCurrentCase();
@@ -1538,6 +1539,7 @@
       if (floor > 0) showReverseBarrier(floor); // re-explain why it can't go further
       updateHud(); return;
     }
+    if (app.selection) { app.selection = null; renderInspector(); }   // same deselect-on-run rule for reverse playback
     app.banner = null;                          // drop the forward end-banner while rewinding
     app.playDir = -1;
     app.playing = true;
