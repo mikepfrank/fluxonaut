@@ -1063,8 +1063,13 @@
     row.append(h('button', { class: 'big', onclick: closeModal }, res.pass ? 'Stay & tinker' : 'Back to the bench'));
     if (res.pass) {
       const next = nextLevel(lv);
-      row.append(h('button', { class: 'big primary', onclick: () => { closeModal(); next ? loadLevel(next) : showScreen('levels'); } },
-        next ? 'Next: ' + next.title + ' →' : 'Level select'));
+      if (next) {
+        row.append(h('button', { class: 'big primary', onclick: () => { closeModal(); loadLevel(next); } }, 'Next: ' + next.title + ' →'));
+      } else {
+        // last level cleared — offer level select, and as the finale reward the free-play Sandbox
+        row.append(h('button', { class: 'big', onclick: () => { closeModal(); showScreen('levels'); } }, 'Level select'));
+        row.append(h('button', { class: 'big primary', onclick: () => { closeModal(); loadLevel(F.SANDBOX); } }, 'Enter the Sandbox →'));
+      }
     }
     box.append(row);
   }
