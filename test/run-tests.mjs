@@ -201,6 +201,27 @@ for (const level of F.LEVELS) {
   testLevel(applyMoves(level, sol), sol);
 }
 
+// ── alternate references: keys like "<levelId>-<tag>" — same level + cases, a different build ──
+console.log('\nAlternate references:');
+for (const key of Object.keys(SOLUTIONS)) {
+  if (!key.includes('-')) continue;                    // level ids carry no dash; "w4l7-utr" does
+  const baseId = key.slice(0, key.indexOf('-'));
+  const level = F.LEVELS.find(l => l.id === baseId);
+  if (!level) { console.log(`alternate ${key}: no base level ${baseId}`); nFail++; continue; }
+  const sol = SOLUTIONS[key];
+  const circuit = buildCircuit(applyMoves(level, sol), sol);
+  const seeds = Array.from({ length: F.engine.CERTIFY_SEEDS }, (_, i) => i);
+  const res = F.engine.certify(circuit, level.cases, seeds, { optional: level.optionalDetectors || [] });
+  console.log(`${key} (alternate of ${baseId}):`);
+  check(`${key}: certifies (all cases × ${seeds.length} seeds)`, res.pass,
+    res.perCase.filter(c => !c.pass).map(c => `\n      case "${c.name}": ${c.reasons.join('; ')}`).join(''));
+  check(`${key}: ${(sol.place || []).length} elements ≤ par ${level.parElements}`, (sol.place || []).length <= level.parElements);
+  check(`${key}: heat ${res.heatMax} ≤ par ${level.parHeat}`, res.heatMax <= level.parHeat);
+  checkGeometry(circuit);
+  const axings = F.engine.countCrossings(circuit);
+  check(`${key}: planar — 0 crossings`, axings === 0, `(${axings})`);
+}
+
 // ───────────────────────────── fault-rule tests ───────────────────────────────
 console.log('\nFault rules:');
 {

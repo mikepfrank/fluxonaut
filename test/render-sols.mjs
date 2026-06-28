@@ -18,7 +18,7 @@ let rafCb = null; globalThis.requestAnimationFrame = cb => { rafCb = cb; return 
 for (const f of ['elements.js', 'engine.js', 'levels.js', 'render.js', 'ui.js']) require(path.join(__dirname, '..', 'js', f));
 const F = globalThis.FLUXON, U = F._ui; const SOL = require('./solutions.json');
 U.boot();
-function applySolution(lv) { const s = SOL[lv.id]; if (!s) return;
+function applySolution(lv, s) { s = s || SOL[lv.id]; if (!s) return;
   if (s.moveFixed) for (const [id, mv] of Object.entries(s.moveFixed)) Object.assign(U.app.elements.find(e => e.id === id), mv);
   if (s.dropPrewires) { const d = new Set(s.dropPrewires.map(i => 'pw' + i)); U.app.wires = U.app.wires.filter(w => !d.has(w.id)); }
   for (const e of (s.place || [])) { const t = F.TYPES[e.type]; U.app.elements.push({ id: e.id, type: e.type, x: e.x, y: e.y, rot: e.rot || 0, mir: !!e.mir, state: 'state' in e ? e.state : (t.states ? t.defaultState : null), cfg: e.cfg ? { ...e.cfg } : (t.config ? { ...t.config } : undefined), placed: true }); }
@@ -31,6 +31,18 @@ for (const lv of F.LEVELS) {
   U.app.trace = null; U.app.playing = false; U.app.banner = null; // static built circuit, no run
   frame(); frame();
   const name = lv.id + '-' + slug(lv.title) + '.png';
+  fs.writeFileSync(path.join(OUT, name), board.toBuffer('image/png'));
+  console.log('wrote', name);
+}
+// alternate references: render "<levelId>-<tag>" solutions against their base level
+for (const key of Object.keys(SOL)) {
+  if (!key.includes('-')) continue;
+  const baseId = key.slice(0, key.indexOf('-')), tag = key.slice(key.indexOf('-') + 1);
+  const lv = F.LEVELS.find(l => l.id === baseId); if (!lv) continue;
+  U.loadLevel(lv); applySolution(lv, SOL[key]);
+  U.app.trace = null; U.app.playing = false; U.app.banner = null;
+  frame(); frame();
+  const name = lv.id + '-' + slug(lv.title) + '-' + tag + '.png';
   fs.writeFileSync(path.join(OUT, name), board.toBuffer('image/png'));
   console.log('wrote', name);
 }

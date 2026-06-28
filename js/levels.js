@@ -830,6 +830,7 @@ joule wasted anywhere. Every part is still a conjecture in niobium, but the <i>c
 is real and provably enough: ballistic asynchronous reversible computing needs nothing more
 exotic than reversible three-terminal devices. Simpler than World 2, cleaner than World 4 —
 the whole point of the research, in a single circuit.`,
+      notebook: ['threeports'],
       fixed: [
         el('L_C', 'LAUNCHER', 2, 5), el('L_D', 'LAUNCHER', 2, 9),
         el('D_cout', 'DETECTOR', 19, 5), el('D_cd', 'DETECTOR', 19, 9), el('D_ncd', 'DETECTOR', 10, 12),
@@ -1244,6 +1245,22 @@ genuinely new idea. Quod erat frustrandum.`,
 abstract elements (Rotary, TCB, PR3, rPS) that real niobium hasn't caught up with
 yet. Everything else — the RM cell, rPF, BSR, PS, PFG, circulator, CB, and the RFSG —
 follows the published designs' digital behavior.</i>`,
+    },
+    threeports: {
+      title: 'Three ports are enough',
+      body: `World 2 proved this kind of logic is universal — but at a price: two-state
+switch gates, pulse Duplicators, constant "1" streams, and long garbage rails for
+Bennett's reverse pass. The gate you just built strips that to the bone. <br><br>A single
+control token props the <b>Toggle Barrier</b> open, loops around <i>exactly once</i> while
+the data slips through the gap, then comes back to shut it — and every device, the barrier
+included, lands back in its starting state. No garbage, no constant streams, not even a
+second polarity: just two reversible <b>three-port</b> devices carrying one bit of memory
+each — a pair of <b>Self-Toggling Switches</b>, or equally a pair of <b>Toggle Rotaries</b> —
+plus an unconditional rotary to steer. <br><br>That is the whole claim: <b>unipolar BARCS is
+universal with nothing but reversible ≤3-port elements</b>, and the gate that proves it is
+far simpler than the one in the 2017 paper. The catch is honest — no one has yet built a
+Self-Toggling Switch or a Toggle Rotary as a fully ballistic, reversible Josephson circuit.
+The logic is settled; the device is the open problem (LPS '23).`,
     },
   };
 
