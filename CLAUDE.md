@@ -10,8 +10,8 @@ the domain authority on its physics/CS. Defer to him on conceptual correctness;
 don't treat in-game text as ground truth.
 
 ## Commands
-- Tests (keep green): `node test/run-tests.mjs` (418 checks) and
-  `node test/smoke-ui.mjs` (189 checks).
+- Tests (keep green): `node test/run-tests.mjs` (479 checks) and
+  `node test/smoke-ui.mjs` (196 checks).
 - Render reference solutions to `sols/*.png`: `node test/render-sols.mjs`
   (run `npm i` first — dev dep `@napi-rs/canvas`).
 - Re-route references to obey the wiring rules: `node test/route-solutions.mjs`.
@@ -35,6 +35,9 @@ follow-up inline over spawning a subagent.
   (DUP/RDUP) fault on out-of-order arrivals; `CIRC` is likewise **partial** (only the
   +-routes A→B and B→C are defined — its real chip design was never finalized). PS/RPS have a `cfg.bent` (+/−/S) that
   picks which arm exits orthogonally — geometry only, distinct from rotate/mirror.
+  `STS` (self-toggling switch) and `UTR` (unconditional toggle rotary) are **aspirational**
+  reversible 3-ports (LPS '23 — no known fully-ballistic JJ build yet); both carry one state
+  bit, render state-driven symbols, and STS reuses the `cfg.bent` (S/U/D) idiom.
 - `js/engine.js` — deterministic event-driven simulator + `certify` (runs each
   case under 100 jitter seeds — `CERTIFY_SEEDS`, shared by game + tests;
   **order must hold, exact timing must not**; records the first failing seed per case →
@@ -113,6 +116,18 @@ follow-up inline over spawning a subagent.
 - **Deployed** 2026-06-25 from `main` (`4a89b31`) → https://fluxonaut.netlify.app . To
   redeploy: rebuild the runtime zip in `../netlify-zips/` (`git archive HEAD index.html css js`)
   and drag it to Netlify.
+- **w4l7 "Three Ports Are Enough" + STS/UTR** (2026-06-28): new World-4 capstone proving unipolar
+  BARCS is universal with only reversible ≤3-port devices — a self-resetting RFSG switch gate (two
+  toggling 3-ports + a Rotary + the Toggle Barrier, zero heat, far simpler than the 2017 paper). Two
+  aspirational elements (LPS '23): the **Self-Toggling Switch (STS)** and **Unconditional Toggle
+  Rotary (UTR)**, both state-driven render symbols (STS solid live-path / dashed reflect; UTR
+  bold-current + faint-reverse arc); STS gained the PS-style bent toggle (S/U/D). Planar STS reference
+  (loopback over the top via the bent U ports) + a certified UTR alternate — `solutions.json` key
+  `w4l7-utr`, with run-tests + render-sols now handling `<levelId>-<tag>` alternate keys generically.
+  New `threeports` notebook page; `[LPS 2023]` biblio; inspector "no known implementation yet" caveat
+  for aspirational elements; level-picker bonus labels now `<n>★`; and a deselect-on-run-start fix
+  (arrows no longer nudge a selected element mid-run). Committed to `main`; runtime zip rebuilt in
+  `../netlify-zips/` — Netlify drag pending.
 - Open threads: w4l6 "The Boomerang Theorem" still wants a standalone review; `TODO.md` has
   the w2l4 timing-constraint loosening (play-test friction — Michael has ideas), the SG-symbol
   port-ordering revisit, the "also offer PS on w4l6's palette" idea, and the UX-friction items.
