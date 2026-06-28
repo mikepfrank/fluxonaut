@@ -833,7 +833,7 @@ the whole point of the research, in a single circuit.`,
       notebook: ['threeports'],
       fixed: [
         el('L_C', 'LAUNCHER', 2, 5), el('L_D', 'LAUNCHER', 2, 9),
-        el('D_cout', 'DETECTOR', 19, 5), el('D_cd', 'DETECTOR', 19, 9), el('D_ncd', 'DETECTOR', 10, 12),
+        el('D_cout', 'DETECTOR', 19, 5), el('D_cd', 'DETECTOR', 19, 9), el('D_ncd', 'DETECTOR', 10, 10),
       ],
       labels: { L_C: 'C IN', L_D: 'D IN', D_cout: 'C OUT', D_cd: 'C·D', D_ncd: 'C̄·D' },
       palette: { STS: 2, UTR: 2, TCB: 1, ROTARY: 2 },
