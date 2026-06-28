@@ -812,6 +812,39 @@ argument. Welcome to research.`,
       ],
       parElements: 1, parHeat: 2,
     },
+
+    {
+      id: 'w4l7', world: 4, n: 7, title: 'Three Ports Are Enough', size: { w: 22, h: 13 },
+      intro: `Everything you've built, distilled. World 2's switch gate needed Duplicators,
+constant streams, and garbage rails; the real World-4 gate needed two polarities and a
+four-port barrier. <br><br>Here: <b>one polarity, three ports, every device reversible.</b>
+A control fluxon opens a <b>Toggle Barrier</b>, loops once through a pair of <b>Self-Toggling
+Switches</b> (or <b>Unconditional Toggling Rotaries</b>) while the data slips through the open door, then comes around to shut it — and
+every device lands back in its starting state. Same five schedules, now at <b>zero heat</b>.
+<br><br>None of these parts has a known fully ballistic, reversible implementation. This level
+isn't a chip — it's a <i>proof</i> (much simpler than the one in the 2017 paper): unipolar BARCS is universal with nothing but reversible
+three-terminal devices. Build it.`,
+      hint: 'Two STS face each other across a static Rotary + the Toggle Barrier, stems (S) pointing inward; bend their U ports up and carry the loopback over the top for a clean, symmetric layout. A second Rotary feeds the data line through the barrier. The right STS splits — loop first, then control-out — so start it in its UP state (and the left, merging, in DOWN). Keep the loopback long so the data always clears the barrier before the control shuts it.',
+      success: `A universal reversible logic gate — unipolar, three-port, self-resetting, and not a
+joule wasted anywhere. Every part is still a conjecture in niobium, but the <i>construction</i>
+is real and provably enough: ballistic asynchronous reversible computing needs nothing more
+exotic than reversible three-terminal devices. Simpler than World 2, cleaner than World 4 —
+the whole point of the research, in a single circuit.`,
+      fixed: [
+        el('L_C', 'LAUNCHER', 2, 5), el('L_D', 'LAUNCHER', 2, 9),
+        el('D_cout', 'DETECTOR', 19, 5), el('D_cd', 'DETECTOR', 19, 9), el('D_ncd', 'DETECTOR', 10, 12),
+      ],
+      labels: { L_C: 'C IN', L_D: 'D IN', D_cout: 'C OUT', D_cd: 'C·D', D_ncd: 'C̄·D' },
+      palette: { STS: 2, UTR: 2, TCB: 1, ROTARY: 2 },
+      cases: [
+        { name: 'C=1 D=1', inputs: [{ launcher: 'L_C', pol: P }, { launcher: 'L_D', pol: P }], expect: { D_cout: [P], D_cd: [P], D_ncd: [] } },
+        { name: 'C=0 D=1', inputs: [{ launcher: 'L_D', pol: P }], expect: { D_cout: [], D_cd: [], D_ncd: [P] } },
+        { name: 'C=1 D=0', inputs: [{ launcher: 'L_C', pol: P }], expect: { D_cout: [P], D_cd: [], D_ncd: [] } },
+        { name: 'C=0 D=0', inputs: [], expect: { D_cout: [], D_cd: [], D_ncd: [] } },
+        { name: 'C=1 D=1, twice', inputs: [{ launcher: 'L_C', pol: P }, { launcher: 'L_D', pol: P }, { launcher: 'L_C', pol: P, dt: 14 }, { launcher: 'L_D', pol: P }], expect: { D_cout: [P, P], D_cd: [P, P], D_ncd: [] } },
+      ],
+      parElements: 5, parHeat: 0,
+    },
   ];
 
   // ═══════════════════════════════ SANDBOX ════════════════════════════════════
@@ -828,6 +861,7 @@ because physics doesn’t take nights off.`,
       LAUNCHER: 6, DETECTOR: 6, REFLECTOR: 8, IREFLECTOR: 4, NOT: 8, ROTARY: 8,
       FD: 4, TCB: 4, TSG: 3, RM1: 4, RM2: 4, BSR: 6, PS: 4, PR3: 6, CIRC: 4,
       PFG: 4, RPF: 4, RPS: 4, CB: 3, DUP: 2, RDUP: 2, CROSS: 6, EXHAUST: 4,
+      STS: 4, UTR: 4,
     },
     cases: [],
     parElements: Infinity, parHeat: Infinity,

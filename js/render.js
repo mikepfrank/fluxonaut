@@ -195,6 +195,27 @@
     ctx.closePath(); ctx.fillStyle = color; ctx.fill();
   }
 
+  // A near-full-circle rotation arrow with a gap + arrowhead at the top, drawn clockwise on
+  // screen when `cw`. Colour/width/dash are explicit so the UTR can show its current sense
+  // bold-solid and the reverse-it-toggles-to faint-dashed.
+  function dirArrow(ctx, r, cw, color, width, dashed) {
+    ctx.save();
+    ctx.strokeStyle = color; ctx.lineWidth = width; ctx.lineCap = 'round';
+    if (dashed) ctx.setLineDash([3, 3.2]);
+    const gap = 0.72, top = -Math.PI / 2, sweep = 2 * Math.PI - 2 * gap;
+    const a0 = top + (cw ? gap : -gap), a1 = a0 + (cw ? sweep : -sweep);
+    ctx.beginPath(); ctx.arc(0, 0, r, a0, a1, !cw); ctx.stroke();
+    ctx.setLineDash([]); ctx.lineCap = 'butt';
+    const tx = r * Math.cos(a1), ty = r * Math.sin(a1), tang = a1 + (cw ? Math.PI / 2 : -Math.PI / 2);
+    const s = width * 1.9 + 1.6;                          // arrowhead size scales with stroke
+    ctx.fillStyle = color; ctx.beginPath();
+    ctx.moveTo(tx + s * Math.cos(tang), ty + s * Math.sin(tang));
+    ctx.lineTo(tx + s * 0.8 * Math.cos(tang + 2.5), ty + s * 0.8 * Math.sin(tang + 2.5));
+    ctx.lineTo(tx + s * 0.8 * Math.cos(tang - 2.5), ty + s * 0.8 * Math.sin(tang - 2.5));
+    ctx.closePath(); ctx.fill();
+    ctx.restore();
+  }
+
   // state: current dynamic state for stateful elements
   function drawElement(ctx, el, state, opts) {
     const type = F.TYPES[el.type];
@@ -406,6 +427,33 @@
           ctx.arc(0, 0, 4, Math.PI / 2, -Math.PI / 2, true);
           ctx.lineTo(0, -12);
           ctx.stroke();
+          break;
+        }
+        case 'STS': {
+          bodyRect(ctx, sz, { selected: opts.selected });
+          ctx.save(); orient(ctx, el);
+          const active = state === 'D' ? 'D' : 'U';
+          const dir = nm => { const sp = F.swappedPort(el, type, type.ports.find(p => p.name === nm)); return [sp.ox * CELL * 0.42, sp.oy * CELL * 0.42]; };
+          const dS = dir('S'), dA = dir(active), dO = dir(active === 'U' ? 'D' : 'U');
+          // dashed link to the reflecting (other-state) port — drawn first, under the live path
+          ctx.strokeStyle = '#6f8db0'; ctx.lineWidth = 2; ctx.setLineDash([3.5, 3.5]);
+          ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(dO[0], dO[1]); ctx.stroke();
+          ctx.setLineDash([]);
+          // solid live through-path: stem S ↔ the state-named port
+          ctx.strokeStyle = '#3fd4ff'; ctx.lineWidth = 2.6; ctx.lineCap = 'round';
+          ctx.beginPath(); ctx.moveTo(dS[0], dS[1]); ctx.lineTo(0, 0); ctx.lineTo(dA[0], dA[1]); ctx.stroke();
+          ctx.lineCap = 'butt';
+          ctx.fillStyle = '#9fd2ff'; ctx.beginPath(); ctx.arc(0, 0, 2.8, 0, 7); ctx.fill();
+          ctx.restore();
+          break;
+        }
+        case 'UTR': {
+          bodyRect(ctx, sz, { selected: opts.selected });
+          ctx.save(); if (el.mir) ctx.scale(-1, 1);
+          const cw = state !== 'ccw';
+          dirArrow(ctx, 10.5, cw, '#3fd4ff', 2.6, false);   // bold solid = the way it spins now
+          dirArrow(ctx, 5.8, !cw, '#6f8db0', 1.6, true);    // faint dashed = the reverse it toggles to
+          ctx.restore();
           break;
         }
         default: {

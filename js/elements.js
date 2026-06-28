@@ -187,6 +187,38 @@
     },
   });
 
+  // --- Aspirational reversible toggling 3-ports (LPS '23). Provably enough for unipolar
+  // universality, but no ballistic implementation is known yet — the World-4 capstone's palette. ---
+  def({
+    id: 'STS', name: 'Self-Toggling Switch (STS)', glyph: 'STS',
+    w: 1, h: 1,
+    ports: [p('S', 0, 0.5, W), p('U', 0.5, 0, N), p('D', 0.5, 1, S)],
+    states: ['U', 'D'], defaultState: 'U', playerSettable: true,
+    bentPort: 'S', bentCycle: ['S', 'U', 'D'], config: { bent: 'S' },   // which port sticks out orthogonally (cycles S/U/D) — geometry only, like the PS
+    reversible: true, heatPerOp: 0, aspirational: true,
+    portLabels: { S: 'S', U: 'U', D: 'D' },
+    blurb: 'Reversible unipolar 3-port with a 2-state memory. From the stem S a pulse exits the port (U/D) that names the current state; a pulse at the matching port returns to S; a pulse at the opposite port reflects. EVERY interaction toggles the state. Fully reversible — but no known implementation yet as a fully ballistic, reversible JJ circuit (one of the 45 open flux-neutral (3,2) behaviors, LPS ’23).',
+    transition(port, pol, state) {
+      const tog = state === 'U' ? 'D' : 'U';
+      if (port === 'S') return { port: state, pol, state: tog };   // stem → the state-named port
+      if (port === state) return { port: 'S', pol, state: tog };   // matching port → stem
+      return { port, pol, state: tog };                            // opposite port → reflect
+    },
+  });
+
+  def({
+    id: 'UTR', name: 'Unconditional Toggle Rotary (UTR)', glyph: 'T↻',
+    w: 1, h: 1, ports: PORTS3.map(q => ({ ...q })),
+    states: ['cw', 'ccw'], defaultState: 'cw', playerSettable: true,
+    reversible: true, heatPerOp: 0, aspirational: true,
+    portLabels: { A: 'A', B: 'B', C: 'C' },
+    blurb: 'A Rotary with a memory: routes each pulse one step around the circle, then REVERSES its sense of rotation. Two states (cw / ccw), fully reversible, polarity-blind (the unconditional toggle rotary; the polarized variant behaves identically in unipolar circuits). No known implementation yet as a fully ballistic, reversible JJ circuit — another open flux-neutral (3,2) behavior (LPS ’23).',
+    transition(port, pol, state) {
+      const next = cyc(ORDER_CW, port, state === 'cw' ? 1 : -1);
+      return { port: next, pol, state: state === 'cw' ? 'ccw' : 'cw' };
+    },
+  });
+
   def({
     id: 'PS', name: 'Polarity Separator (biased)', glyph: 'PS',
     w: 1, h: 1,

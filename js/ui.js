@@ -104,7 +104,7 @@
       for (const lv of F.LEVELS.filter(l => l.world === w.n)) {
         const stars = starCount(lv);
         const card = h('div', { class: 'level-card' + (lv.bonus ? ' bonus' : '') },
-          h('div', { class: 'lv-num' }, lv.bonus ? '★' : String(lv.n)),
+          h('div', { class: 'lv-num' }, lv.bonus ? String(lv.n) + '★' : String(lv.n)),
           h('div', { class: 'lv-title' }, lv.title),
           h('div', { class: 'lv-stars' }, '★'.repeat(stars) + '☆'.repeat(4 - stars)));
         card.addEventListener('click', () => loadLevel(lv));
@@ -431,6 +431,7 @@
       : `<b class="cr">Dissipative implementation.</b> The logic is injective (reversible in principle), but this device pays heat on every pass.`;
     else if (hasFaults) note = `<b class="rv">Partial function — reversible where defined.</b> Each defined arrival maps to its own output (injective, no heat); other arrival orders are left undefined and fault.`;
     else note = `<b class="rv">Reversible.</b> Every input maps to its own distinct output — the map is injective, so the device runs free: nothing merged, nothing erased, no heat owed.`;
+    if (t.aspirational) note += ` <b class="cr">No known implementation yet</b> as a fully ballistic, reversible JJ circuit — aspirational, here to show universality is reachable with only reversible 3-ports.`;
     box.append(h('div', { class: 'rule-note', html: note }));
     box.append(h('div', { class: 'modal-btns' }, h('button', { class: 'big primary', onclick: closeModal }, 'Close')));
   }
