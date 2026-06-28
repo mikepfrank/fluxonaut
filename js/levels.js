@@ -1226,6 +1226,23 @@ junction, all the way home. To peel the token off the control line you need an
 element whose routing <i>breaks</i> that inverse-pairing: trapped flux, bias, or a
 genuinely new idea. Quod erat frustrandum.`,
     },
+    threeports: {
+      title: 'Three ports are enough',
+      body: `World 2 proved this kind of logic is universal — but at a price: two-state
+switch gates, pulse Duplicators, constant "1" streams, and long garbage rails for
+Bennett's reverse pass. The gate you build on this level strips that to the bone. <br><br>A single
+control token props the <b>Toggle Barrier</b> open, loops around <i>exactly once</i> while
+the data slips through the gap, then comes back to shut it — and every device, the barrier
+included, lands back in its starting state. No garbage, no constant streams, not even a
+second polarity: just two reversible <b>three-port</b> devices carrying one bit of memory
+each — a pair of <b>Self-Toggling Switches</b>, or equally a pair of <b>Toggle Rotaries</b> —
+plus an unconditional rotary to steer. <br><br>That is the whole claim: <b>unipolar BARCS is
+universal with nothing but reversible ≤3-port elements</b>, and the gate that proves it is
+far simpler than the one in the 2017 paper. The catch is honest — no one has yet built any of
+the elements invoked on this level as fully ballistic, reversible Josephson junction circuits.
+World 4, Level 4 is as far as we've gotten in reality. The logic is settled; the device is the
+open problem (LPS '23).`,
+    },
     refs: {
       title: 'The real papers (go read them!)',
       body: `<b>The BARCS program</b> · M.P. Frank, R.M. Lewis, S.B. Kaplan et al., Sandia National Laboratories, 2016–2026.<br>
@@ -1245,22 +1262,6 @@ genuinely new idea. Quod erat frustrandum.`,
 abstract elements (Rotary, TCB, PR3, rPS) that real niobium hasn't caught up with
 yet. Everything else — the RM cell, rPF, BSR, PS, PFG, circulator, CB, and the RFSG —
 follows the published designs' digital behavior.</i>`,
-    },
-    threeports: {
-      title: 'Three ports are enough',
-      body: `World 2 proved this kind of logic is universal — but at a price: two-state
-switch gates, pulse Duplicators, constant "1" streams, and long garbage rails for
-Bennett's reverse pass. The gate you just built strips that to the bone. <br><br>A single
-control token props the <b>Toggle Barrier</b> open, loops around <i>exactly once</i> while
-the data slips through the gap, then comes back to shut it — and every device, the barrier
-included, lands back in its starting state. No garbage, no constant streams, not even a
-second polarity: just two reversible <b>three-port</b> devices carrying one bit of memory
-each — a pair of <b>Self-Toggling Switches</b>, or equally a pair of <b>Toggle Rotaries</b> —
-plus an unconditional rotary to steer. <br><br>That is the whole claim: <b>unipolar BARCS is
-universal with nothing but reversible ≤3-port elements</b>, and the gate that proves it is
-far simpler than the one in the 2017 paper. The catch is honest — no one has yet built a
-Self-Toggling Switch or a Toggle Rotary as a fully ballistic, reversible Josephson circuit.
-The logic is settled; the device is the open problem (LPS '23).`,
     },
   };
 
