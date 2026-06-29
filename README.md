@@ -9,6 +9,8 @@ See `GAME-DESIGN.md` for the full design document.
 
 ## Play it
 
+Currently hosted live at [Netlify](https://fluxonaut.netlify.app).
+
 No build step, no dependencies. Either:
 
 - **Just open `index.html`** in any modern browser (Chrome/Edge/Firefox/Safari), or
