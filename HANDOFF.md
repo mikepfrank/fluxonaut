@@ -64,9 +64,10 @@ carries a dated changelog; this file is the higher-level *how we work + where th
   `sg-port-reorder`) — see TODO.md's "Agreed next major pass + branch policy" for the full brief.
   Motivation: w2l4 Duplicator timing friction is play-testers' #1 stumbling block; the reorder may
   loosen timing and/or shed crossovers, and spreading w2l4's pre-placed elements is a complementary
-  easing. Merge to `main` only after play-testing the branch build proves a net win. First housekeeping
-  act in the next Code session: commit the pending docs-only working-tree edits (TODO.md,
-  EXPANDED-EDITION-IDEAS.md, HANDOFF.md + Opus's CLAUDE.md/GAME-DESIGN.md refresh).
+  easing. Merge to `main` only after play-testing the branch build proves a net win. (The planning-pass
+  docs edits are committed — `44dc4a8`. An earlier draft of this line also listed a pending
+  CLAUDE.md/GAME-DESIGN.md refresh; that was a phantom of the Cowork mount-staleness bug below —
+  those refreshes were already committed in June. Nothing is pending.)
 - **`TODO.md`** also carries: the w2l4 timing-constraint loosening details (Michael has ideas),
   the "also offer PS on w4l6's palette" idea, parked reach/distribution ideas, and other UX items.
 - **Small consistency nit, flagged not fixed:** the World-2 "Universality" notebook page still opens
