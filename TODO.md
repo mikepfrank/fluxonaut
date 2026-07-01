@@ -47,6 +47,14 @@ in other W2 levels (and bears directly on the duplicator-planarity question belo
 reference solutions for many levels (every level that wires an SG/TSG), plus re-verifying
 robustness and regenerating renders. Do not start without a dedicated pass.
 
+**Agreed next major pass + branch policy (Michael, 2026-07-01):** this is the chosen
+centerpiece of the next "debt-clearing" pass, because the Duplicator's timing friction is
+the #1 stumbling block reported by every play-tester so far (Michael and Colin included),
+and the reorder may loosen w2l4's timing and/or shed its crossovers. Do ALL of this work
+on a **new branch** (e.g. `sg-port-reorder`) — the change could plausibly make some levels
+worse instead of better; merge back to `main` only as a deliberate decision after thorough
+play-testing of the branch build.
+
 ## Level design — w4l6: also offer the Polarity Separator (PS) on the palette (added 2026-06-21)
 
 Michael's note: the irreversible PS would ALSO break the boomerang in w4l6 — it routes the
@@ -68,7 +76,11 @@ makes the failing seed *watchable*, and dropping a part on a wire now flags it r
 silently mis-connecting — but neither loosens the constraint itself.
 
 Refine the level's design to widen the timing margin. **Michael has specific ideas — revisit with
-him before changing anything.** NOT the right fix: globally loosening the certify jitter (that
+him before changing anything.** One of them (2026-07-01): **spread out the pre-placed elements'
+initial positions** so there are more viable wire routings — possibly a large easing on its own,
+independent of (and complementary to) the SG port reorder. Play-test notes also flag w2l4 as
+"too many new things at once" and "better without crossovers" — the reorder + spreading combo
+should be evaluated against both complaints. NOT the right fix: globally loosening the certify jitter (that
 weakens every level's robustness guarantee). The fix belongs in this level's layout / element
 choice / par counts, keeping the shared 100-seed gate intact.
 
@@ -91,3 +103,18 @@ used the buggy counter, and it predated the World-4 PS rebuild. Superseded.)
 Open *academic* question (not urgent): is the switch-gate duplicator intrinsically non-planar,
 or only in its bolted-down layout? Strong evidence it needs ≥1 crossing as currently laid out,
 but no proof over all placements. The SG-symbol item above may be the lever that settles it.
+
+## Reach / distribution ideas (parked 2026-07-01 — circle back after the SG pass)
+
+- **Shareable solution links.** Encode the placed circuit (elements + wires) into the URL
+  (e.g. compressed base64 in the fragment) so players can share/compare constructions.
+  Cheap (~a day), and it seeds the community/compare-solutions dynamic the expanded
+  edition wants. Alternate-solution culture already exists (`solutions.json` `-tag` keys).
+- **Touch / mobile support.** From the original wishlist; widens the audience a lot.
+  Port-click wiring needs a tap-friendly rethink (bigger hit targets — synergy with the
+  "larger icons" play-test item).
+- **itch.io mirror.** Free, discoverable by puzzle-game players, supports HTML5 games
+  directly; same zip as Netlify. Low effort, real discovery channel.
+- **One-page teacher's guide.** Non-code artifact mapping levels → concepts (Landauer,
+  reversibility, asynchrony, universality) with suggested classroom use; serves the
+  workforce-development vision. Could live in the repo as `TEACHERS-GUIDE.md`.

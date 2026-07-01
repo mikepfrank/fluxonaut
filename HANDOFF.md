@@ -60,8 +60,15 @@ carries a dated changelog; this file is the higher-level *how we work + where th
   only *defers* the cost (the cell ends flipped — Bennett debt); whether it's a genuine reversible
   separator is a real open question for Michael, intentionally left out of player-facing text. The
   narrow PR3+NOT theorem stands.
-- **`TODO.md`** carries: the w2l4 timing-constraint loosening (play-test friction — Michael has ideas),
-  the SG-symbol port-ordering revisit, the "also offer PS on w4l6's palette" idea, and other UX items.
+- **AGREED NEXT MAJOR PASS (2026-07-01): the SG-symbol port reorder, on a new branch** (e.g.
+  `sg-port-reorder`) — see TODO.md's "Agreed next major pass + branch policy" for the full brief.
+  Motivation: w2l4 Duplicator timing friction is play-testers' #1 stumbling block; the reorder may
+  loosen timing and/or shed crossovers, and spreading w2l4's pre-placed elements is a complementary
+  easing. Merge to `main` only after play-testing the branch build proves a net win. First housekeeping
+  act in the next Code session: commit the pending docs-only working-tree edits (TODO.md,
+  EXPANDED-EDITION-IDEAS.md, HANDOFF.md + Opus's CLAUDE.md/GAME-DESIGN.md refresh).
+- **`TODO.md`** also carries: the w2l4 timing-constraint loosening details (Michael has ideas),
+  the "also offer PS on w4l6's palette" idea, parked reach/distribution ideas, and other UX items.
 - **Small consistency nit, flagged not fixed:** the World-2 "Universality" notebook page still opens
   "That's what you just built…" (`js/levels.js`, the `universality:` page). Notebook pages open with the
   puzzle *before* anything is built, so the tense is slightly off — the w4l7 page was just corrected the
@@ -90,6 +97,14 @@ Deploys page. Zips live in the non-repo `../netlify-zips/`.
   installed system-wide (`winget install OpenJS.NodeJS.LTS`), so CLAUDE.md commands run verbatim. After
   a winget install, fully quit Claude from the tray to refresh PATH. The old Cowork sandbox quirks no
   longer apply (see git history before 2026-06-16 if ever needed).
+- **Cowork sessions: file tools only — NEVER git — for this repo.** Verified live 2026-07-01: the
+  Cowork sandbox's mount of the working tree still goes stale/truncated (a file mid-edit appeared
+  cut off mid-word on the mount while the Windows-side canonical copy was complete), and the
+  sandbox's Linux git sees whole-file CRLF/LF phantom diffs on every tracked file. Any `git add`/
+  `commit` from the Cowork mount risks committing truncated, EOL-mangled content. In Cowork:
+  edit via the Read/Write/Edit file tools (they act on the canonical Windows files), and leave all
+  git operations to a Claude Code session (or Michael) on the host. Read-only `git log`/`ls-remote`
+  from the mount is fine.
 - `test/render-sols.mjs` needs the dev dep `@napi-rs/canvas` (`npm i`; if "Cannot find native binding",
   `npm ci` restores the vetted lockfile-pinned binary).
 - **npm supply-chain caution:** before any `npm install`/`update` or lockfile change, verify each
