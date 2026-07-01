@@ -197,7 +197,7 @@ it isn’t one. Nothing cares <i>when</i> pulses arrive. Only the order is sacre
       notebook: ['tsg'],
       fixed: [
         el('L_ctl', 'LAUNCHER', 1, 2), el('L_dat', 'LAUNCHER', 1, 8),
-        el('D_up', 'DETECTOR', 20, 4), el('D_dn', 'DETECTOR', 20, 9), el('D_co', 'DETECTOR', 20, 12),
+        el('D_co', 'DETECTOR', 20, 2), el('D_up', 'DETECTOR', 20, 5), el('D_dn', 'DETECTOR', 20, 8),
       ],
       labels: { L_ctl: 'CTL IN', L_dat: 'DATA IN', D_up: 'UP', D_dn: 'DOWN', D_co: 'CTL OUT' },
       palette: { TSG: 1 },
@@ -222,12 +222,12 @@ goes to its one fixed output port, end of story.
 <br><br>The Switch Gate breaks the impasse: run it in reverse. Pulses arriving on U or D
 (in the matching state) exit together through <b>I</b> — one shared line.
 <br><br>Merge the UPPER and LOWER data pulses onto OUT, flipping the switch between them.`,
-      hint: 'Rotate the chip (R key, or ⟳ in the inspector) so U and D face the launchers. Upper data → U while up; control flips it; lower data → D.',
+      hint: 'Mirror the chip (F key, or ⇄ flip in the inspector) so U and D face the lanes — the demux, reversed. Upper data → U while up; control flips it; lower data → D; both leave through I.',
       success: 'When reversible-logic papers draw a Y-shaped merging wire, THIS is what the drawing secretly means: a switch gate plus deliberately ordered control pulses.',
       notebook: ['merge'],
       fixed: [
-        el('L_u', 'LAUNCHER', 1, 4), el('L_d', 'LAUNCHER', 1, 8), el('L_ctl', 'LAUNCHER', 1, 1),
-        el('D_out', 'DETECTOR', 20, 6), el('D_co', 'DETECTOR', 20, 12),
+        el('L_u', 'LAUNCHER', 1, 4), el('L_d', 'LAUNCHER', 1, 8), el('L_ctl', 'LAUNCHER', 20, 2, 2),
+        el('D_out', 'DETECTOR', 20, 4), el('D_co', 'DETECTOR', 1, 2, 2),
       ],
       labels: { L_u: 'UPPER', L_d: 'LOWER', L_ctl: 'CTL IN', D_out: 'OUT', D_co: 'CTL OUT' },
       palette: { TSG: 1 },

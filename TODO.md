@@ -55,6 +55,19 @@ on a **new branch** (e.g. `sg-port-reorder`) — the change could plausibly make
 worse instead of better; merge back to `main` only as a deliberate decision after thorough
 play-testing of the branch build.
 
+**In progress on `sg-port-reorder` (2026-07-01).** The chip is now 2×3, inputs west
+(Ci top row, I middle), outputs east (Co, U, D top-to-bottom), symbol in the CB two-rail
+idiom. Michael confirmed the icon in-game and hand-solved w2l2 with it. Propagation notes:
+
+- **Every TSG level needs its fixed I/O placements rejiggered** (Michael, 2026-07-01) —
+  launcher/detector positions were designed around the old top/bottom control axis, and
+  e.g. w2l2's CTL OUT at bottom-right now forces awkward wrap-around routing. Re-place
+  I/O per level to suit the new chip while minimizing (ideally eliminating) crossings.
+- **The Crossover still needs a home in the level sequence** even if the rebuilt W2 no
+  longer forces any crossing: players must learn CROSS exists (and how to use it) for
+  free-play Sandbox builds. Where to introduce it most logically is an open design
+  question — decide once we know whether w2l4/w2l5 end up genuinely crossing-free.
+
 ## Level design — w4l6: also offer the Polarity Separator (PS) on the palette (added 2026-06-21)
 
 Michael's note: the irreversible PS would ALSO break the boomerang in w4l6 — it routes the
