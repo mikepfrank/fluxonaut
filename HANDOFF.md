@@ -1,132 +1,121 @@
 # FLUXONAUT — session handoff notes
 
-For future Claude sessions (or humans) continuing this project. State as of 2026-06-18.
+For future Claude sessions (Code or Cowork) or humans continuing this project.
+State as of **2026-06-28** (release **v1.1**). `CLAUDE.md` is the technical project guide and
+carries a dated changelog; this file is the higher-level *how we work + where things stand*.
 
-## Status
+## Where things stand
 
-- Game complete and deployed at **https://fluxonaut.netlify.app** (Netlify drag-and-drop
-  of `../fluxonaut-site.zip`, which is rebuilt from runtime files only — no `test/`,
-  so no solution spoilers ship).
-- All tests green: `node test/run-tests.mjs` (356 checks: element-table audits, every
-  level certified solvable within element & heat par across 7 jitter seeds, fault rules,
-  per-segment polarity regression, Landauer merge-law, sandbox coverage) and
-  `node test/smoke-ui.mjs` (117 checks: full UI flow with stubbed DOM).
-- `ps-physics-fix` is now MERGED into `main` (2026-06-18): the corrected lossy PS plus
-  the full World 4 rebuild — new rPF element & level w4l1, redrawn CB symbol, C1/C2
-  control ports, w4l3 (Round Trip) and w4l4 (Switch Gate) rebuilt for the real PS
-  (w4l4 has a self-resetting "twice" case), the PS/RPS +/−/S bent-arm toggle, a
-  complete sandbox, and a regenerated reference gallery. Suite green.
-- Not yet redeployed to Netlify — regenerate the zip from `main` HEAD first.
-- The W2·6 "Putting It Together" capstone (full Bennett AND from Dup + SG + rDup) is done.
-- Michael has playtested through World 3's "Antifluxon"; feedback so far applied:
-  picosecond display units (1 cell ≈ 50 µm, ~c/30 ⇒ 16 ps per sim-second), port labels
-  on element icons, bottom-edge detector labels drawn beside the element, and
-  per-segment pulse polarity so color flips at twists/RM/BSR (with a flash ring).
+- **Live & released.** Deployed at **https://fluxonaut.netlify.app**. Current GitHub release is
+  **v1.1** ("Three Ports Are Enough"), following **v1.0** (2026-06-26) — the deployed `main` HEAD is
+  the v1.1 build. Releases: https://github.com/mikepfrank/fluxonaut/releases .
+- **Suite green:** `node test/run-tests.mjs` (479 checks) and `node test/smoke-ui.mjs` (196). Keep
+  both green — `certify` is sensitive to routed wire lengths vs. the input-gap jitter, so any geometry
+  or timing change needs a re-run.
+- **Recent arc (mid/late June 2026, newest last)** — full detail in CLAUDE.md's "Current state" list:
+  - `CROSS` (Crossover) element + a collinear-merging planarity counter; every reference is 0-crossing.
+  - 🔍 Mealy transition-table inspector; `CIRC` made *partial*; w4l6 reworked around the theoretical rotary.
+  - Instant replay of a fuzzed-seed failure; drop-on-wire sticky-red flag.
+  - Reverse playback (rewind to barriers); per-wire delay/length tooltip; pre-roll skip.
+  - Arrow-key transport + element nudge; direction-remembering spacebar.
+  - **v1.1 headline — w4l7 "Three Ports Are Enough":** a self-resetting reversible switch gate from
+    only reversible ≤3-port devices (a unipolar-universality proof, far simpler than the 2017 paper).
+    New aspirational elements **STS** (self-toggling switch) + **UTR** (unconditional toggle rotary)
+    with state-driven symbols and the STS `bent` toggle; a planar STS reference + a certified UTR
+    alternate; `threeports` notebook page; `[LPS 2023]` reference; and deselect-on-run, Sandbox-finale
+    button, and `n★` picker-label fixes.
 
-## Pending — resume here (2026-06-18)
-World 4 polish is DONE and pushed to `origin/main` (commits 4f70cc8, d0f3792, 98849f0,
-3c2e355, + this HANDOFF). Suite green 356 + 117.
+## How we work with Michael
 
-DONE this session
-- w4l5 reference solution re-tidied with the rPS bent-port selector (psL mir+bent='M',
-  psR bent='M') — fully planar, 0 wire crossings, still certifies at heat 0.
-- w4l5 gained the self-reset "C=1 D=1, twice" case; w4l4's same case renamed to match
-  (comma, not semicolon); both intros reworded to a coherent "five schedules" (four logic
-  cases + one fired twice to prove self-reset).
-- Palette fix (Michael spotted stray elements): w4l5 trimmed to its real set `{RPS:2, PR3:1}`
-  (it had carried surplus PR3/RM2/NOT); the rotary + twists moved to w4l6 "Boomerang" so
-  players can experiment toward the theorem → `{CIRC:1, PR3:1, NOT:2}`.
-- w4l6 success text rescoped to rotaries+twists, dropping "provably impossible" (intro/hint/
-  notebook were already correctly scoped). Mechanics/solution unchanged.
+- **Michael Frank is the domain authority.** He wrote the 2017 ABRC paper and the BARCS references the
+  game dramatizes. Defer to him on physics/CS correctness, and **do not treat in-game text as ground
+  truth** — if something reads wrong, ask or flag it; don't "correct" the physics from the game's own
+  wording.
+- **Tight iterative loop.** He proposes a feature or a small tweak; you implement it, keep the suite
+  green, and *show the result* — a rendered `sols/*.png`, a mockup via the visualize tool, or a crisp
+  diff summary — before or as you land it. He play-tests locally on the `file://` build and returns
+  with precise adjustments. Expect many small surgical changes, not big drops.
+- **Git rhythm.** Work on **`main` directly** (absolute paths — see the worktree caveat under Source
+  control). Commit in logical chunks. He'll usually give a standing "commit + push these fixes" for a
+  working session and does the **Netlify deploy himself** (drags the zip); outside an explicit
+  go-ahead, don't push, and only tag releases when he asks.
+- **Level-construction discipline.** Build a new level's reference in a *throwaway harness* under the
+  scratchpad (require `js/elements.js` + `engine.js` + `levels.js`; reuse run-tests' `buildCircuit`),
+  and confirm **certify @ 100 jitter seeds** (order must hold, exact timing must not) **+ 0 crossings +
+  no through-element/overlap** BEFORE writing it into `test/solutions.json`. A brute-force
+  rot/mir/bent search over `swappedPort` is the quick way to place ports for a clean planar layout.
+  Store alternate constructions as `solutions.json` key `"<levelId>-<tag>"` — run-tests + render-sols
+  handle those generically (certify + planarity + a gallery render).
+- **Cost.** Default `Agent`/`Workflow` subagents to **Sonnet** (**Haiku** for trivial passes), reserve
+  **Opus** for genuinely hard synthesis/search, pass `model:` explicitly, and prefer inline follow-up
+  over spawning a subagent — an Opus-heavy multi-agent session once burned Michael's weekly quota.
+- **Scratch files** go in the session scratchpad (never `/tmp`, never the repo).
 
-KEY FINDING — see the erratum atop `../notes/boomerang-theorem-analysis.md`. An exhaustive
-circulator-free wiring sweep (1.67M wirings) found that an **RM2 memory cell** enables a robust,
-geometry-independent, **zero-heat** peel of the token — so RM2 was deliberately kept OUT of the
-w4l6 palette (the PR3+NOT-only space re-verified safe: 0 wins). The notes' old "2-port can't peel"
-topology-wall claim was corrected. The RM2 peel only *defers* the cost (the cell ends flipped —
-Bennett debt), so whether it's a genuine reversible separator is a real open question for Michael;
-intentionally left out of the player-facing text. The narrow PR3+NOT Boomerang theorem stands.
+## Open threads / next steps
 
-TODO
-1. **Deploy** — live Netlify site is still the OLD build. Regenerate the zip from `main` HEAD
-   (`git archive HEAD index.html README.md GAME-DESIGN.md css js -o ../netlify-zips/...zip`)
-   and drag it to Netlify. Zips live in non-repo `../netlify-zips/`.
-2. **`ps-physics-fix` branch** — merged into `main`; its remote is stale. Harmless; delete or leave.
+- **w4l6 "The Boomerang Theorem"** still wants a standalone review. See the erratum atop
+  `../notes/boomerang-theorem-analysis.md`: an exhaustive circulator-free sweep (1.67M wirings) found an
+  **RM2 memory cell** enables a robust, geometry-independent, zero-heat token peel — so RM2 is
+  deliberately kept OUT of the w4l6 palette (the PR3+NOT-only space re-verified safe, 0 wins). That peel
+  only *defers* the cost (the cell ends flipped — Bennett debt); whether it's a genuine reversible
+  separator is a real open question for Michael, intentionally left out of player-facing text. The
+  narrow PR3+NOT theorem stands.
+- **`TODO.md`** carries: the w2l4 timing-constraint loosening (play-test friction — Michael has ideas),
+  the SG-symbol port-ordering revisit, the "also offer PS on w4l6's palette" idea, and other UX items.
+- **Small consistency nit, flagged not fixed:** the World-2 "Universality" notebook page still opens
+  "That's what you just built…" (`js/levels.js`, the `universality:` page). Notebook pages open with the
+  puzzle *before* anything is built, so the tense is slightly off — the w4l7 page was just corrected the
+  same way ("the gate you build on this level"). Left as-is since it's Michael's existing copy; offer to
+  align it if he wants.
 
-## Architecture (see GAME-DESIGN.md and README.md first)
+## Deploy
 
-- `js/elements.js` + `js/engine.js` + `js/levels.js` are DOM-free (Node-testable).
-- Engine runs a full deterministic event-driven trace up front; `ui.js` plays it back.
-- Reference solutions for every level live in `test/solutions.json` (shared by both
-  test harnesses). If you change level geometry or timing constants, re-run tests —
-  the certify step is sensitive to wire lengths vs. the input-gap jitter (0.7–1.5×).
+Runtime files ONLY:
+`git archive HEAD index.html css js -o ../netlify-zips/fluxonaut-site-<date>_<time>.zip`, then copy it
+over `../netlify-zips/fluxonaut-site.zip`. **No `.md`** (nothing in the game loads or links to them),
+and leaving `test/` out means no solution spoilers ship. Michael then drags the zip onto Netlify's
+Deploys page. Zips live in the non-repo `../netlify-zips/`.
+
+## Architecture (see CLAUDE.md, GAME-DESIGN.md, README.md for detail)
+
+- `js/elements.js` + `js/engine.js` + `js/levels.js` are DOM-free and Node-testable; `js/render.js`
+  (canvas), `js/ui.js` (app shell), `js/biblio.js` (refs) are the browser layer.
+- The engine runs a full deterministic event-driven trace up front; `ui.js` plays it back (forward and
+  reverse). Reference solutions per level live in `test/solutions.json` — the shared oracle for both
+  test harnesses. Change level geometry/timing → re-run tests.
 
 ## Environment
 
-- Work is now done in the **Claude Code CLI on Windows** (initially via the desktop
-  app's CLI tab, also runnable in any terminal). Node.js LTS v24 + npm 11 are installed
-  system-wide via `winget install OpenJS.NodeJS.LTS`, so the CLAUDE.md commands run
-  verbatim from a normal shell.
-- All the old Cowork sandbox quirks (file-sync truncation, NUL-padded writes, mount
-  blocking `rm`/`git config`, the `cp`-round-trip workaround, `clean.py`, etc.) NO
-  LONGER APPLY and have been removed from this doc. If you ever need them as
-  historical reference, see git history for `HANDOFF.md` before 2026-06-16.
-- **npm supply-chain caution:** before any `npm install`, `npm update`, or accepting
-  a lockfile change, verify each affected package (direct AND transitive) is at least
-  14 days old. Tests run on the real OS with real credentials in scope, so a freshly
-  hijacked package can exfiltrate secrets or corrupt the remote repo. `@napi-rs/canvas`
-  was vetted manually on 2026-06-15 (1.0.0 published 2026-05-04).
-
-## Live playtest results (2026-06-11, fresh session, Chrome integration working)
-
-Played 8 levels end-to-end in the deployed site by clicking: all of World 1 (5/5),
-W2-1 Gatekeeper, W3-2 Exchange Rate, W4-1 Controlled Barrier — all certified 3★.
-Console clean (only Chrome-extension messaging noise). Progress persisted across levels.
-
-What played well:
-- Wiring UX is solid: port-click → bend-clicks → port works precisely; wires follow
-  dragged elements; right-click delete reliable. Pulse/polarity colors and the RM/CB
-  stored-state icons read clearly. Fault banners are the star: collision, "two in a
-  row" separation, and "fluxon flowed back into a launcher (absorbed; heavy heat)"
-  each teach the rule that was violated, with expected-vs-got detector readouts.
-- Difficulty curve felt right: W1 mostly first-try; W2-1 Gatekeeper needed real
-  iteration (data-path delay must land between the two control arrivals — trial-and-
-  error wire-length tuning, 3 attempts); W4-1 needed one instructive failure to learn
-  CB ejects tokens out the SAME K-port.
-
-Friction worth considering:
-- Palette stays armed after placing an element; clicking empty space places another
-  copy instead of deselecting (caused an accidental placement). Esc disarms.
-- The per-element "rotate" button acts on the armed palette ghost, not the just-placed
-  element — rotating a placed element requires selecting its body first (small click
-  target; easy to click a port and start a wire instead). R key works once selected.
-- Wire-length timing puzzles (Gatekeeper) are pure trial and error — no readout of
-  path delay. The GAME-DESIGN wishlist item "how a wire's length sets timing" visual
-  hint would help a lot; even a ps-length tooltip per wire would do.
-- Fault banner at top can cover the topmost row of the board (Tailgaters reflector).
-- At 1× speed long boards take 10-15 s per run; fine for watching physics, but a
-  "skip to result" affordance would help when iterating.
+- **Claude Code CLI on Windows** (desktop-app CLI tab, or any terminal). Node.js LTS v24 + npm 11 are
+  installed system-wide (`winget install OpenJS.NodeJS.LTS`), so CLAUDE.md commands run verbatim. After
+  a winget install, fully quit Claude from the tray to refresh PATH. The old Cowork sandbox quirks no
+  longer apply (see git history before 2026-06-16 if ever needed).
+- `test/render-sols.mjs` needs the dev dep `@napi-rs/canvas` (`npm i`; if "Cannot find native binding",
+  `npm ci` restores the vetted lockfile-pinned binary).
+- **npm supply-chain caution:** before any `npm install`/`update` or lockfile change, verify each
+  affected package (direct AND transitive) is ≥14 days old — tests run on the real OS with real
+  credentials in scope, so a freshly hijacked package could exfiltrate secrets or corrupt the repo.
+  `@napi-rs/canvas` was vetted 2026-06-15 (1.0.0 published 2026-05-04).
 
 ## Source control
 
-- Code is on GitHub: **https://github.com/mikepfrank/fluxonaut** (public).
-- This local folder is a normal git clone tracking `origin/main`. Claude Code sessions
-  often run in a worktree under `.claude/worktrees/<name>/` on branch
-  `claude/<name>`; commit there, push the branch, fast-forward `main` afterwards.
-- The `docs/` PDFs at the BARCS root must NEVER be pushed (not publicly distributable).
-  `.gitignore` covers `*.zip`, `node_modules/`, and `.DS_Store`.
-- **Pushing now works directly from Claude Code on Windows** — `git push` uses the
-  user's authenticated git credentials (no need to hand off to GitHub Desktop /
-  VS Code as in the Cowork days).
+- Public repo: **https://github.com/mikepfrank/fluxonaut**, tracking `origin/main`. Pushing works
+  directly from Claude Code on Windows (the user's authenticated git credentials).
+- **Work on `main` directly via absolute paths.** Claude Code opens a worktree under
+  `.claude/worktrees/<name>/` on branch `claude/<name>`, but that checkout has repeatedly gone **stale**
+  and will feed OLD code to reads/Grep/subagents — so this session edits the real checkout at
+  `C:\Users\MikeFrank\BARCS\fluxon-game\` by absolute path and commits there. If you must use the
+  worktree, fast-forward its branch to `main` first.
+- The `docs/` PDFs at the BARCS root must **NEVER** be pushed (not publicly distributable). The parent
+  `../` also holds working `.md` notes + `netlify-zips/` — none of that is in the repo. `.gitignore`
+  covers `*.zip`, `node_modules/`, `.DS_Store`.
 
-## Sensible next steps
+## Historical: live playtest (2026-06-11)
 
-- Live playtest in the browser (works from a fresh session): play several levels
-  end-to-end by clicking; evaluate wiring UX, pacing, fault-message clarity.
-- Remaining design polish candidates: undo for wire edits, a level-skip affordance,
-  touch support, an in-game "how a wire's length sets timing" visual hint.
-- Michael's larger wishlist (future editions, per GAME-DESIGN §6): viscosity/losses,
-  error margins, JJ-circuit-level design mode, desktop/mobile ports.
-- Hosting: Netlify free tier; redeploy = rebuild zip (`python3` zip recipe in session
-  history, or just zip index.html + css/ + js/ + README.md + GAME-DESIGN.md) and drag
-  onto the site's Deploys page.
+Played 8 levels end-to-end in the deployed site (all of World 1, W2-1, W3-2, W4-1 — all 3★, console
+clean, progress persisted). Wiring UX solid; fault banners teach the violated rule well; difficulty
+curve felt right. Several frictions noted then have since been **addressed**: the per-wire delay/length
+tooltip (was "no readout of path delay"), pre-roll skip (was "skip to result"), the deselect-on-run
+fix, and drop-on-wire flagging. Still open-ish: the palette stays armed after placing (Esc disarms);
+rotating a placed element needs selecting its small body first; the fault banner can overlap the top
+board row.
