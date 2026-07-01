@@ -298,10 +298,10 @@
   // ===========================================================================
   def({
     id: 'TSG', name: 'Switch Gate chip (TSG)', glyph: 'SG',
-    w: 2, h: 2,
+    w: 2, h: 3,
     ports: [
       p('Ci', 0, 0.5, W), p('Co', 2, 0.5, E),
-      p('I', 0, 1.5, W), p('U', 2, 1.5, E), p('D', 1.5, 2, S),
+      p('I', 0, 1.5, W), p('U', 2, 1.5, E), p('D', 2, 2.5, E),
     ],
     states: ['up', 'down'], defaultState: 'up', playerSettable: true,
     reversible: true, heatPerOp: 0,
