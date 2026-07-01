@@ -300,8 +300,8 @@
     id: 'TSG', name: 'Switch Gate chip (TSG)', glyph: 'SG',
     w: 2, h: 2,
     ports: [
-      p('Ci', 0.5, 0, N), p('Co', 0.5, 2, S),
-      p('I', 0, 1.5, W), p('U', 2, 0.5, E), p('D', 2, 1.5, E),
+      p('Ci', 0, 0.5, W), p('Co', 2, 0.5, E),
+      p('I', 0, 1.5, W), p('U', 2, 1.5, E), p('D', 1.5, 2, S),
     ],
     states: ['up', 'down'], defaultState: 'up', playerSettable: true,
     reversible: true, heatPerOp: 0,

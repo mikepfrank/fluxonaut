@@ -316,11 +316,18 @@
         case 'TSG': {
           bodyRect(ctx, sz, { selected: opts.selected });
           const up = state === 'up';
-          glyphText(ctx, 'SG', 13, '#9fd2ff', 0, -12);
+          glyphText(ctx, 'SG', 12, '#9fd2ff', 0, -4);
           ctx.save(); orient(ctx, el);
+          // control rail (top): straight through Ci→Co; the tap marks that each
+          // passing pulse actuates (toggles) the switch below
+          ctx.strokeStyle = '#6f93bb'; ctx.lineWidth = 1.6;
+          ctx.beginPath(); ctx.moveTo(-36, -20); ctx.lineTo(36, -20); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(0, -20); ctx.lineTo(0, -13); ctx.stroke();
+          // data arm: I passes straight to U (up state) or diverts down to D (down)
           ctx.strokeStyle = up ? COL.plus : '#ffd16e'; ctx.lineWidth = 2.4;
-          ctx.beginPath(); ctx.moveTo(-16, 8);
-          ctx.lineTo(0, 8); ctx.lineTo(16, up ? -4 : 16); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(-36, 20); ctx.lineTo(0, 20);
+          if (up) ctx.lineTo(36, 20); else ctx.lineTo(20, 36);
+          ctx.stroke();
           ctx.restore();
           break;
         }
