@@ -71,10 +71,15 @@ reference needs a CROSS anymore. Full details in CLAUDE.md's current-state entry
 - **parElements for w2l4 (2) and w2l5 (2)**: references now place 0 and 1 elements.
   Tightening to 0/1 makes the build star honest but turns palette-CROSS use into a
   star cost; bundled with the CROSS-introduction decision below.
-- **The Crossover still needs a home in the level sequence**: the rebuilt W2 never
-  forces a crossing, but players must learn CROSS exists (and how to use it) for
-  Sandbox builds. w2l4/w2l5 still OFFER it (palette unchanged) and their notebook
-  unlocks still include the 'crossover' page — decide where it should live now.
+- **The Crossover still needs a home in the level sequence** (Michael, 2026-07-01):
+  the rebuilt W2 never forces a crossing, but players must learn CROSS exists (and how
+  to use it) for Sandbox builds. The ask: find a *simple, natural puzzle design —
+  perhaps a new level — that genuinely forces the player to learn the Crossover*. Not
+  urgent, and it may emerge naturally in a future world with bigger, more challenging
+  puzzles (a level whose port topology is intrinsically non-planar, e.g. a K3,3-ish
+  routing or a swap-two-lanes task). Until then w2l4/w2l5 still OFFER CROSS (palette
+  unchanged) and their notebook unlocks still include the 'crossover' page, so the
+  element remains discoverable.
 
 ## Level design — w4l6: also offer the Polarity Separator (PS) on the palette (added 2026-06-21)
 
