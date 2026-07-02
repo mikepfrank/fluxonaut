@@ -71,6 +71,12 @@ reference needs a CROSS anymore. Full details in CLAUDE.md's current-state entry
 - **parElements for w2l4 (2) and w2l5 (2)**: references now place 0 and 1 elements.
   Tightening to 0/1 makes the build star honest but turns palette-CROSS use into a
   star cost; bundled with the CROSS-introduction decision below.
+- **w2l4 exists in TWO candidate versions pending Michael's play-test pick (2026-07-02):**
+  `sg-port-reorder` carries v3 (chips at (11,2)/(11,7), 2 crossings honestly bridged by the
+  2 palette Crossovers, margin 18.4 ps); `sg-port-reorder-w2l4alt` (one commit ahead) carries
+  Michael's flipped-A variant (A rot2+mir at (11,6), OUT/NOT-X swapped, 1 crossing / 1 CROSS,
+  CONST launches dt+2, margin 12.9 ps). Shared work continues on `sg-port-reorder`; re-cherry-pick
+  the single alt commit when the base moves. Whichever wins folds into `main`.
 - **The Crossover still needs a home in the level sequence** (Michael, 2026-07-01):
   the rebuilt W2 never forces a crossing, but players must learn CROSS exists (and how
   to use it) for Sandbox builds. The ask: find a *simple, natural puzzle design —
