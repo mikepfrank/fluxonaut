@@ -293,12 +293,12 @@ low road: that pulse IS <b>A AND B</b>. If A didn’t, B exits the high road: th
 <br><br>One wrinkle: if A toggled the switch, something must toggle it back. The fix is pure Bennett — compute, then uncompute: the upstream circuit lends you A <i>twice</i>
 (e.g. by using a <b>Duplicator</b>). Catch both spent A’s at A OUT. Later, if needed, a reversed
 version of a <b>Duplicator</b> can reduce the two A’s back to a single copy, plus constant streams.`,
-      hint: 'A → Ci, spent A’s out Co → A OUT. B → I. D port → AND, U port → ¬A·B. One crossing is unavoidable — route it through a Crossover for the planar star.',
+      hint: 'A → Ci, spent A’s out Co → A OUT. B → I. U (high road) → ¬A·B, D (low road) → A·B. The chip’s row order matches the detectors — no crossings needed.',
       success: `AND plus NOT is everything — adders, CPUs, all of it. The 2017 paper proved exactly this construction universal: <i>asynchronous ballistic reversible computing can compute anything</i>. Worlds 3 and 4: making it real, in superconductors.`,
       notebook: ['and', 'universality', 'crossover'],
       fixed: [
         el('L_A', 'LAUNCHER', 1, 3), el('L_B', 'LAUNCHER', 1, 9),
-        el('D_a', 'DETECTOR', 20, 2), el('D_and', 'DETECTOR', 20, 8), el('D_nab', 'DETECTOR', 20, 11),
+        el('D_a', 'DETECTOR', 20, 5), el('D_nab', 'DETECTOR', 20, 7), el('D_and', 'DETECTOR', 20, 9),
       ],
       labels: { L_A: 'A IN', L_B: 'B IN', D_a: 'A OUT', D_and: 'A·B', D_nab: '¬A·B' },
       palette: { TSG: 1, CROSS: 1 },
