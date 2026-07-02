@@ -335,24 +335,24 @@ version of a <b>Duplicator</b> can reduce the two A’s back to a single copy, p
         {
           name: 'A=1 · B=1', inputs: [
             { launcher: 'L_A', pol: P }, { launcher: 'L_M', pol: P }, { launcher: 'L_B', pol: P },
-            { launcher: 'L_1', pol: P, dt: 2.5 }, { launcher: 'L_M', pol: P, dt: 2.5 },
+            { launcher: 'L_1', pol: P, dt: 4.5 }, { launcher: 'L_M', pol: P, dt: 2.5 },
           ], expect: { D_and: [P], D_nand: [], D_A: [P], D_M: [P, P], D_1: [P] },
         },
         {
           name: 'A=1 · B=0', inputs: [
             { launcher: 'L_A', pol: P }, { launcher: 'L_M', pol: P },
-            { launcher: 'L_1', pol: P, dt: 2.5 }, { launcher: 'L_M', pol: P, dt: 2.5 },
+            { launcher: 'L_1', pol: P, dt: 4.5 }, { launcher: 'L_M', pol: P, dt: 2.5 },
           ], expect: { D_and: [], D_nand: [], D_A: [P], D_M: [P, P], D_1: [P] },
         },
         {
           name: 'A=0 · B=1', inputs: [
             { launcher: 'L_M', pol: P }, { launcher: 'L_B', pol: P },
-            { launcher: 'L_1', pol: P, dt: 2.5 }, { launcher: 'L_M', pol: P, dt: 2.5 },
+            { launcher: 'L_1', pol: P, dt: 4.5 }, { launcher: 'L_M', pol: P, dt: 2.5 },
           ], expect: { D_and: [], D_nand: [P], D_A: [], D_M: [P, P], D_1: [P] },
         },
         {
           name: 'A=0 · B=0', inputs: [
-            { launcher: 'L_M', pol: P }, { launcher: 'L_1', pol: P, dt: 2.5 }, { launcher: 'L_M', pol: P, dt: 2.5 },
+            { launcher: 'L_M', pol: P }, { launcher: 'L_1', pol: P, dt: 4.5 }, { launcher: 'L_M', pol: P, dt: 2.5 },
           ], expect: { D_and: [], D_nand: [], D_A: [], D_M: [P, P], D_1: [P] },
         },
       ],
