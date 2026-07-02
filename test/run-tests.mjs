@@ -350,6 +350,25 @@ console.log('\nFault rules:');
   check('twisted pulse detected with flipped polarity', t.detections.D.length === 1 && t.detections.D[0].pol === -1);
 }
 
+// planarity counter: a wire crossing ITSELF must count (found by Michael in
+// play-test 2026-07-02 — a self-looping wire scored "planar"); its corner
+// touches must NOT count.
+{
+  const selfCross = {
+    elements: [
+      { id: 'L', type: 'LAUNCHER', x: 1, y: 2, rot: 0, state: null },
+      { id: 'D', type: 'DETECTOR', x: 10, y: 2, rot: 0, state: null },
+    ],
+    wires: [{ id: 'w1', a: { el: 'L', port: 'A' }, b: { el: 'D', port: 'A' },
+      via: [{ x: 7, y: 2.5 }, { x: 7, y: 5 }, { x: 4, y: 5 }, { x: 4, y: 1 }, { x: 9, y: 1 }, { x: 9, y: 2.5 }] }],
+  };
+  check('a self-crossing wire counts 1 crossing', F.engine.countCrossings(selfCross) === 1,
+    `(got ${F.engine.countCrossings(selfCross)})`);
+  const plain = { ...selfCross, wires: [{ id: 'w1', a: { el: 'L', port: 'A' }, b: { el: 'D', port: 'A' }, via: [{ x: 5, y: 5.5 }] }] };
+  check('an L-bending wire counts 0 crossings', F.engine.countCrossings(plain) === 0,
+    `(got ${F.engine.countCrossings(plain)})`);
+}
+
 // reverse-playback barriers: many-to-one merges (PS/PFG) and dissipative sinks (exhaust) halt rewind
 console.log('\nReverse-playback barriers:');
 {

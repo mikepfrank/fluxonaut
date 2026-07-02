@@ -131,7 +131,9 @@ choice / par counts, keeping the shared 100-seed gate intact.
 Done. The crossing counter was found to under-count: it split each wire at every via/port-
 stub vertex, so a crossing landing exactly on one read as two harmless T-touches and was
 missed (a visibly-crossed layout could score "planar"). `engine.countCrossings` now
-collinear-merges first, and `run-tests` asserts every reference is 0-crossing. A `CROSS`
+collinear-merges first, and `run-tests` asserts every reference is 0-crossing.
+(2026-07-02: second counter gap found in play-test — a wire crossing ITSELF wasn't
+counted, since only inter-wire segment pairs were compared. Fixed + regression-tested.) A `CROSS`
 (Crossover) element was added; a level that genuinely can't avoid a crossing is handed
 exactly enough crossovers. Final state — every reference 0-crossing, robust at the 100-seed
 certify gate + all jitter corners + a factor grid:

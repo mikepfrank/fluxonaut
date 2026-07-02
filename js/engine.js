@@ -137,12 +137,18 @@
   // gadget's ports, so neither has a free segment through the other).
   function countCrossings(circuit) {
     const ws = circuit.wires.map(w => _xsegs(wirePath(circuit, w)));
-    let n = 0;
-    for (let i = 0; i < ws.length; i++) for (let j = i + 1; j < ws.length; j++) for (const a of ws[i]) for (const b of ws[j]) {
-      if (a.horiz === b.horiz) continue;
+    const crossP = (a, b) => {
+      if (a.horiz === b.horiz) return false;
       const H = a.horiz ? a : b, V = a.horiz ? b : a;
       const hx1 = Math.min(H.a.x, H.b.x), hx2 = Math.max(H.a.x, H.b.x), vy1 = Math.min(V.a.y, V.b.y), vy2 = Math.max(V.a.y, V.b.y);
-      if (V.a.x > hx1 + 1e-9 && V.a.x < hx2 - 1e-9 && H.a.y > vy1 + 1e-9 && H.a.y < vy2 - 1e-9) n++;
+      return V.a.x > hx1 + 1e-9 && V.a.x < hx2 - 1e-9 && H.a.y > vy1 + 1e-9 && H.a.y < vy2 - 1e-9;
+    };
+    let n = 0;
+    for (let i = 0; i < ws.length; i++) {
+      // a wire crossing ITSELF counts too (segments are collinear-merged, and the
+      // strict-interior test ignores the shared corners of adjacent segments)
+      for (let a = 0; a < ws[i].length; a++) for (let b = a + 1; b < ws[i].length; b++) if (crossP(ws[i][a], ws[i][b])) n++;
+      for (let j = i + 1; j < ws.length; j++) for (const a of ws[i]) for (const b of ws[j]) if (crossP(a, b)) n++;
     }
     return n;
   }
