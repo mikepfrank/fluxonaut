@@ -55,18 +55,26 @@ on a **new branch** (e.g. `sg-port-reorder`) — the change could plausibly make
 worse instead of better; merge back to `main` only as a deliberate decision after thorough
 play-testing of the branch build.
 
-**In progress on `sg-port-reorder` (2026-07-01).** The chip is now 2×3, inputs west
-(Ci top row, I middle), outputs east (Co, U, D top-to-bottom), symbol in the CB two-rail
-idiom. Michael confirmed the icon in-game and hand-solved w2l2 with it. Propagation notes:
+**DONE on `sg-port-reorder` (2026-07-01) — awaiting Michael's play-test before merge.**
+Chip is 2×3, inputs west (Ci top, I mid), outputs east (Co/U/D); all five TSG levels
+rebuilt with per-level I/O rejiggers; suite 479+196 green; gallery regenerated; no
+reference needs a CROSS anymore. Full details in CLAUDE.md's current-state entry.
 
-- **Every TSG level needs its fixed I/O placements rejiggered** (Michael, 2026-07-01) —
-  launcher/detector positions were designed around the old top/bottom control axis, and
-  e.g. w2l2's CTL OUT at bottom-right now forces awkward wrap-around routing. Re-place
-  I/O per level to suit the new chip while minimizing (ideally eliminating) crossings.
-- **The Crossover still needs a home in the level sequence** even if the rebuilt W2 no
-  longer forces any crossing: players must learn CROSS exists (and how to use it) for
-  free-play Sandbox builds. Where to introduce it most logically is an open design
-  question — decide once we know whether w2l4/w2l5 end up genuinely crossing-free.
+**Michael sign-offs still needed (from the pass):**
+- **w2l6 schedule change**: CONST `1` now launches `dt: 2.5` late so the final M can
+  thread BETWEEN the returning copies with real margin (the old schedule's feasible
+  window was ~empty under the 100-seed gate — natural builds failed by ≤0.5 ps). Also
+  intro/hint rewrites there (the old "make the SG loop long" advice was half wrong).
+- **w2l4's X IN launches from the right edge** (rot 2) — topologically forced in the
+  only certifying planar family, and timing-optimal (short X path); old CONST-from-the-
+  right precedent. Also the intro/hint rewrites (no forced crossings anymore).
+- **parElements for w2l4 (2) and w2l5 (2)**: references now place 0 and 1 elements.
+  Tightening to 0/1 makes the build star honest but turns palette-CROSS use into a
+  star cost; bundled with the CROSS-introduction decision below.
+- **The Crossover still needs a home in the level sequence**: the rebuilt W2 never
+  forces a crossing, but players must learn CROSS exists (and how to use it) for
+  Sandbox builds. w2l4/w2l5 still OFFER it (palette unchanged) and their notebook
+  unlocks still include the 'crossover' page — decide where it should live now.
 
 ## Level design — w4l6: also offer the Polarity Separator (PS) on the palette (added 2026-06-21)
 

@@ -128,9 +128,29 @@ follow-up inline over spawning a subagent.
   for aspirational elements; level-picker bonus labels now `<n>★`; and a deselect-on-run-start fix
   (arrows no longer nudge a selected element mid-run). Committed to `main`; runtime zip rebuilt in
   `../netlify-zips/` — Netlify drag pending.
+- **SG port reorder** (2026-07-01, branch `sg-port-reorder` — NOT yet merged; play-test first):
+  the TSG chip is now **2×3** (DUP/RDUP form factor): inputs west (`Ci` top row, `I` middle),
+  outputs east (`Co`, `U`, `D` top-to-bottom), symbol redrawn in the CB two-rail idiom (thin
+  control rail + actuation tap; state-colored arm swings center-right ↔ bottom-right) — the chip
+  now mirrors the w2l1 Gatekeeper construction it packages, and a mirrored chip visually reads
+  "run in reverse". All five TSG levels rebuilt with per-level fixed-I/O rejiggers (Michael's
+  directive: the old I/O placements were designed for the old top/bottom control axis): w2l2
+  detector stack echoes the chip rows (CTL OUT/UP/DOWN); w2l3 merge = mirrored chip, lanes
+  straight in, CTL enters top-right/exits top-left; **w2l4 redesigned** — vertical chip column
+  (B above A at x17), M+CONST rails sweep west→east, X triggers from the right, A↔B loop is two
+  short hooks (~10 units), **zero Crossovers** (was 8 wires + 2 CROSS with razor timing — the #1
+  play-test friction); w2l5 detectors re-stacked so U→¬A·B/D→A·B match the intro's high/low-road
+  language; w2l6 SG re-seated (8,3,mir) with the AND detectors adjacent, and its **case schedule
+  changed** (CONST `1` launches `dt: 2.5` late): measured under the 100-seed gate, the rDup needs
+  the final M to arrive BETWEEN the two returning copies and the old schedule's feasible
+  wire-length window was ~empty (every layout candidate failed by ≤0.5 ps) — spacing the copies
+  makes natural direct routes certify with ±4-unit tolerance. All references planar; **no
+  reference places a CROSS anymore**. Suite 479+196 green; gallery regenerated. Pending Michael's
+  sign-off (see TODO.md): the w2l6 schedule change, w2l4's X-from-the-right, level-text voice
+  passes, w2l4/w2l5 `parElements` (still 2; references now place 0/1), and WHERE the Crossover
+  gets introduced now that W2 never forces a crossing.
 - Open threads: w4l6 "The Boomerang Theorem" still wants a standalone review; `TODO.md` has
-  the w2l4 timing-constraint loosening (play-test friction — Michael has ideas), the SG-symbol
-  port-ordering revisit, the "also offer PS on w4l6's palette" idea, and the UX-friction items.
+  the SG-pass sign-offs above, the "also offer PS on w4l6's palette" idea, and the UX-friction items.
 
 ## Folder layout
 This git repo is `fluxon-game/`. Its PARENT (`C:\Users\MikeFrank\BARCS\`) also
