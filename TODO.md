@@ -135,9 +135,10 @@ collinear-merges first, and `run-tests` asserts every reference is 0-crossing. A
 (Crossover) element was added; a level that genuinely can't avoid a crossing is handed
 exactly enough crossovers. Final state — every reference 0-crossing, robust at the 100-seed
 certify gate + all jitter corners + a factor grid:
-- **Genuinely planar (no crossover):** every level except the two below — incl. w2l1, w2l3,
-  w2l6 (w2l6's fixed layout was rearranged: SG flipped on top, Dup/rDup lowered, inputs spread).
-- **Need crossovers:** w2l4 The Duplicator (×2), w2l5 AND Finally (×1).
+- **Genuinely planar (no crossover):** every level except w2l4 — updated after the
+  sg-port-reorder pass (2026-07-02): the TSG port reorder made w2l5 and w2l6 planar,
+  and w2l4's flipped-A redesign reduced it to a single crossing.
+- **Need crossovers:** w2l4 The Duplicator (×1).
 
 (The earlier 2026-06-14 audit above — "6 references cross wires" — was wrong twice over: it
 used the buggy counter, and it predated the World-4 PS rebuild. Superseded.)
@@ -145,6 +146,25 @@ used the buggy counter, and it predated the World-4 PS rebuild. Superseded.)
 Open *academic* question (not urgent): is the switch-gate duplicator intrinsically non-planar,
 or only in its bolted-down layout? Strong evidence it needs ≥1 crossing as currently laid out,
 but no proof over all placements. The SG-symbol item above may be the lever that settles it.
+
+### Known honesty gap: DUP/rDUP chip port order vs the flattened circuit (noted 2026-07-02)
+
+The **Dup** and **rDup** chips' port orderings (X/M/1 stacked west, XX/M/¬X east — three
+parallel rails) were chosen in a June session (Opus + Michael) so that w2l6 "Putting It
+Together" routes with zero crossings. They do **not** — and likely never did — mirror the
+port geometry of the actual switch-gate duplicator the player builds in w2l4 (in the current
+w2l4, X even enters from the east, while the DUP chip takes X on the west). Consequence:
+World 2 as shown **understates the wiring complexity of a fully flattened, non-hierarchical
+w2l6** — the chip abstraction quietly absorbs crossings a real single-layer layout would
+need. (Contrast the TSG chip, whose ports were deliberately made faithful to its w2l1
+construction in the sg-port-reorder pass.)
+
+Not worth fixing now: re-matching the chip ports would reintroduce crossovers in w2l6 and/or
+w2l4 to honor a construction that is deliberately over-complicated to begin with — by the end
+of World 4 the game reaches a much simpler non-toggling switch-gate construction anyway.
+Revisit only if someone attempts a rigorous minimum-crossing proof for the flattened
+w2l6-class circuit (which folds into the academic question above). Acknowledged here and in
+comments at the DUP/RDUP definitions in `js/elements.js`.
 
 ## Reach / distribution ideas (parked 2026-07-01 — circle back after the SG pass)
 
