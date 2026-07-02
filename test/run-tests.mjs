@@ -156,6 +156,34 @@ function checkGeometry(circuit){
   check('no wire self-overlap',self===0,`(${self})`);
 }
 
+// I/O elements too close together overlap their labels on the board (a repeated
+// review finding) — enforce ≥2 cells (Chebyshev) between any two fixed I/O elements.
+function checkIoSpacing(level) {
+  const ios = level.fixed.filter(e => F.TYPES[e.type].io);
+  const crowded = [];
+  for (let i = 0; i < ios.length; i++) for (let j = i + 1; j < ios.length; j++) {
+    const a = ios[i], b = ios[j];
+    if (Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y)) < 2) crowded.push(`${a.id}(${a.x},${a.y})/${b.id}(${b.x},${b.y})`);
+  }
+  check('fixed I/O elements are ≥2 cells apart (labels stay legible)', crowded.length === 0, crowded.join(', '));
+}
+
+// The reference must earn the in-game proper-build star: place at least the
+// supplied component count and leave no placed/pre-placed device unused
+// (mirrors ui.js buildQuality, incl. the optionalPalette exemption).
+function checkProperBuild(level, solution, circuit, res) {
+  const used = new Set(res.usedEls || []);
+  const optionalTypes = new Set(level.optionalPalette || []);
+  const devices = circuit.elements.filter(e => !F.TYPES[e.type].io);
+  const unused = devices.filter(e => !used.has(e.id) && !optionalTypes.has(e.type));
+  const optionalSupplied = [...optionalTypes].reduce((s, t) => s + ((level.palette && level.palette[t]) || 0), 0);
+  const supplied = Math.max(0, (isFinite(level.parElements) ? level.parElements : 0) - optionalSupplied);
+  const placed = (solution.place || []).length;
+  check('reference earns the proper-build star (places & uses every component)',
+    placed >= supplied && unused.length === 0,
+    `(placed ${placed}/${supplied}${unused.length ? '; unused: ' + unused.map(e => e.id).join(',') : ''})`);
+}
+
 function testLevel(level, solution) {
   console.log(`Level ${level.id} — ${level.title}:`);
   const circuit = buildCircuit(level, solution);
@@ -168,6 +196,8 @@ function testLevel(level, solution) {
   const placed = (solution.place || []).length;
   check(`element count ${placed} ≤ par ${level.parElements}`, placed <= level.parElements);
   check(`heat ${res.heatMax} ≤ par ${level.parHeat}`, res.heatMax <= level.parHeat, `(heat ${res.heatMax})`);
+  checkIoSpacing(level);
+  checkProperBuild(level, solution, circuit, res);
   if (level.layoutPending) {
     // TEMPORARY: this reference CERTIFIES (logic/timing verified) but its layout isn't tidied yet
     // — Michael is tinkering it in-editor. Skip the 4-star geometry/planarity exemplar guards until

@@ -250,15 +250,15 @@ goes to its one fixed output port, end of story.
 <br><br>This rig is wired-for-you EXCEPT the wires. Two switch gates do it. <b>A</b> is the copier; <b>B</b> is a multiplexer that feeds signals into A’s control line, steered by the <b>M</b> pulses.
 <br><br>If <b>X</b> arrives, it routes through B into A’s control: A flips, and the pulse leaves at <b>OUT</b> — copy #1. A is now flipped, so the <b>constant</b> pulse takes A’s other road, loops back through B into A’s control, flips A <i>back</i>, and exits <b>OUT</b> — copy #2. Two pulses out; A and B end exactly as they began.
 <br><br>No <b>X</b>? A never flips, so the constant pulse leaves on the <b>¬X</b> line instead — incidental “garbage” you could uncompute later with a mirror circuit.
-<br><br>There’s no clock: <b>order</b> is everything. X must reach A before the constant does — so keep the A↔B loop short: two snug hooks around the chip column. (8 wires; no crossings needed.)`,
-      hint: 'Wire three paths (8 wires). Copy: CONST→A.I; A.D hooks up the right to B.D; B.I hooks down the left to A.Ci; A.Co→OUT; A.U→NOT-X. Trigger: X→B.U. Mux control: M→B.Ci, B.Co→M OUT. Keep both hooks snug so the second copy returns in time.',
+<br><br>There’s no clock: <b>order</b> is everything. X must reach A before the constant does — keep the B→A control link snug. And notice the return loop: climbing back up to B it must cross <i>both</i> output rails — two genuinely unavoidable crossings. Bridge each with a <b>Crossover</b> so the signals pass without touching. (12 wires + the 2 crossovers.)`,
+      hint: 'Mux: M→B.Ci, B.Co→M OUT; trigger X→B.U (from the right). Control link: B.I→A.Ci down the left flank. Copy: CONST→A.I; A.Co and A.U head east to OUT / NOT-X, each through a Crossover’s A·B rail; the return loop A.D→B.D climbs the Crossovers’ vertical C·D ports.',
       success: 'X in, two X’s out — and both switches end exactly as they began. Copying without erasing, paid for with one constant pulse. (When X is absent you got ¬X — a NOT, for free.)',
       notebook: ['copying', 'crossover'],
       fixed: [
-        el('L_M', 'LAUNCHER', 1, 3), el('L_1', 'LAUNCHER', 1, 8), el('L_X', 'LAUNCHER', 20, 4, 2),
-        el('tsgB', 'TSG', 17, 3), el('tsgA', 'TSG', 17, 7),
-        el('D_mrec', 'DETECTOR', 20, 3), el('D_out', 'DETECTOR', 20, 7),
-        el('D_notx', 'DETECTOR', 20, 8),
+        el('L_M', 'LAUNCHER', 1, 2), el('L_1', 'LAUNCHER', 1, 8), el('L_X', 'LAUNCHER', 20, 4, 2),
+        el('tsgB', 'TSG', 11, 2), el('tsgA', 'TSG', 11, 7),
+        el('D_mrec', 'DETECTOR', 20, 2), el('D_out', 'DETECTOR', 20, 7),
+        el('D_notx', 'DETECTOR', 20, 9),
       ],
       labels: { L_X: 'X IN', L_M: 'M CTL', L_1: 'CONST 1', D_out: 'OUT', D_notx: 'NOT-X', D_mrec: 'M OUT', tsgA: 'A', tsgB: 'B' },
       palette: { CROSS: 2 },
@@ -295,20 +295,20 @@ low road: that pulse IS <b>A AND B</b>. If A didn’t, B exits the high road: th
 version of a <b>Duplicator</b> can reduce the two A’s back to a single copy, plus constant streams.`,
       hint: 'A → Ci, spent A’s out Co → A OUT. B → I. U (high road) → ¬A·B, D (low road) → A·B. The chip’s row order matches the detectors — no crossings needed.',
       success: `AND plus NOT is everything — adders, CPUs, all of it. The 2017 paper proved exactly this construction universal: <i>asynchronous ballistic reversible computing can compute anything</i>. Worlds 3 and 4: making it real, in superconductors.`,
-      notebook: ['and', 'universality', 'crossover'],
+      notebook: ['and', 'universality'],
       fixed: [
         el('L_A', 'LAUNCHER', 1, 3), el('L_B', 'LAUNCHER', 1, 9),
         el('D_a', 'DETECTOR', 20, 5), el('D_nab', 'DETECTOR', 20, 7), el('D_and', 'DETECTOR', 20, 9),
       ],
       labels: { L_A: 'A IN', L_B: 'B IN', D_a: 'A OUT', D_and: 'A·B', D_nab: '¬A·B' },
-      palette: { TSG: 1, CROSS: 1 },
+      palette: { TSG: 1 },
       cases: [
         { name: 'A=1 B=1', inputs: [{ launcher: 'L_A', pol: P }, { launcher: 'L_B', pol: P }, { launcher: 'L_A', pol: P }], expect: { D_a: [P, P], D_and: [P], D_nab: [] } },
         { name: 'A=1 B=0', inputs: [{ launcher: 'L_A', pol: P }, { launcher: 'L_A', pol: P }], expect: { D_a: [P, P], D_and: [], D_nab: [] } },
         { name: 'A=0 B=1', inputs: [{ launcher: 'L_B', pol: P }], expect: { D_a: [], D_and: [], D_nab: [P] } },
         { name: 'A=0 B=0', inputs: [], expect: { D_a: [], D_and: [], D_nab: [] } },
       ],
-      parElements: 2, parHeat: 0,
+      parElements: 1, parHeat: 0,
     },
 
     {
@@ -323,7 +323,7 @@ version of a <b>Duplicator</b> can reduce the two A’s back to a single copy, p
       fixed: [
         el('L_B', 'LAUNCHER', 1, 2), el('L_A', 'LAUNCHER', 1, 7), el('L_M', 'LAUNCHER', 1, 9), el('L_1', 'LAUNCHER', 1, 12),
         el('dup', 'DUP', 4, 7), el('sg', 'TSG', 8, 3, 0, { mir: true }), el('rdup', 'RDUP', 17, 7),
-        el('D_nand', 'DETECTOR', 6, 4, 2), el('D_and', 'DETECTOR', 6, 5, 2),
+        el('D_nand', 'DETECTOR', 6, 4, 2), el('D_and', 'DETECTOR', 4, 5, 2),
         el('D_A', 'DETECTOR', 22, 5), el('D_M', 'DETECTOR', 22, 8), el('D_1', 'DETECTOR', 22, 11),
       ],
       labels: {
