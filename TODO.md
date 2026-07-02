@@ -77,16 +77,16 @@ reference needs a CROSS anymore. Full details in CLAUDE.md's current-state entry
   Michael's flipped-A variant (A rot2+mir at (11,6), OUT/NOT-X swapped, 1 crossing / 1 CROSS,
   CONST launches dt+2, margin 12.9 ps). Shared work continues on `sg-port-reorder`; re-cherry-pick
   the single alt commit when the base moves. Whichever wins folds into `main`.
-- **Timing-margin floor for references (surveyed 2026-07-02, decision pending):** the
-  engine faults below 3.5 ps (MIN_GAP); a 100-seed margin survey of every reference found
-  NONE below 7 ps (2× threshold) after the w2l6 dt fix — the tightest are a ~7.0–7.1 ps
-  cluster (w1l5, w3l8, w4l1, w3l2, w1l3), then w2l1 7.9, w2l3 8.4, a 10.0 ps group
-  (w1l2, w3l6, w4l2, w1l4), w4l7 11.3; everything else ≥12 ps. Proposal: (a) adopt a
-  2×-threshold (7 ps) suite guard NOW — zero levels impacted, prevents another 9.1 ps
-  w2l6-style squeaker (cheapest via engine: track min arrival gap inside certify and
-  return it, so the guard adds no extra simulation); (b) a later "margin uplift" pass
-  retunes the eleven sub-3× levels with the same schedule-spacing lever, raising the
-  guard to 10.5 ps. Survey harness: scratchpad sg/survey-margins.mjs + lib margin().
+- **Timing-margin floor: ADOPTED 2026-07-02 at 0.43 u = 6.88 ps.** certify() now tracks
+  the min arrival gap across all seeds (engine `res.minGap`, zero extra simulation) and
+  run-tests asserts every reference (and alternate) clears the floor. The floor sits a
+  whisker under strict 2×MIN_GAP because the legacy trio w1l5/w3l8/w4l1 measures exactly
+  0.4392 u (7.03 ps). Note the floor catches *near-fault* references only — the 9.1 ps
+  w2l6 squeaker Michael found by play-testing would have passed it; route-slack for
+  players comes from generous schedules (measure with scratchpad sg/ margin() + envelope
+  probes). **Planned "margin uplift" pass:** retune the eleven sub-3× levels
+  (w1l2/3/4/5, w2l1/3, w3l2/6/8, w4l1/2 — mostly the input-dt spacing lever) and raise
+  the floor to 3× (0.66 u ≈ 10.5 ps).
 - **The Crossover still needs a home in the level sequence** (Michael, 2026-07-01):
   the rebuilt W2 never forces a crossing, but players must learn CROSS exists (and how
   to use it) for Sandbox builds. The ask: find a *simple, natural puzzle design —

@@ -234,7 +234,7 @@
     const trace = {
       ok: true, fault: null, tEnd: 0, heat: 0, heatEvents: [],
       detections: {}, backflows: 0, pulses: [], stateChanges: [], arrivals: [], barriers: [],
-      finalStates: {},
+      finalStates: {}, minGap: Infinity,   // tightest arrival separation at any one element
     };
     for (const e of circuit.elements) if (F.TYPES[e.type].id === 'DETECTOR') trace.detections[e.id] = [];
 
@@ -357,6 +357,7 @@
             pp.x, pp.y);
           continue;
         }
+        if (last !== undefined && ev.t - last < trace.minGap) trace.minGap = ev.t - last;
         lastArrival.set(ev.el, ev.t);
         trace.arrivals.push({ t: ev.t, el: ev.el, port: ev.port, pol: ev.pol });
 
@@ -489,13 +490,14 @@
   function certify(circuit, cases, seeds, opts) {
     seeds = seeds || Array.from({ length: CERTIFY_SEEDS }, (_, i) => i);
     const perCase = [];
-    let pass = true, heatMax = 0;
+    let pass = true, heatMax = 0, minGap = Infinity;
     const used = new Set();   // element ids a fluxon reaches (utilization check)
     for (const cs of cases) {
       let cPass = true, reasons = [], heat = 0, failSeed = -1;
       for (const seed of seeds) {
         const r = runCase(circuit, cs, seed, opts);
         heat = Math.max(heat, r.trace.heat);
+        minGap = Math.min(minGap, r.trace.minGap);
         if (seed === seeds[0]) for (const a of r.trace.arrivals) used.add(a.el);
         if (!r.pass) { cPass = false; reasons = r.reasons; failSeed = seed; break; }
       }
@@ -503,7 +505,7 @@
       if (!cPass) pass = false;
       perCase.push({ name: cs.name, pass: cPass, reasons, heat, failSeed });
     }
-    return { pass, heatMax, perCase, usedEls: [...used] };
+    return { pass, heatMax, perCase, usedEls: [...used], minGap };
   }
 
   F.engine = { SPEED, MIN_GAP, GAP, PS_PER_UNIT, UM_PER_PS, CERTIFY_SEEDS, CORNER_R, portWorld, wirePath, pathLength, pointAlong, roundedPath, countCrossings, validate, simulate, buildInputs, runCase, certify, polSym };
