@@ -71,12 +71,12 @@ reference needs a CROSS anymore. Full details in CLAUDE.md's current-state entry
 - **parElements for w2l4 (2) and w2l5 (2)**: references now place 0 and 1 elements.
   Tightening to 0/1 makes the build star honest but turns palette-CROSS use into a
   star cost; bundled with the CROSS-introduction decision below.
-- **w2l4 exists in TWO candidate versions pending Michael's play-test pick (2026-07-02):**
-  `sg-port-reorder` carries v3 (chips at (11,2)/(11,7), 2 crossings honestly bridged by the
-  2 palette Crossovers, margin 18.4 ps); `sg-port-reorder-w2l4alt` (one commit ahead) carries
-  Michael's flipped-A variant (A rot2+mir at (11,6), OUT/NOT-X swapped, 1 crossing / 1 CROSS,
-  CONST launches dt+2, margin 12.9 ps). Shared work continues on `sg-port-reorder`; re-cherry-pick
-  the single alt commit when the base moves. Whichever wins folds into `main`.
+- **w2l4 RESOLVED (2026-07-02): Michael's flipped-A variant won** and is merged into
+  `sg-port-reorder` (his first hand-wiring passed certification immediately). A is mounted
+  upside-down (rot2+mir at (11,6)), OUT/NOT-X swapped, ONE crossing bridged by the single
+  palette Crossover, CONST launches dt+2; margin 12.9 ps with a balanced ±4u route envelope.
+  To revert to the two-crossover v3: the pre-merge state is commit `268db68` (or revert
+  `8d15928`). The `sg-port-reorder-w2l4alt` branch label is now redundant and can be deleted.
 - **Timing-margin floor: ADOPTED 2026-07-02 at 0.43 u = 6.88 ps.** certify() now tracks
   the min arrival gap across all seeds (engine `res.minGap`, zero extra simulation) and
   run-tests asserts every reference (and alternate) clears the floor. The floor sits a
