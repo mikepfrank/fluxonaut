@@ -250,36 +250,36 @@ goes to its one fixed output port, end of story.
 <br><br>This rig is wired-for-you EXCEPT the wires. Two switch gates do it. <b>A</b> is the copier; <b>B</b> is a multiplexer that feeds signals into A’s control line, steered by the <b>M</b> pulses.
 <br><br>If <b>X</b> arrives, it routes through B into A’s control: A flips, and the pulse leaves at <b>OUT</b> — copy #1. A is now flipped, so the <b>constant</b> pulse takes A’s other road, loops back through B into A’s control, flips A <i>back</i>, and exits <b>OUT</b> — copy #2. Two pulses out; A and B end exactly as they began.
 <br><br>No <b>X</b>? A never flips, so the constant pulse leaves on the <b>¬X</b> line instead — incidental “garbage” you could uncompute later with a mirror circuit.
-<br><br>There’s no clock: <b>order</b> is everything. X must reach A before the constant does — keep the B→A control link snug. And notice the return loop: climbing back up to B it must cross <i>both</i> output rails — two genuinely unavoidable crossings. Bridge each with a <b>Crossover</b> so the signals pass without touching. (12 wires + the 2 crossovers.)`,
-      hint: 'Mux: M→B.Ci, B.Co→M OUT; trigger X→B.U (from the right). Control link: B.I→A.Ci down the left flank. Copy: CONST→A.I; A.Co and A.U head east to OUT / NOT-X, each through a Crossover’s A·B rail; the return loop A.D→B.D climbs the Crossovers’ vertical C·D ports.',
+<br><br>There’s no clock: <b>order</b> is everything. X must reach A before the constant does. Notice A is mounted <i>upside-down</i> (control rail on the bottom) — that lines the copy loop up dead straight. The price: one genuinely unavoidable crossing, where the B→A control link crosses the constant’s feed. Bridge it with the <b>Crossover</b>. (10 wires + the crossover.)`,
+      hint: 'Mux: M→B.Ci, B.Co→M OUT; trigger X→B.U (from the right). Control link: B.I dives down through the Crossover’s C·D ports to A.Ci (bottom-left of the flipped A). Copy: CONST→A.I through the Crossover’s A·B rail; A.D→B.D runs straight up the east flank; A.Co→OUT, A.U→NOT-X.',
       success: 'X in, two X’s out — and both switches end exactly as they began. Copying without erasing, paid for with one constant pulse. (When X is absent you got ¬X — a NOT, for free.)',
       notebook: ['copying', 'crossover'],
       fixed: [
-        el('L_M', 'LAUNCHER', 1, 2), el('L_1', 'LAUNCHER', 1, 8), el('L_X', 'LAUNCHER', 20, 4, 2),
-        el('tsgB', 'TSG', 11, 2), el('tsgA', 'TSG', 11, 7),
-        el('D_mrec', 'DETECTOR', 20, 2), el('D_out', 'DETECTOR', 20, 7),
-        el('D_notx', 'DETECTOR', 20, 9),
+        el('L_M', 'LAUNCHER', 1, 2), el('L_1', 'LAUNCHER', 1, 7), el('L_X', 'LAUNCHER', 20, 4, 2),
+        el('tsgB', 'TSG', 11, 2), el('tsgA', 'TSG', 11, 6, 2, { mir: true }),
+        el('D_mrec', 'DETECTOR', 20, 2), el('D_notx', 'DETECTOR', 20, 6),
+        el('D_out', 'DETECTOR', 20, 8),
       ],
       labels: { L_X: 'X IN', L_M: 'M CTL', L_1: 'CONST 1', D_out: 'OUT', D_notx: 'NOT-X', D_mrec: 'M OUT', tsgA: 'A', tsgB: 'B' },
-      palette: { CROSS: 2 },
+      palette: { CROSS: 1 },
       cases: [
         {
           name: 'X = 1', inputs: [
             { launcher: 'L_X', pol: P }, { launcher: 'L_M', pol: P },
-            { launcher: 'L_1', pol: P }, { launcher: 'L_M', pol: P, dt: 5 },
+            { launcher: 'L_1', pol: P, dt: 2 }, { launcher: 'L_M', pol: P, dt: 5 },
           ],
           expect: { D_out: [P, P], D_notx: [], D_mrec: [P, P] },
           finalStates: { tsgA: 'up', tsgB: 'up' },
         },
         {
           name: 'X = 0', inputs: [
-            { launcher: 'L_M', pol: P }, { launcher: 'L_1', pol: P }, { launcher: 'L_M', pol: P, dt: 5 },
+            { launcher: 'L_M', pol: P }, { launcher: 'L_1', pol: P, dt: 2 }, { launcher: 'L_M', pol: P, dt: 5 },
           ],
           expect: { D_out: [], D_notx: [P], D_mrec: [P, P] },
           finalStates: { tsgA: 'up', tsgB: 'up' },
         },
       ],
-      parElements: 2, parHeat: 0,
+      parElements: 1, parHeat: 0,
     },
 
     {
