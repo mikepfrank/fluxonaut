@@ -168,6 +168,21 @@ function checkIoSpacing(level) {
   check('fixed I/O elements are ≥2 cells apart (labels stay legible)', crowded.length === 0, crowded.join(', '));
 }
 
+// A labeled element flush with the bottom row gets its name drawn BESIDE it
+// (ui.js drawLabelsAndChips flips when (y+h)*CELL+12 exceeds the canvas), where
+// an incoming west-side wire runs straight through the text. Require one row
+// of clearance so labels always render below (another repeated review finding).
+function checkLabelRoom(level) {
+  const flush = [];
+  for (const el of level.fixed) {
+    if (!(level.labels || {})[el.id]) continue;
+    const sz = F.rotatedSize(F.TYPES[el.type], el.rot || 0);
+    if (el.y + sz.h >= level.size.h) flush.push(`${el.id}(${el.x},${el.y})`);
+  }
+  check('labeled elements leave room for a below-label (not flush with the bottom edge)',
+    flush.length === 0, flush.join(', '));
+}
+
 // The reference must earn the in-game proper-build star: place at least the
 // supplied component count and leave no placed/pre-placed device unused
 // (mirrors ui.js buildQuality, incl. the optionalPalette exemption).
@@ -210,6 +225,7 @@ function testLevel(level, solution) {
   check(`element count ${placed} ≤ par ${level.parElements}`, placed <= level.parElements);
   check(`heat ${res.heatMax} ≤ par ${level.parHeat}`, res.heatMax <= level.parHeat, `(heat ${res.heatMax})`);
   checkIoSpacing(level);
+  checkLabelRoom(level);
   checkProperBuild(level, solution, circuit, res);
   if (level.layoutPending) {
     // TEMPORARY: this reference CERTIFIES (logic/timing verified) but its layout isn't tidied yet

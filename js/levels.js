@@ -170,7 +170,7 @@ arrivals matters. The device sits quietly between pulses — there is no clock h
       notebook: ['tcb'],
       fixed: [
         el('L_C', 'LAUNCHER', 1, 3), el('L_D', 'LAUNCHER', 1, 9),
-        el('D_ctl', 'DETECTOR', 20, 3), el('D_pass', 'DETECTOR', 20, 9), el('D_refl', 'DETECTOR', 20, 12),
+        el('D_ctl', 'DETECTOR', 20, 3), el('D_pass', 'DETECTOR', 20, 9), el('D_refl', 'DETECTOR', 20, 11),
       ],
       labels: { L_C: 'CTL IN', L_D: 'DATA IN', D_ctl: 'CTL', D_pass: 'PASS', D_refl: 'BOUNCE' },
       palette: { TCB: 1, ROTARY: 2 },
@@ -715,7 +715,7 @@ The future is the next level.`,
       fixed: [
         el('cb', 'CB', 11, 6, 0, { state: M }),
         el('L_C', 'LAUNCHER', 1, 8), el('L_D', 'LAUNCHER', 1, 11),
-        el('D_cout', 'DETECTOR', 20, 2), el('D_cd', 'DETECTOR', 20, 8), el('D_ncd', 'DETECTOR', 20, 12),
+        el('D_cout', 'DETECTOR', 20, 2), el('D_cd', 'DETECTOR', 20, 8), el('D_ncd', 'DETECTOR', 20, 11),
       ],
       labels: { L_C: 'C IN', L_D: 'D IN', D_cout: 'C OUT', D_cd: 'C·D', D_ncd: 'C̄·D', cb: 'CB' },
       palette: { PS: 2, CIRC: 1 },
@@ -753,7 +753,7 @@ without one — the BARCS bibliography in the Notebook tells you exactly who to 
       fixed: [
         el('cb', 'CB', 11, 6, 0, { state: M }),
         el('L_C', 'LAUNCHER', 1, 8), el('L_D', 'LAUNCHER', 1, 11),
-        el('D_cout', 'DETECTOR', 20, 2), el('D_cd', 'DETECTOR', 20, 8), el('D_ncd', 'DETECTOR', 20, 12),
+        el('D_cout', 'DETECTOR', 20, 2), el('D_cd', 'DETECTOR', 20, 8), el('D_ncd', 'DETECTOR', 20, 11),
       ],
       labels: { L_C: 'C IN', L_D: 'D IN', D_cout: 'C OUT', D_cd: 'C·D', D_ncd: 'C̄·D', cb: 'CB' },
       palette: { RPS: 2, PR3: 1 },
