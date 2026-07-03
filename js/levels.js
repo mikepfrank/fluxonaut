@@ -223,7 +223,7 @@ goes to its one fixed output port, end of story.
 (in the matching state) exit together through <b>I</b> — one shared line.
 <br><br>Merge the UPPER and LOWER data pulses onto OUT, flipping the switch between them.`,
       hint: 'Mirror the chip (F key, or ⇄ flip in the inspector) so U and D face the lanes — the demux, reversed. Upper data → U while up; control flips it; lower data → D; both leave through I.',
-      success: 'When reversible-logic papers draw a Y-shaped merging wire, THIS is what the drawing secretly means: a switch gate plus deliberately ordered control pulses.',
+      success: 'When papers like ICRC’17 draw a Y-shaped merging wire (its Fig. 8 spells out the shorthand), THIS is what the drawing secretly means: a switch gate plus deliberately ordered control pulses.',
       notebook: ['merge'],
       fixed: [
         el('L_u', 'LAUNCHER', 1, 4), el('L_d', 'LAUNCHER', 1, 8), el('L_ctl', 'LAUNCHER', 20, 2, 2),
