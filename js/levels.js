@@ -193,7 +193,7 @@ or <b>D</b> (down state).
 pulses that arrive between them. The control stream looks like a clock — but notice
 it isn’t one. Nothing cares <i>when</i> pulses arrive. Only the order is sacred.`,
       hint: 'CTL → Ci. Spent controls leave via Co — catch them at CTL OUT. Data: IN → I; U → UP; D → DOWN.',
-      success: 'Demultiplexing, no clock required. Run it backwards in your head: the same circuit is a multiplexer — merging needs state too.',
+      success: 'Demultiplexing, no clock required. Run it backwards in your head — or press ◀ Reverse and watch: the same circuit is a multiplexer. Merging needs state too.',
       notebook: ['tsg'],
       fixed: [
         el('L_ctl', 'LAUNCHER', 1, 2), el('L_dat', 'LAUNCHER', 1, 8),
