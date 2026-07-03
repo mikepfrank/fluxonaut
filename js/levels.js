@@ -960,11 +960,13 @@ The rest of World 2 is that proof, played by hand.`,
       title: 'The Toggling Switch Gate',
       body: `A TCB with a rotary on each side, packaged: control pulses toggle it
 between routing data "up" and "down" (and spent controls exit on their own line —
-nothing is swallowed). Feynman studied switch gates in his quantum computing
-lectures and showed they're universal. The toggling, asynchronous version is the
-ICRC'17 paper's Fig. 7. Notice what makes it tick: the control's effect lives on
-in device state, so control and data needn't coincide — they only need to arrive
-in the right order.`,
+nothing is swallowed). Switch gates carry some history: <b>Andrew Ressler</b> — Ed
+Fredkin's student — proved them universal in his 1981 MIT Master's thesis, years
+before Feynman took them up in his celebrated quantum computing lectures (hence
+the <i>Ressler–Feynman</i> Switch Gate you'll meet again in World 4). The toggling,
+asynchronous version is the ICRC'17 paper's Fig. 7. Notice what makes it tick: the
+control's effect lives on in device state, so control and data needn't coincide —
+they only need to arrive in the right order.`,
     },
     merge: {
       title: 'Merging is a privilege, not a right',
