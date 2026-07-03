@@ -292,7 +292,8 @@ low road: that pulse IS <b>A AND B</b>. If A didn’t, B exits the high road: th
 <b>(NOT A) AND B</b>. Both outputs matter — reversible logic keeps its receipts.
 <br><br>One wrinkle: if A toggled the switch, something must toggle it back. The fix is pure Bennett — compute, then uncompute: the upstream circuit lends you A <i>twice</i>
 (e.g. by using a <b>Duplicator</b>). Catch both spent A’s at A OUT. Later, if needed, a reversed
-version of a <b>Duplicator</b> can reduce the two A’s back to a single copy, plus constant streams.`,
+version of a <b>Duplicator</b> can reduce the two A’s back to a single copy, plus constant streams.
+<br><br>In the next level, you’ll actually put that all together.`,
       hint: 'A → Ci, spent A’s out Co → A OUT. B → I. U (high road) → ¬A·B, D (low road) → A·B. The chip’s row order matches the detectors — no crossings needed.',
       success: `AND plus NOT is everything — adders, CPUs, all of it. The 2017 paper proved exactly this construction universal: <i>asynchronous ballistic reversible computing can compute anything</i>. Worlds 3 and 4: making it real, in superconductors.`,
       notebook: ['and', 'universality'],
