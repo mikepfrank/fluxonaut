@@ -7,8 +7,9 @@ carries a dated changelog; this file is the higher-level *how we work + where th
 ## Where things stand
 
 - **Live & released.** Deployed at **https://fluxonaut.netlify.app**. Current GitHub release is
-  **v1.1** ("Three Ports Are Enough"), following **v1.0** (2026-06-26) — the deployed `main` HEAD is
-  the v1.1 build. Releases: https://github.com/mikepfrank/fluxonaut/releases .
+  **v1.2** ("World 2, Rewired", 2026-07-03, merge commit `1c51643`), following v1.1 ("Three Ports
+  Are Enough", 2026-06-28) and v1.0 (2026-06-26) — the deployed site is the v1.2 build (Michael
+  deployed + announced on X the same day). Releases: https://github.com/mikepfrank/fluxonaut/releases .
 - **The SG-port-reorder pass is MERGED to `main` and released (2026-07-03).** The TSG chip is
   faithful to its w2l1 circuit (inputs west, outputs east), all of World 2 was rebuilt around it
   (w2l4 = Michael's flipped-A one-crossover Duplicator), Michael thoroughly reviewed Worlds 1–2
