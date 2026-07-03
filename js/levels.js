@@ -158,7 +158,7 @@ exact schedule don’t count in this lab.)`,
     {
       id: 'w2l1', world: 2, n: 1, title: 'Gatekeeper', size: { w: 22, h: 13 },
       bipolar: false,
-      intro: `This is the <b>Toggle Barrier</b> (TCB) — the star of the 2017 theory paper.
+      intro: `This is the <b>Toggling Controlled Barrier</b> (TCB) — or just <b>Toggle Barrier</b> for short — the star of the 2017 theory paper.
 A pulse hitting its control port <b>C</b> bounces back <i>and toggles the barrier</i>.
 The side channel A↔B passes pulses when open, bounces them when closed. It starts closed.
 <br><br>Three test schedules, one circuit. Control pulses must end at CTL;
@@ -948,7 +948,8 @@ that break injectivity on purpose, and pay heat for it.) <i>Ref: ICRC'17, §II.1
     },
     tcb: {
       title: 'The Toggle Barrier (TCB)',
-      body: `Among all 2-state, 3-port reversible single-pulse-type devices, the TCB
+      body: `In full: the <b>Toggling Controlled Barrier</b> — Toggle Barrier for short.
+Among all 2-state, 3-port reversible single-pulse-type devices, the TCB
 is one of only two with time symmetry plus a symmetric data channel (ICRC'17). The
 control port toggles between <i>conducting</i> and <i>blocking</i>; the side channel
 obeys the current setting. Its claim to fame: {Rotary, TCB} is a computationally
