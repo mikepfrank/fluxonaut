@@ -128,9 +128,51 @@ follow-up inline over spawning a subagent.
   for aspirational elements; level-picker bonus labels now `<n>★`; and a deselect-on-run-start fix
   (arrows no longer nudge a selected element mid-run). Committed to `main`; runtime zip rebuilt in
   `../netlify-zips/` — Netlify drag pending.
-- Open threads: w4l6 "The Boomerang Theorem" still wants a standalone review; `TODO.md` has
-  the w2l4 timing-constraint loosening (play-test friction — Michael has ideas), the SG-symbol
-  port-ordering revisit, the "also offer PS on w4l6's palette" idea, and the UX-friction items.
+- **SG port reorder** (2026-07-01, branch `sg-port-reorder` — mid-pass snapshot; superseded on
+  several points by the release entry below):
+  the TSG chip is now **2×3** (DUP/RDUP form factor): inputs west (`Ci` top row, `I` middle),
+  outputs east (`Co`, `U`, `D` top-to-bottom), symbol redrawn in the CB two-rail idiom (thin
+  control rail + actuation tap; state-colored arm swings center-right ↔ bottom-right) — the chip
+  now mirrors the w2l1 Gatekeeper construction it packages, and a mirrored chip visually reads
+  "run in reverse". All five TSG levels rebuilt with per-level fixed-I/O rejiggers (Michael's
+  directive: the old I/O placements were designed for the old top/bottom control axis): w2l2
+  detector stack echoes the chip rows (CTL OUT/UP/DOWN); w2l3 merge = mirrored chip, lanes
+  straight in, CTL enters top-right/exits top-left; **w2l4 redesigned** — vertical chip column
+  (B above A at x17), M+CONST rails sweep west→east, X triggers from the right, A↔B loop is two
+  short hooks (~10 units), **zero Crossovers** (was 8 wires + 2 CROSS with razor timing — the #1
+  play-test friction); w2l5 detectors re-stacked so U→¬A·B/D→A·B match the intro's high/low-road
+  language; w2l6 SG re-seated (8,3,mir) with the AND detectors adjacent, and its **case schedule
+  changed** (CONST `1` launches `dt: 2.5` late): measured under the 100-seed gate, the rDup needs
+  the final M to arrive BETWEEN the two returning copies and the old schedule's feasible
+  wire-length window was ~empty (every layout candidate failed by ≤0.5 ps) — spacing the copies
+  makes natural direct routes certify with ±4-unit tolerance. All references planar; **no
+  reference places a CROSS anymore**. Suite 479+196 green; gallery regenerated. Pending Michael's
+  sign-off (see TODO.md): the w2l6 schedule change, w2l4's X-from-the-right, level-text voice
+  passes, w2l4/w2l5 `parElements` (still 2; references now place 0/1), and WHERE the Crossover
+  gets introduced now that W2 never forces a crossing.
+- **SG pass play-tested, hardened & merged (2026-07-02/03 → `main`, released):** Michael
+  play-tested Worlds 1–2 thoroughly. Final w2l4 is HIS flipped-A design: B (11,2), A (11,6)
+  rot2+mir ("mounted upside-down"), OUT/NOT-X swapped, ONE crossing bridged by the single palette
+  CROSS (par 1), CONST launches `dt: 2` — 12.9 ps margin with a balanced ±4-unit route envelope
+  (the zero-cross v3 survives at `268db68`). w2l6's CONST dt widened 2.5→4.5 after a real
+  play-test near-miss: the rDup's copy1→M₂ race tolerated only +1 unit of route slack; now
+  M +4u / copies +6u, reference margin 9.1→18.1 ps. **Four new suite guards** (all from recurring
+  review findings): fixed-I/O spacing ≥2 cells; labeled elements off the bottom row (the ui.js
+  label-flip puts text in the wire's path); reference proper-build parity (places & uses every
+  non-optional palette component, mirroring ui.js buildQuality); and a **timing-margin floor**
+  0.43 u = 6.88 ps via new engine `certify().minGap` (tracked during existing sims, zero cost —
+  floor sits just under the exact-0.4392 u legacy trio w1l5/w3l8/w4l1). `countCrossings` now
+  counts a wire crossing ITSELF (play-test find: a self-loop scored planar). Bottom-flush labeled
+  detectors nudged up on w2l1/w4l4/w4l5. Text/pedagogy: TCB named in full at introduction;
+  **Ressler credited alongside Feynman** (independent invention — never imply cribbing; see
+  [Ressler 1981]); Y-merge shorthand attributed to ICRC'17 Fig. 8; w2l2 success plugs ◀ Reverse
+  (a TSG-only run rewinds fully); w2l5 "approaching the summit" + capstone preview; w2l6 success
+  scopes uncomputation to the duplication garbage and universality to {Rotary, TCB}. DUP/rDUP
+  port-order honesty gap documented (TODO.md + elements.js comments). Suite **586+196**.
+- Open threads: w4l6 "The Boomerang Theorem" still wants a standalone review; Worlds 3–4 haven't
+  had the thorough text/pedagogy review W1–W2 just got; `TODO.md` has the 3× margin-uplift pass
+  (eleven sub-10.5 ps levels), the CROSS-forcing puzzle question, the "also offer PS on w4l6's
+  palette" idea, and the UX-friction items.
 
 ## Folder layout
 This git repo is `fluxon-game/`. Its PARENT (`C:\Users\MikeFrank\BARCS\`) also

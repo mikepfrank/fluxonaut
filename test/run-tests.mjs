@@ -156,6 +156,61 @@ function checkGeometry(circuit){
   check('no wire self-overlap',self===0,`(${self})`);
 }
 
+// I/O elements too close together overlap their labels on the board (a repeated
+// review finding) — enforce ≥2 cells (Chebyshev) between any two fixed I/O elements.
+function checkIoSpacing(level) {
+  const ios = level.fixed.filter(e => F.TYPES[e.type].io);
+  const crowded = [];
+  for (let i = 0; i < ios.length; i++) for (let j = i + 1; j < ios.length; j++) {
+    const a = ios[i], b = ios[j];
+    if (Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y)) < 2) crowded.push(`${a.id}(${a.x},${a.y})/${b.id}(${b.x},${b.y})`);
+  }
+  check('fixed I/O elements are ≥2 cells apart (labels stay legible)', crowded.length === 0, crowded.join(', '));
+}
+
+// A labeled element flush with the bottom row gets its name drawn BESIDE it
+// (ui.js drawLabelsAndChips flips when (y+h)*CELL+12 exceeds the canvas), where
+// an incoming west-side wire runs straight through the text. Require one row
+// of clearance so labels always render below (another repeated review finding).
+function checkLabelRoom(level) {
+  const flush = [];
+  for (const el of level.fixed) {
+    if (!(level.labels || {})[el.id]) continue;
+    const sz = F.rotatedSize(F.TYPES[el.type], el.rot || 0);
+    if (el.y + sz.h >= level.size.h) flush.push(`${el.id}(${el.x},${el.y})`);
+  }
+  check('labeled elements leave room for a below-label (not flush with the bottom edge)',
+    flush.length === 0, flush.join(', '));
+}
+
+// The reference must earn the in-game proper-build star: place at least the
+// supplied component count and leave no placed/pre-placed device unused
+// (mirrors ui.js buildQuality, incl. the optionalPalette exemption).
+function checkProperBuild(level, solution, circuit, res) {
+  const used = new Set(res.usedEls || []);
+  const optionalTypes = new Set(level.optionalPalette || []);
+  const devices = circuit.elements.filter(e => !F.TYPES[e.type].io);
+  const unused = devices.filter(e => !used.has(e.id) && !optionalTypes.has(e.type));
+  const optionalSupplied = [...optionalTypes].reduce((s, t) => s + ((level.palette && level.palette[t]) || 0), 0);
+  const supplied = Math.max(0, (isFinite(level.parElements) ? level.parElements : 0) - optionalSupplied);
+  const placed = (solution.place || []).length;
+  check('reference earns the proper-build star (places & uses every component)',
+    placed >= supplied && unused.length === 0,
+    `(placed ${placed}/${supplied}${unused.length ? '; unused: ' + unused.map(e => e.id).join(',') : ''})`);
+}
+
+// Timing-margin floor: a reference must not be a near-fault squeaker. The engine
+// faults below MIN_GAP (0.22 u ≈ 3.5 ps); we require ~2× that, set at 0.43 u
+// (6.88 ps) because the legacy trio w1l5/w3l8/w4l1 sits at exactly 0.4392 u
+// (7.03 ps) — just under a strict 2×. Raising the floor to 3× (0.66 u) is the
+// planned "margin uplift" pass (see TODO.md).
+const MARGIN_FLOOR = 0.43;
+function checkMarginFloor(res) {
+  const ps = (res.minGap * F.engine.PS_PER_UNIT).toFixed(2);
+  check(`timing margin ≥ ${(MARGIN_FLOOR * F.engine.PS_PER_UNIT).toFixed(1)} ps across all seeds`,
+    res.minGap >= MARGIN_FLOOR, `(worst ${ps} ps)`);
+}
+
 function testLevel(level, solution) {
   console.log(`Level ${level.id} — ${level.title}:`);
   const circuit = buildCircuit(level, solution);
@@ -163,11 +218,15 @@ function testLevel(level, solution) {
   const res = F.engine.certify(circuit, level.cases, seeds, { optional: level.optionalDetectors || [] });
   check(`certify passes (all cases × ${seeds.length} seeds)`, res.pass,
     res.perCase.filter(c => !c.pass).map(c => `\n      case "${c.name}": ${c.reasons.join('; ')}`).join(''));
+  checkMarginFloor(res);
   // a passing case reports failSeed === -1 (the field the instant-replay button keys on)
   check('every passing case reports failSeed = -1', res.perCase.every(c => c.failSeed === -1));
   const placed = (solution.place || []).length;
   check(`element count ${placed} ≤ par ${level.parElements}`, placed <= level.parElements);
   check(`heat ${res.heatMax} ≤ par ${level.parHeat}`, res.heatMax <= level.parHeat, `(heat ${res.heatMax})`);
+  checkIoSpacing(level);
+  checkLabelRoom(level);
+  checkProperBuild(level, solution, circuit, res);
   if (level.layoutPending) {
     // TEMPORARY: this reference CERTIFIES (logic/timing verified) but its layout isn't tidied yet
     // — Michael is tinkering it in-editor. Skip the 4-star geometry/planarity exemplar guards until
@@ -215,6 +274,7 @@ for (const key of Object.keys(SOLUTIONS)) {
   console.log(`${key} (alternate of ${baseId}):`);
   check(`${key}: certifies (all cases × ${seeds.length} seeds)`, res.pass,
     res.perCase.filter(c => !c.pass).map(c => `\n      case "${c.name}": ${c.reasons.join('; ')}`).join(''));
+  checkMarginFloor(res);
   check(`${key}: ${(sol.place || []).length} elements ≤ par ${level.parElements}`, (sol.place || []).length <= level.parElements);
   check(`${key}: heat ${res.heatMax} ≤ par ${level.parHeat}`, res.heatMax <= level.parHeat);
   checkGeometry(circuit);
@@ -304,6 +364,25 @@ console.log('\nFault rules:');
   check('segment polarity flips across a twist', segs.length === 2 && segs[0].pol === 1 && segs[1].pol === -1,
     JSON.stringify(segs.map(s => s.pol)));
   check('twisted pulse detected with flipped polarity', t.detections.D.length === 1 && t.detections.D[0].pol === -1);
+}
+
+// planarity counter: a wire crossing ITSELF must count (found by Michael in
+// play-test 2026-07-02 — a self-looping wire scored "planar"); its corner
+// touches must NOT count.
+{
+  const selfCross = {
+    elements: [
+      { id: 'L', type: 'LAUNCHER', x: 1, y: 2, rot: 0, state: null },
+      { id: 'D', type: 'DETECTOR', x: 10, y: 2, rot: 0, state: null },
+    ],
+    wires: [{ id: 'w1', a: { el: 'L', port: 'A' }, b: { el: 'D', port: 'A' },
+      via: [{ x: 7, y: 2.5 }, { x: 7, y: 5 }, { x: 4, y: 5 }, { x: 4, y: 1 }, { x: 9, y: 1 }, { x: 9, y: 2.5 }] }],
+  };
+  check('a self-crossing wire counts 1 crossing', F.engine.countCrossings(selfCross) === 1,
+    `(got ${F.engine.countCrossings(selfCross)})`);
+  const plain = { ...selfCross, wires: [{ id: 'w1', a: { el: 'L', port: 'A' }, b: { el: 'D', port: 'A' }, via: [{ x: 5, y: 5.5 }] }] };
+  check('an L-bending wire counts 0 crossings', F.engine.countCrossings(plain) === 0,
+    `(got ${F.engine.countCrossings(plain)})`);
 }
 
 // reverse-playback barriers: many-to-one merges (PS/PFG) and dissipative sinks (exhaust) halt rewind

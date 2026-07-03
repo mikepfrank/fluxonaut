@@ -298,10 +298,10 @@
   // ===========================================================================
   def({
     id: 'TSG', name: 'Switch Gate chip (TSG)', glyph: 'SG',
-    w: 2, h: 2,
+    w: 2, h: 3,
     ports: [
-      p('Ci', 0.5, 0, N), p('Co', 0.5, 2, S),
-      p('I', 0, 1.5, W), p('U', 2, 0.5, E), p('D', 2, 1.5, E),
+      p('Ci', 0, 0.5, W), p('Co', 2, 0.5, E),
+      p('I', 0, 1.5, W), p('U', 2, 1.5, E), p('D', 2, 2.5, E),
     ],
     states: ['up', 'down'], defaultState: 'up', playerSettable: true,
     reversible: true, heatPerOp: 0,
@@ -346,6 +346,10 @@
   def({
     id: 'DUP', name: 'Duplicator (×2)', glyph: 'DUP',
     w: 2, h: 3,
+    // NOTE: this port layout (three parallel W→E rails) was chosen for clean routing in
+    // w2l6, NOT to mirror the internal switch-gate circuit built in w2l4 (whose flattened
+    // wiring needs crossings the chip abstraction hides). Known + accepted — see TODO.md
+    // "Known honesty gap". The TSG chip, by contrast, is faithful to its w2l1 circuit.
     ports: [
       p('X', 0, 0.5, W), p('M', 0, 1.5, W), p('C', 0, 2.5, W),
       p('XX', 2, 0.5, E), p('MO', 2, 1.5, E), p('NX', 2, 2.5, E),
@@ -363,6 +367,7 @@
   def({
     id: 'RDUP', name: 'Reverse Duplicator', glyph: 'rDUP',
     w: 2, h: 3,
+    // Port layout mirrors DUP for w2l6 routing cleanliness — same honesty caveat as DUP.
     ports: [
       p('XX', 0, 0.5, W), p('M', 0, 1.5, W), p('NX', 0, 2.5, W),
       p('X', 2, 0.5, E), p('MO', 2, 1.5, E), p('C', 2, 2.5, E),

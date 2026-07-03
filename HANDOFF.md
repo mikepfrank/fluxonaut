@@ -9,9 +9,16 @@ carries a dated changelog; this file is the higher-level *how we work + where th
 - **Live & released.** Deployed at **https://fluxonaut.netlify.app**. Current GitHub release is
   **v1.1** ("Three Ports Are Enough"), following **v1.0** (2026-06-26) — the deployed `main` HEAD is
   the v1.1 build. Releases: https://github.com/mikepfrank/fluxonaut/releases .
-- **Suite green:** `node test/run-tests.mjs` (479 checks) and `node test/smoke-ui.mjs` (196). Keep
-  both green — `certify` is sensitive to routed wire lengths vs. the input-gap jitter, so any geometry
-  or timing change needs a re-run.
+- **The SG-port-reorder pass is MERGED to `main` and released (2026-07-03).** The TSG chip is
+  faithful to its w2l1 circuit (inputs west, outputs east), all of World 2 was rebuilt around it
+  (w2l4 = Michael's flipped-A one-crossover Duplicator), Michael thoroughly reviewed Worlds 1–2
+  (levels + all narrative text), and four new suite guards came out of it (I/O spacing ≥2, label
+  bottom-row clearance, proper-build parity, 6.88 ps timing-margin floor; the self-crossing
+  counter gap is fixed). Worlds 3–4 still await the same thorough review. TODO.md carries the
+  DUP/rDUP port-order honesty note and the planned 3× margin-uplift pass.
+- **Suite green:** `node test/run-tests.mjs` (586 checks) and `node test/smoke-ui.mjs` (196).
+  Keep both green — `certify` is sensitive to routed wire lengths vs. the input-gap jitter, so
+  any geometry or timing change needs a re-run.
 - **Recent arc (mid/late June 2026, newest last)** — full detail in CLAUDE.md's "Current state" list:
   - `CROSS` (Crossover) element + a collinear-merging planarity counter; every reference is 0-crossing.
   - 🔍 Mealy transition-table inspector; `CIRC` made *partial*; w4l6 reworked around the theoretical rotary.

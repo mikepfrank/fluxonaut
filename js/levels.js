@@ -158,7 +158,7 @@ exact schedule don’t count in this lab.)`,
     {
       id: 'w2l1', world: 2, n: 1, title: 'Gatekeeper', size: { w: 22, h: 13 },
       bipolar: false,
-      intro: `This is the <b>Toggle Barrier</b> (TCB) — the star of the 2017 theory paper.
+      intro: `This is the <b>Toggling Controlled Barrier</b> (TCB) — or just <b>Toggle Barrier</b> for short — the star of the 2017 theory paper.
 A pulse hitting its control port <b>C</b> bounces back <i>and toggles the barrier</i>.
 The side channel A↔B passes pulses when open, bounces them when closed. It starts closed.
 <br><br>Three test schedules, one circuit. Control pulses must end at CTL;
@@ -170,7 +170,7 @@ arrivals matters. The device sits quietly between pulses — there is no clock h
       notebook: ['tcb'],
       fixed: [
         el('L_C', 'LAUNCHER', 1, 3), el('L_D', 'LAUNCHER', 1, 9),
-        el('D_ctl', 'DETECTOR', 20, 3), el('D_pass', 'DETECTOR', 20, 9), el('D_refl', 'DETECTOR', 20, 12),
+        el('D_ctl', 'DETECTOR', 20, 3), el('D_pass', 'DETECTOR', 20, 9), el('D_refl', 'DETECTOR', 20, 11),
       ],
       labels: { L_C: 'CTL IN', L_D: 'DATA IN', D_ctl: 'CTL', D_pass: 'PASS', D_refl: 'BOUNCE' },
       palette: { TCB: 1, ROTARY: 2 },
@@ -193,11 +193,11 @@ or <b>D</b> (down state).
 pulses that arrive between them. The control stream looks like a clock — but notice
 it isn’t one. Nothing cares <i>when</i> pulses arrive. Only the order is sacred.`,
       hint: 'CTL → Ci. Spent controls leave via Co — catch them at CTL OUT. Data: IN → I; U → UP; D → DOWN.',
-      success: 'Demultiplexing, no clock required. Run it backwards in your head: the same circuit is a multiplexer — merging needs state too.',
+      success: 'Demultiplexing, no clock required. Run it backwards in your head — or press ◀ Reverse and watch: the same circuit is a multiplexer. Merging needs state too.',
       notebook: ['tsg'],
       fixed: [
         el('L_ctl', 'LAUNCHER', 1, 2), el('L_dat', 'LAUNCHER', 1, 8),
-        el('D_up', 'DETECTOR', 20, 4), el('D_dn', 'DETECTOR', 20, 9), el('D_co', 'DETECTOR', 20, 12),
+        el('D_co', 'DETECTOR', 20, 2), el('D_up', 'DETECTOR', 20, 5), el('D_dn', 'DETECTOR', 20, 8),
       ],
       labels: { L_ctl: 'CTL IN', L_dat: 'DATA IN', D_up: 'UP', D_dn: 'DOWN', D_co: 'CTL OUT' },
       palette: { TSG: 1 },
@@ -222,12 +222,12 @@ goes to its one fixed output port, end of story.
 <br><br>The Switch Gate breaks the impasse: run it in reverse. Pulses arriving on U or D
 (in the matching state) exit together through <b>I</b> — one shared line.
 <br><br>Merge the UPPER and LOWER data pulses onto OUT, flipping the switch between them.`,
-      hint: 'Rotate the chip (R key, or ⟳ in the inspector) so U and D face the launchers. Upper data → U while up; control flips it; lower data → D.',
-      success: 'When reversible-logic papers draw a Y-shaped merging wire, THIS is what the drawing secretly means: a switch gate plus deliberately ordered control pulses.',
+      hint: 'Mirror the chip (F key, or ⇄ flip in the inspector) so U and D face the lanes — the demux, reversed. Upper data → U while up; control flips it; lower data → D; both leave through I.',
+      success: 'When papers like ICRC’17 draw a Y-shaped merging wire (its Fig. 8 spells out the shorthand), THIS is what the drawing secretly means: a switch gate plus deliberately ordered control pulses.',
       notebook: ['merge'],
       fixed: [
-        el('L_u', 'LAUNCHER', 1, 4), el('L_d', 'LAUNCHER', 1, 8), el('L_ctl', 'LAUNCHER', 1, 1),
-        el('D_out', 'DETECTOR', 20, 6), el('D_co', 'DETECTOR', 20, 12),
+        el('L_u', 'LAUNCHER', 1, 4), el('L_d', 'LAUNCHER', 1, 8), el('L_ctl', 'LAUNCHER', 20, 2, 2),
+        el('D_out', 'DETECTOR', 20, 4), el('D_co', 'DETECTOR', 1, 2, 2),
       ],
       labels: { L_u: 'UPPER', L_d: 'LOWER', L_ctl: 'CTL IN', D_out: 'OUT', D_co: 'CTL OUT' },
       palette: { TSG: 1 },
@@ -250,65 +250,66 @@ goes to its one fixed output port, end of story.
 <br><br>This rig is wired-for-you EXCEPT the wires. Two switch gates do it. <b>A</b> is the copier; <b>B</b> is a multiplexer that feeds signals into A’s control line, steered by the <b>M</b> pulses.
 <br><br>If <b>X</b> arrives, it routes through B into A’s control: A flips, and the pulse leaves at <b>OUT</b> — copy #1. A is now flipped, so the <b>constant</b> pulse takes A’s other road, loops back through B into A’s control, flips A <i>back</i>, and exits <b>OUT</b> — copy #2. Two pulses out; A and B end exactly as they began.
 <br><br>No <b>X</b>? A never flips, so the constant pulse leaves on the <b>¬X</b> line instead — incidental “garbage” you could uncompute later with a mirror circuit.
-<br><br>There’s no clock: <b>order</b> is everything. X must reach A before the constant does — so keep the A↔B loop short. A couple of wires can't help crossing here — drop a <b>Crossover</b> on each so they pass straight through without touching, keeping the board planar for the 4th star. (8 wires + 2 crossovers.)`,
-      hint: 'Wire three paths (8 wires). Copy: CONST→A.I, then A.D loops to B.D, B.I→A.Ci, A.Co→OUT, A.U→¬X. Trigger: X→B.U. Mux control: M→B.Ci, B.Co→M OUT. Keep the A↔B loop short so the second copy returns in time.',
+<br><br>There’s no clock: <b>order</b> is everything. X must reach A before the constant does. Notice A is mounted <i>upside-down</i> (control rail on the bottom) — that lines the copy loop up dead straight. The price: one genuinely unavoidable crossing, where the B→A control link crosses the constant’s feed. Bridge it with the <b>Crossover</b>. (10 wires + the crossover.)`,
+      hint: 'Mux: M→B.Ci, B.Co→M OUT; trigger X→B.U (from the right). Control link: B.I dives down through the Crossover’s C·D ports to A.Ci (bottom-left of the flipped A). Copy: CONST→A.I through the Crossover’s A·B rail; A.D→B.D runs straight up the east flank; A.Co→OUT, A.U→NOT-X.',
       success: 'X in, two X’s out — and both switches end exactly as they began. Copying without erasing, paid for with one constant pulse. (When X is absent you got ¬X — a NOT, for free.)',
       notebook: ['copying', 'crossover'],
       fixed: [
-        el('L_X', 'LAUNCHER', 1, 2), el('L_M', 'LAUNCHER', 1, 6), el('L_1', 'LAUNCHER', 17, 2, 2),
-        el('tsgB', 'TSG', 4, 2, 2), el('tsgA', 'TSG', 11, 2, 2),
-        el('D_out', 'DETECTOR', 20, 5), el('D_notx', 'DETECTOR', 8, 9, 0),
-        el('D_mrec', 'DETECTOR', 20, 12),
+        el('L_M', 'LAUNCHER', 1, 2), el('L_1', 'LAUNCHER', 1, 7), el('L_X', 'LAUNCHER', 20, 4, 2),
+        el('tsgB', 'TSG', 11, 2), el('tsgA', 'TSG', 11, 6, 2, { mir: true }),
+        el('D_mrec', 'DETECTOR', 20, 2), el('D_notx', 'DETECTOR', 20, 6),
+        el('D_out', 'DETECTOR', 20, 8),
       ],
       labels: { L_X: 'X IN', L_M: 'M CTL', L_1: 'CONST 1', D_out: 'OUT', D_notx: 'NOT-X', D_mrec: 'M OUT', tsgA: 'A', tsgB: 'B' },
-      palette: { CROSS: 2 },
+      palette: { CROSS: 1 },
       cases: [
         {
           name: 'X = 1', inputs: [
             { launcher: 'L_X', pol: P }, { launcher: 'L_M', pol: P },
-            { launcher: 'L_1', pol: P }, { launcher: 'L_M', pol: P, dt: 5 },
+            { launcher: 'L_1', pol: P, dt: 2 }, { launcher: 'L_M', pol: P, dt: 5 },
           ],
           expect: { D_out: [P, P], D_notx: [], D_mrec: [P, P] },
           finalStates: { tsgA: 'up', tsgB: 'up' },
         },
         {
           name: 'X = 0', inputs: [
-            { launcher: 'L_M', pol: P }, { launcher: 'L_1', pol: P }, { launcher: 'L_M', pol: P, dt: 5 },
+            { launcher: 'L_M', pol: P }, { launcher: 'L_1', pol: P, dt: 2 }, { launcher: 'L_M', pol: P, dt: 5 },
           ],
           expect: { D_out: [], D_notx: [P], D_mrec: [P, P] },
           finalStates: { tsgA: 'up', tsgB: 'up' },
         },
       ],
-      parElements: 2, parHeat: 0,
+      parElements: 1, parHeat: 0,
     },
 
     {
       id: 'w2l5', world: 2, n: 5, title: 'AND Finally', size: { w: 22, h: 13 },
       bipolar: false,
-      intro: `The summit of World 2: a logic gate. Signals are single-rail —
+      intro: `We’re approaching the summit of World 2: a logic gate. Signals are single-rail —
 “pulse = 1, no pulse = 0.”
 <br><br>Route A into the switch’s control and B into its data. If A came, B exits the
 low road: that pulse IS <b>A AND B</b>. If A didn’t, B exits the high road: that’s
 <b>(NOT A) AND B</b>. Both outputs matter — reversible logic keeps its receipts.
 <br><br>One wrinkle: if A toggled the switch, something must toggle it back. The fix is pure Bennett — compute, then uncompute: the upstream circuit lends you A <i>twice</i>
 (e.g. by using a <b>Duplicator</b>). Catch both spent A’s at A OUT. Later, if needed, a reversed
-version of a <b>Duplicator</b> can reduce the two A’s back to a single copy, plus constant streams.`,
-      hint: 'A → Ci, spent A’s out Co → A OUT. B → I. D port → AND, U port → ¬A·B. One crossing is unavoidable — route it through a Crossover for the planar star.',
+version of a <b>Duplicator</b> can reduce the two A’s back to a single copy, plus constant streams.
+<br><br>In the next level, you’ll actually put that all together.`,
+      hint: 'A → Ci, spent A’s out Co → A OUT. B → I. U (high road) → ¬A·B, D (low road) → A·B. The chip’s row order matches the detectors — no crossings needed.',
       success: `AND plus NOT is everything — adders, CPUs, all of it. The 2017 paper proved exactly this construction universal: <i>asynchronous ballistic reversible computing can compute anything</i>. Worlds 3 and 4: making it real, in superconductors.`,
-      notebook: ['and', 'universality', 'crossover'],
+      notebook: ['and', 'universality'],
       fixed: [
         el('L_A', 'LAUNCHER', 1, 3), el('L_B', 'LAUNCHER', 1, 9),
-        el('D_a', 'DETECTOR', 20, 2), el('D_and', 'DETECTOR', 20, 8), el('D_nab', 'DETECTOR', 20, 11),
+        el('D_a', 'DETECTOR', 20, 5), el('D_nab', 'DETECTOR', 20, 7), el('D_and', 'DETECTOR', 20, 9),
       ],
       labels: { L_A: 'A IN', L_B: 'B IN', D_a: 'A OUT', D_and: 'A·B', D_nab: '¬A·B' },
-      palette: { TSG: 1, CROSS: 1 },
+      palette: { TSG: 1 },
       cases: [
         { name: 'A=1 B=1', inputs: [{ launcher: 'L_A', pol: P }, { launcher: 'L_B', pol: P }, { launcher: 'L_A', pol: P }], expect: { D_a: [P, P], D_and: [P], D_nab: [] } },
         { name: 'A=1 B=0', inputs: [{ launcher: 'L_A', pol: P }, { launcher: 'L_A', pol: P }], expect: { D_a: [P, P], D_and: [], D_nab: [] } },
         { name: 'A=0 B=1', inputs: [{ launcher: 'L_B', pol: P }], expect: { D_a: [], D_and: [], D_nab: [P] } },
         { name: 'A=0 B=0', inputs: [], expect: { D_a: [], D_and: [], D_nab: [] } },
       ],
-      parElements: 2, parHeat: 0,
+      parElements: 1, parHeat: 0,
     },
 
     {
@@ -316,14 +317,14 @@ version of a <b>Duplicator</b> can reduce the two A’s back to a single copy, p
       bipolar: false,
       intro: `The capstone. You built a <b>Duplicator</b> (W2·4) and a switch-gate <b>AND</b> (W2·5); now assemble the whole Bennett construction — compute the duplicated copies of A, use them in the switch gate, <i>then uncompute</i> — so all that remains at the end is the answer plus a single clean copy of A.
 <br><br>Three chips are bolted down for you: a <b>Dup</b> (×2), the <b>SG</b>, and an <b>rDup</b> (the Duplicator run backward). Dup copies <b>A</b> into two pulses (it needs <b>M</b> and a constant <b>1</b>). The two copies drive the SG’s control while <b>B</b> slips in between — computing <b>A·B</b> and <b>¬A·B</b>. Then the spent copies, the <b>¬X</b> garbage, and the <b>M</b> passes feed the rDup, which folds it all back into one <b>A</b>, a regenerated <b>1</b>, and the <b>M</b> stream.
-<br><br>No clock — <b>order</b> is everything. The rDup only accepts <b>M first</b>, so the copy path (out through the SG and back) must run <i>long enough to fall behind</i> the direct M line. Give the final <b>M</b> a generous gap so the earlier pulses settle before it resets the gates.`,
-      hint: 'Dup: A→X, M→M, 1→C. Copies XX→SG.Ci; B→SG.I; SG.D→A·B, SG.U→¬A·B. Spent copies SG.Co→rDup.XX; Dup.M→rDup.M; Dup.¬X→rDup.¬X. Out: rDup.X→A OUT, rDup.M→M OUT, rDup.1→1 OUT. Make the SG.Co→rDup loop long so M beats the copies into the rDup.',
-      success: `Universal reversible computing, fully assembled: AND and all its garbage computed, then <i>uncomputed</i>, leaving one clean copy of A. That is the 2017 paper’s construction end to end — Landauer’s limit dodged, Bennett’s trick made physical.<br><br>Notice how complicated a construction this is just to get an <b>AND</b>! It suffices to show that asynchronous ballistic reversible computing is <i>universal</i> — but we’d really like to do logic without all those extra constant streams. In the next two worlds, we’ll figure out how to do that, using primitives we can implement in <i>actual</i> superconducting circuits!`,
+<br><br>No clock — <b>order</b> is everything. The rDup only accepts <b>M first</b> — the copies’ longer road out through the SG makes them fall behind the direct M line on its own. The constant <b>1</b> launches a beat late, so the two returning copies stay well apart — and the final <b>M</b> threads the gap <i>between</i> them to reset the gates.`,
+      hint: 'Dup: A→X, M→M, 1→C. Copies XX→SG.Ci; B→SG.I; SG.D→A·B, SG.U→¬A·B. Spent copies SG.Co→rDup.XX; Dup.M→rDup.M; Dup.¬X→rDup.¬X. Out: rDup.X→A OUT, rDup.M→M OUT, rDup.1→1 OUT. Direct routes work — the schedule already spaces the copies so each M finds its slot.',
+      success: `Universal reversible computing, fully assembled: a reversible AND built on a toggling switch gate, with all the incidental garbage needed to duplicate the A pulse computed, then <i>uncomputed</i> — leaving one clean copy of A, plus the auxiliary ¬A·B output that reversibility demands (uncomputing THAT one is the job of whatever larger circuit consumes the AND). That is the 2017 paper’s construction end to end — Landauer’s limit dodged, Bennett’s trick made physical.<br><br>Notice how complicated a construction this is just to get an <b>AND</b>! It suffices to show that asynchronous ballistic reversible computing using just Rotary and TCB elements is <i>universal</i> — but we’d really like to do logic without all those extra constant streams. In the next two worlds, we’ll figure out how to do that, using primitives we can implement in <i>actual</i> superconducting circuits!`,
       notebook: ['universality', 'and', 'garbage'],
       fixed: [
         el('L_B', 'LAUNCHER', 1, 2), el('L_A', 'LAUNCHER', 1, 7), el('L_M', 'LAUNCHER', 1, 9), el('L_1', 'LAUNCHER', 1, 12),
-        el('dup', 'DUP', 4, 7), el('sg', 'TSG', 7, 2, 2, { mir: true }), el('rdup', 'RDUP', 17, 7),
-        el('D_and', 'DETECTOR', 12, 2), el('D_nand', 'DETECTOR', 12, 5),
+        el('dup', 'DUP', 4, 7), el('sg', 'TSG', 8, 3, 0, { mir: true }), el('rdup', 'RDUP', 17, 7),
+        el('D_nand', 'DETECTOR', 6, 4, 2), el('D_and', 'DETECTOR', 4, 5, 2),
         el('D_A', 'DETECTOR', 22, 5), el('D_M', 'DETECTOR', 22, 8), el('D_1', 'DETECTOR', 22, 11),
       ],
       labels: {
@@ -335,24 +336,24 @@ version of a <b>Duplicator</b> can reduce the two A’s back to a single copy, p
         {
           name: 'A=1 · B=1', inputs: [
             { launcher: 'L_A', pol: P }, { launcher: 'L_M', pol: P }, { launcher: 'L_B', pol: P },
-            { launcher: 'L_1', pol: P }, { launcher: 'L_M', pol: P, dt: 2.5 },
+            { launcher: 'L_1', pol: P, dt: 4.5 }, { launcher: 'L_M', pol: P, dt: 2.5 },
           ], expect: { D_and: [P], D_nand: [], D_A: [P], D_M: [P, P], D_1: [P] },
         },
         {
           name: 'A=1 · B=0', inputs: [
             { launcher: 'L_A', pol: P }, { launcher: 'L_M', pol: P },
-            { launcher: 'L_1', pol: P }, { launcher: 'L_M', pol: P, dt: 2.5 },
+            { launcher: 'L_1', pol: P, dt: 4.5 }, { launcher: 'L_M', pol: P, dt: 2.5 },
           ], expect: { D_and: [], D_nand: [], D_A: [P], D_M: [P, P], D_1: [P] },
         },
         {
           name: 'A=0 · B=1', inputs: [
             { launcher: 'L_M', pol: P }, { launcher: 'L_B', pol: P },
-            { launcher: 'L_1', pol: P }, { launcher: 'L_M', pol: P, dt: 2.5 },
+            { launcher: 'L_1', pol: P, dt: 4.5 }, { launcher: 'L_M', pol: P, dt: 2.5 },
           ], expect: { D_and: [], D_nand: [P], D_A: [], D_M: [P, P], D_1: [P] },
         },
         {
           name: 'A=0 · B=0', inputs: [
-            { launcher: 'L_M', pol: P }, { launcher: 'L_1', pol: P }, { launcher: 'L_M', pol: P, dt: 2.5 },
+            { launcher: 'L_M', pol: P }, { launcher: 'L_1', pol: P, dt: 4.5 }, { launcher: 'L_M', pol: P, dt: 2.5 },
           ], expect: { D_and: [], D_nand: [], D_A: [], D_M: [P, P], D_1: [P] },
         },
       ],
@@ -715,7 +716,7 @@ The future is the next level.`,
       fixed: [
         el('cb', 'CB', 11, 6, 0, { state: M }),
         el('L_C', 'LAUNCHER', 1, 8), el('L_D', 'LAUNCHER', 1, 11),
-        el('D_cout', 'DETECTOR', 20, 2), el('D_cd', 'DETECTOR', 20, 8), el('D_ncd', 'DETECTOR', 20, 12),
+        el('D_cout', 'DETECTOR', 20, 2), el('D_cd', 'DETECTOR', 20, 8), el('D_ncd', 'DETECTOR', 20, 11),
       ],
       labels: { L_C: 'C IN', L_D: 'D IN', D_cout: 'C OUT', D_cd: 'C·D', D_ncd: 'C̄·D', cb: 'CB' },
       palette: { PS: 2, CIRC: 1 },
@@ -753,7 +754,7 @@ without one — the BARCS bibliography in the Notebook tells you exactly who to 
       fixed: [
         el('cb', 'CB', 11, 6, 0, { state: M }),
         el('L_C', 'LAUNCHER', 1, 8), el('L_D', 'LAUNCHER', 1, 11),
-        el('D_cout', 'DETECTOR', 20, 2), el('D_cd', 'DETECTOR', 20, 8), el('D_ncd', 'DETECTOR', 20, 12),
+        el('D_cout', 'DETECTOR', 20, 2), el('D_cd', 'DETECTOR', 20, 8), el('D_ncd', 'DETECTOR', 20, 11),
       ],
       labels: { L_C: 'C IN', L_D: 'D IN', D_cout: 'C OUT', D_cd: 'C·D', D_ncd: 'C̄·D', cb: 'CB' },
       palette: { RPS: 2, PR3: 1 },
@@ -948,7 +949,8 @@ that break injectivity on purpose, and pay heat for it.) <i>Ref: ICRC'17, §II.1
     },
     tcb: {
       title: 'The Toggle Barrier (TCB)',
-      body: `Among all 2-state, 3-port reversible single-pulse-type devices, the TCB
+      body: `In full: the <b>Toggling Controlled Barrier</b> — Toggle Barrier for short.
+Among all 2-state, 3-port reversible single-pulse-type devices, the TCB
 is one of only two with time symmetry plus a symmetric data channel (ICRC'17). The
 control port toggles between <i>conducting</i> and <i>blocking</i>; the side channel
 obeys the current setting. Its claim to fame: {Rotary, TCB} is a computationally
@@ -959,11 +961,13 @@ The rest of World 2 is that proof, played by hand.`,
       title: 'The Toggling Switch Gate',
       body: `A TCB with a rotary on each side, packaged: control pulses toggle it
 between routing data "up" and "down" (and spent controls exit on their own line —
-nothing is swallowed). Feynman studied switch gates in his quantum computing
-lectures and showed they're universal. The toggling, asynchronous version is the
-ICRC'17 paper's Fig. 7. Notice what makes it tick: the control's effect lives on
-in device state, so control and data needn't coincide — they only need to arrive
-in the right order.`,
+nothing is swallowed). Switch gates carry some history: <b>Andrew Ressler</b> — Ed
+Fredkin's student — proved them universal in his 1981 MIT Master's thesis, years
+before Feynman took them up in his celebrated quantum computing lectures (hence
+the <i>Ressler–Feynman</i> Switch Gate you'll meet again in World 4). The toggling,
+asynchronous version is the ICRC'17 paper's Fig. 7. Notice what makes it tick: the
+control's effect lives on in device state, so control and data needn't coincide —
+they only need to arrive in the right order.`,
     },
     merge: {
       title: 'Merging is a privilege, not a right',

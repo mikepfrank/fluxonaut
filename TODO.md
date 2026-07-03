@@ -55,6 +55,48 @@ on a **new branch** (e.g. `sg-port-reorder`) — the change could plausibly make
 worse instead of better; merge back to `main` only as a deliberate decision after thorough
 play-testing of the branch build.
 
+**DONE on `sg-port-reorder` (2026-07-01) — awaiting Michael's play-test before merge.**
+Chip is 2×3, inputs west (Ci top, I mid), outputs east (Co/U/D); all five TSG levels
+rebuilt with per-level I/O rejiggers; suite 479+196 green; gallery regenerated; no
+reference needs a CROSS anymore. Full details in CLAUDE.md's current-state entry.
+
+**Michael sign-offs still needed (from the pass):**
+- **w2l6 schedule change**: CONST `1` now launches `dt: 2.5` late so the final M can
+  thread BETWEEN the returning copies with real margin (the old schedule's feasible
+  window was ~empty under the 100-seed gate — natural builds failed by ≤0.5 ps). Also
+  intro/hint rewrites there (the old "make the SG loop long" advice was half wrong).
+- **w2l4's X IN launches from the right edge** (rot 2) — topologically forced in the
+  only certifying planar family, and timing-optimal (short X path); old CONST-from-the-
+  right precedent. Also the intro/hint rewrites (no forced crossings anymore).
+- **parElements for w2l4 (2) and w2l5 (2)**: references now place 0 and 1 elements.
+  Tightening to 0/1 makes the build star honest but turns palette-CROSS use into a
+  star cost; bundled with the CROSS-introduction decision below.
+- **w2l4 RESOLVED (2026-07-02): Michael's flipped-A variant won** and is merged into
+  `sg-port-reorder` (his first hand-wiring passed certification immediately). A is mounted
+  upside-down (rot2+mir at (11,6)), OUT/NOT-X swapped, ONE crossing bridged by the single
+  palette Crossover, CONST launches dt+2; margin 12.9 ps with a balanced ±4u route envelope.
+  To revert to the two-crossover v3: the pre-merge state is commit `268db68` (or revert
+  `8d15928`). The `sg-port-reorder-w2l4alt` branch label is now redundant and can be deleted.
+- **Timing-margin floor: ADOPTED 2026-07-02 at 0.43 u = 6.88 ps.** certify() now tracks
+  the min arrival gap across all seeds (engine `res.minGap`, zero extra simulation) and
+  run-tests asserts every reference (and alternate) clears the floor. The floor sits a
+  whisker under strict 2×MIN_GAP because the legacy trio w1l5/w3l8/w4l1 measures exactly
+  0.4392 u (7.03 ps). Note the floor catches *near-fault* references only — the 9.1 ps
+  w2l6 squeaker Michael found by play-testing would have passed it; route-slack for
+  players comes from generous schedules (measure with scratchpad sg/ margin() + envelope
+  probes). **Planned "margin uplift" pass:** retune the eleven sub-3× levels
+  (w1l2/3/4/5, w2l1/3, w3l2/6/8, w4l1/2 — mostly the input-dt spacing lever) and raise
+  the floor to 3× (0.66 u ≈ 10.5 ps).
+- **The Crossover still needs a home in the level sequence** (Michael, 2026-07-01):
+  the rebuilt W2 never forces a crossing, but players must learn CROSS exists (and how
+  to use it) for Sandbox builds. The ask: find a *simple, natural puzzle design —
+  perhaps a new level — that genuinely forces the player to learn the Crossover*. Not
+  urgent, and it may emerge naturally in a future world with bigger, more challenging
+  puzzles (a level whose port topology is intrinsically non-planar, e.g. a K3,3-ish
+  routing or a swap-two-lanes task). Until then w2l4/w2l5 still OFFER CROSS (palette
+  unchanged) and their notebook unlocks still include the 'crossover' page, so the
+  element remains discoverable.
+
 ## Level design — w4l6: also offer the Polarity Separator (PS) on the palette (added 2026-06-21)
 
 Michael's note: the irreversible PS would ALSO break the boomerang in w4l6 — it routes the
@@ -89,13 +131,16 @@ choice / par counts, keeping the shared 100-seed gate intact.
 Done. The crossing counter was found to under-count: it split each wire at every via/port-
 stub vertex, so a crossing landing exactly on one read as two harmless T-touches and was
 missed (a visibly-crossed layout could score "planar"). `engine.countCrossings` now
-collinear-merges first, and `run-tests` asserts every reference is 0-crossing. A `CROSS`
+collinear-merges first, and `run-tests` asserts every reference is 0-crossing.
+(2026-07-02: second counter gap found in play-test — a wire crossing ITSELF wasn't
+counted, since only inter-wire segment pairs were compared. Fixed + regression-tested.) A `CROSS`
 (Crossover) element was added; a level that genuinely can't avoid a crossing is handed
 exactly enough crossovers. Final state — every reference 0-crossing, robust at the 100-seed
 certify gate + all jitter corners + a factor grid:
-- **Genuinely planar (no crossover):** every level except the two below — incl. w2l1, w2l3,
-  w2l6 (w2l6's fixed layout was rearranged: SG flipped on top, Dup/rDup lowered, inputs spread).
-- **Need crossovers:** w2l4 The Duplicator (×2), w2l5 AND Finally (×1).
+- **Genuinely planar (no crossover):** every level except w2l4 — updated after the
+  sg-port-reorder pass (2026-07-02): the TSG port reorder made w2l5 and w2l6 planar,
+  and w2l4's flipped-A redesign reduced it to a single crossing.
+- **Need crossovers:** w2l4 The Duplicator (×1).
 
 (The earlier 2026-06-14 audit above — "6 references cross wires" — was wrong twice over: it
 used the buggy counter, and it predated the World-4 PS rebuild. Superseded.)
@@ -103,6 +148,25 @@ used the buggy counter, and it predated the World-4 PS rebuild. Superseded.)
 Open *academic* question (not urgent): is the switch-gate duplicator intrinsically non-planar,
 or only in its bolted-down layout? Strong evidence it needs ≥1 crossing as currently laid out,
 but no proof over all placements. The SG-symbol item above may be the lever that settles it.
+
+### Known honesty gap: DUP/rDUP chip port order vs the flattened circuit (noted 2026-07-02)
+
+The **Dup** and **rDup** chips' port orderings (X/M/1 stacked west, XX/M/¬X east — three
+parallel rails) were chosen in a June session (Opus + Michael) so that w2l6 "Putting It
+Together" routes with zero crossings. They do **not** — and likely never did — mirror the
+port geometry of the actual switch-gate duplicator the player builds in w2l4 (in the current
+w2l4, X even enters from the east, while the DUP chip takes X on the west). Consequence:
+World 2 as shown **understates the wiring complexity of a fully flattened, non-hierarchical
+w2l6** — the chip abstraction quietly absorbs crossings a real single-layer layout would
+need. (Contrast the TSG chip, whose ports were deliberately made faithful to its w2l1
+construction in the sg-port-reorder pass.)
+
+Not worth fixing now: re-matching the chip ports would reintroduce crossovers in w2l6 and/or
+w2l4 to honor a construction that is deliberately over-complicated to begin with — by the end
+of World 4 the game reaches a much simpler non-toggling switch-gate construction anyway.
+Revisit only if someone attempts a rigorous minimum-crossing proof for the flattened
+w2l6-class circuit (which folds into the academic question above). Acknowledged here and in
+comments at the DUP/RDUP definitions in `js/elements.js`.
 
 ## Reach / distribution ideas (parked 2026-07-01 — circle back after the SG pass)
 
