@@ -285,7 +285,7 @@ goes to its one fixed output port, end of story.
     {
       id: 'w2l5', world: 2, n: 5, title: 'AND Finally', size: { w: 22, h: 13 },
       bipolar: false,
-      intro: `The summit of World 2: a logic gate. Signals are single-rail —
+      intro: `We’re approaching the summit of World 2: a logic gate. Signals are single-rail —
 “pulse = 1, no pulse = 0.”
 <br><br>Route A into the switch’s control and B into its data. If A came, B exits the
 low road: that pulse IS <b>A AND B</b>. If A didn’t, B exits the high road: that’s
