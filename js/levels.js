@@ -1037,7 +1037,7 @@ antifluxon — and it costs nothing to use it as data. The BARCS classification 
 (ICRC'22) catalogued every possible reversible element for these bipolar pulses
 with up to 3 ports and 2 states, under the real physical constraints: flux
 conservation and <b>flux-negation symmetry</b> (flip every sign in the universe and
-the circuit must behave identically, unless it hides trapped flux). Every bipolar
+the circuit must behave identically, unless it hides trapped flux that isn't flipped). Every bipolar
 element in this game comes from that catalogue.`,
     },
     superconductors: {
