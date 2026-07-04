@@ -86,7 +86,8 @@ carries a dated changelog; this file is the higher-level *how we work + where th
 
 ## Deploy
 
-Runtime files ONLY:
+Release ritual: bump the on-screen version line (`#game-version` in `index.html`) BEFORE
+tagging — the title screen shows it. Then runtime files ONLY:
 `git archive HEAD index.html css js -o ../netlify-zips/fluxonaut-site-<date>_<time>.zip`, then copy it
 over `../netlify-zips/fluxonaut-site.zip`. **No `.md`** (nothing in the game loads or links to them),
 and leaving `test/` out means no solution spoilers ship. Michael then drags the zip onto Netlify's
