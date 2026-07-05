@@ -173,6 +173,11 @@ follow-up inline over spawning a subagent.
   had the thorough text/pedagogy review W1–W2 just got; `TODO.md` has the 3× margin-uplift pass
   (eleven sub-10.5 ps levels), the CROSS-forcing puzzle question, the "also offer PS on w4l6's
   palette" idea, and the UX-friction items.
+- **Research side-thread (2026-07-04, gated):** a real physics investigation grew out of the
+  W3·L1 Twist review — polarity as Z₂ ribbon holonomy + an integer fluxoid ledger on circuit
+  homology. Working memo in `../notes/fluxon-topology-conservation.md`; protocol and next steps
+  in TODO.md's "Research side-thread" section. Proposal-first supervision: no execution until
+  Michael signs off the LaTeX proposal (audience eventually includes Sandia colleagues).
 
 ## Folder layout
 This git repo is `fluxon-game/`. Its PARENT (`C:\Users\MikeFrank\BARCS\`) also

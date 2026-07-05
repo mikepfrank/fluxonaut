@@ -28,6 +28,30 @@ None are blockers; do not start a new version until playtesting is complete.
    Add a "skip to result" / instant-evaluate affordance (engine already computes
    the full trace up front, so this is playback-only).
 
+## Research side-thread: fluxon conservation topology (started 2026-07-04)
+
+Sparked by a W3·L1 review question (what does the polarity Twist conserve?), a genuine
+research thread is now running alongside the game work. Working memo (+ PDF):
+`../notes/fluxon-topology-conservation.md` — proposes: polarity = Z₂-holonomy of the
+junction ribbon (the memo's per-port ℳᵢ negations = local frame gauge; ℱ = global flip
+with covariant trapped flux); general conservation = an integer fluxoid ledger on the
+circuit's homology, with the junction-free/junction-crossing cycle distinction made
+structural (exact winding theorem vs. cosine-well labels canonical only at quiescence).
+Michael reviewed §§1–2 closely (three refinements recorded in the memo, dated 2026-07-04).
+
+**Agreed working mode (supervision protocol):** (1) Michael finishes reviewing the memo
+and clears remaining questions; (2) THEN a full LaTeX research proposal gets written
+(MiKTeX 25.12 installed; references to be verified via a literature pass — Devoret/Vool
+circuit quantization, sine-Gordon on metric graphs, Gulevich–Kusmartsev flux cloning,
+phase-slip theory, Möbius-boundary annular LJJs) — intended to be polished enough to
+share with Sandia colleagues; (3) only after proposal sign-off does execution start
+(first item: the lumped-ladder twisted-conservation theorem + a Node/JoSIM simulation
+with an explicit rail transposition; then the Layer-2 dynamics questions, incl. the
+RPS open problem as the flagship case, and the 39+45-class behavioral nomenclature
+addressing BARC-memo p. 44's "(TO DO)"). Key sources: `../docs/BARC-memo-2024.pdf`
+(145 pp., extracted + key pages rendered under `../docs/extracted/`),
+`../docs/BARCS-Cell-Library-0v15.pdf`, github.com/sandialabs/barcs (archived).
+
 ## Notes
 
 - Console was clean across the whole session; no engine/UI bugs observed.
