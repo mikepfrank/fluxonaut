@@ -1038,7 +1038,10 @@ antifluxon — and it costs nothing to use it as data. The BARCS classification 
 with up to 3 ports and 2 states, under the real physical constraints: flux
 conservation and <b>flux-negation symmetry</b> (flip every sign in the universe and
 the circuit must behave identically, unless it hides trapped flux that isn't flipped). Every bipolar
-element in this game comes from that catalogue.`,
+element in this game comes from that catalogue — except the humble Twist, which turns
+out not to be a device at all: it just swaps the junction's two rails, so the same
+fluxon is read with the opposite sign. Polarity is a relationship between a fluxon
+and its wiring, not a property of the fluxon alone.`,
     },
     superconductors: {
       title: 'Why superconductors?',
