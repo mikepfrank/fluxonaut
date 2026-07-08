@@ -44,7 +44,7 @@
     id: 'IREFLECTOR', name: 'Inverting Reflector', glyph: 'V±',
     w: 1, h: 1, ports: [p('A', 0, 0.5, W)],
     states: null, reversible: true, heatPerOp: 0, bipolarOnly: true,
-    blurb: 'Bounces a fluxon back with its polarity flipped. (An open line end.)',
+    blurb: 'Bounces a fluxon back with its polarity flipped — same port, no heat, nothing stored. (An open line end: the Inverting Reflector of ASC ’18.)',
     transition: (port, pol, state) => ({ port: 'A', pol: -pol, state }),
   });
 
