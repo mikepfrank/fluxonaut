@@ -1,8 +1,18 @@
 # FLUXONAUT — session handoff notes
 
 For future Claude sessions (Code or Cowork) or humans continuing this project.
-State as of **2026-06-28** (release **v1.1**). `CLAUDE.md` is the technical project guide and
+State as of **2026-07-08** (release **v1.2** live). `CLAUDE.md` is the technical project guide and
 carries a dated changelog; this file is the higher-level *how we work + where things stand*.
+
+> **The active work since 2026-07-04 is the RESEARCH side-thread, not the game.** A physics
+> research program (fluxon holonomy / the Möbius-LJJ manuscript) grew out of the game's W3
+> polarity-twist question and now lives in the LOCAL git repo `C:\Users\MikeFrank\BARCS\research\`
+> (not pushed anywhere). **Its `WORKLOG.md` is the compaction/restart anchor for that thread — read
+> it first.** Current status there: standalone manuscript `research/paper/moebius-ljj.tex` at v0.2
+> (internally refereed, numbers audited, citations verified); Michael is reviewing a printout;
+> v0.3 edits queued in the worklog (§5 topology rewording per his correction, ASC ’18 IR citation,
+> the capture/sink-taxonomy argument, T5 mouth-door results). The interim report, atlases (LaTeX),
+> lit reviews with vision hand-reads, and the 3d-departures note are all in that repo, committed.
 
 ## Where things stand
 
@@ -60,6 +70,12 @@ carries a dated changelog; this file is the higher-level *how we work + where th
 - **Scratch files** go in the session scratchpad (never `/tmp`, never the repo).
 
 ## Open threads / next steps
+
+- **IR (Inverting Reflector) teaching level** — 2026-07-08: Michael rediscovered that `IREFLECTOR`
+  has been in the sandbox palette all along (elements.js, wedge + orange ±); its blurb now cites
+  ASC ’18 ("an open line end"). No level demonstrates it yet; a natural home is World 3's polarity
+  arc (e.g., the only way to make a needed "−" is bouncing a "+" off an open end). Suites 586+196
+  green with the blurb change (committed on `claude/confident-haibt-12f573`, folded to local main).
 
 - **w4l6 "The Boomerang Theorem"** still wants a standalone review. See the erratum atop
   `../notes/boomerang-theorem-analysis.md`: an exhaustive circulator-free sweep (1.67M wirings) found an
