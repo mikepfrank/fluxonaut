@@ -1,7 +1,7 @@
 # FLUXONAUT — session handoff notes
 
 For future Claude sessions (Code or Cowork) or humans continuing this project.
-State as of **2026-07-08** (release **v1.2** live). `CLAUDE.md` is the technical project guide and
+State as of **2026-07-08** (release **v1.2** live); open threads and the research pointer updated **2026-10-22**. `CLAUDE.md` is the technical project guide and
 carries a dated changelog; this file is the higher-level *how we work + where things stand*.
 
 > **The active work since 2026-07-04 is the RESEARCH side-thread, not the game.** A physics
@@ -13,6 +13,10 @@ carries a dated changelog; this file is the higher-level *how we work + where th
 > v0.3 edits queued in the worklog (§5 topology rewording per his correction, ASC ’18 IR citation,
 > the capture/sink-taxonomy argument, T5 mouth-door results). The interim report, atlases (LaTeX),
 > lit reviews with vision hand-reads, and the 3d-departures note are all in that repo, committed.
+> **Element atlas (2026-10-22, branch `atlas-diagrams-v3` there, local):** a publishable website
+> (`research/atlas/site/`, zip in `../netlify-zips/barcs-atlas-site-*.zip`) and v3 PDF atlases,
+> all verified against barc's output; see `research/atlas/README.md`. The BARC memo may be *cited*
+> but must never be posted or put in a site zip (unfinished; `_check_site.mjs` enforces).
 
 ## Where things stand
 
@@ -70,6 +74,18 @@ carries a dated changelog; this file is the higher-level *how we work + where th
 - **Scratch files** go in the session scratchpad (never `/tmp`, never the repo).
 
 ## Open threads / next steps
+
+- **TABLED (2026-10-22): flux-negation symmetry of the "neutral" two-state elements.** The game's
+  STS, UTR, TCB, TSG and FD are polarity-blind (a negative fluxon routes like a positive one in the
+  same state). barc and ICRC ’22 instead define flux negation to also exchange a flux-neutral
+  element's two states, so as two-polarity devices these elements are *not* in barc's catalog —
+  only their positive-fluxon halves are (STS = class 31 / PTSB, UTR = class 43 / PNTR, TCB =
+  class 15 / PTCB). No level is affected (all their levels are positive-only); only the sandbox
+  would change. Michael's proposed fix — make the STS obey F (= PTSB) and mark its U/D arms with
+  "+"/"−" in the separator colors — is **tabled; scope undecided** (STS only / STS+UTR / all
+  five). Full write-up, audit table and open decisions: **TODO.md**, "Element semantics —
+  flux-negation symmetry". Audit: `node test/audit-flux-negation.mjs`. Not yet reflected in any
+  player-facing text or in the public atlas pages.
 
 - **IR (Inverting Reflector) teaching level** — 2026-07-08: Michael rediscovered that `IREFLECTOR`
   has been in the sandbox palette all along (elements.js, wedge + orange ±); its blurb now cites

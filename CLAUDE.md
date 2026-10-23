@@ -173,6 +173,12 @@ follow-up inline over spawning a subagent.
   had the thorough text/pedagogy review W1–W2 just got; `TODO.md` has the 3× margin-uplift pass
   (eleven sub-10.5 ps levels), the CROSS-forcing puzzle question, the "also offer PS on w4l6's
   palette" idea, and the UX-friction items.
+- **Tabled (2026-10-22): flux-negation symmetry.** STS, UTR, TCB, TSG and FD are polarity-blind,
+  whereas barc/ICRC ’22 make flux negation also exchange a flux-neutral element's states — so as
+  two-polarity devices they are not in barc's catalog (their positive-fluxon halves are: STS =
+  class 31 PTSB, UTR = 43 PNTR, TCB = 15 PTCB). Don't change their negative-fluxon behavior or
+  symbols ad hoc: scope is undecided — see TODO.md "Element semantics — flux-negation symmetry"
+  and `node test/audit-flux-negation.mjs`.
 - **Research side-thread (2026-07-04, gated):** a real physics investigation grew out of the
   W3·L1 Twist review — polarity as Z₂ ribbon holonomy + an integer fluxoid ledger on circuit
   homology. Working memo in `../notes/fluxon-topology-conservation.md`; protocol and next steps

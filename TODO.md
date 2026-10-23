@@ -59,6 +59,76 @@ addressing BARC-memo p. 44's "(TO DO)"). Key sources: `../docs/BARC-memo-2024.pd
   redesign, 100-seed certify gate, sandbox per-pulse launch timing) before the next
   deploy. He will flag high-priority issues as he goes.
 
+## Element semantics — flux-negation symmetry of the two-state "neutral" elements (added 2026-10-22, TABLED)
+
+**Status: documented, deliberately tabled by Michael (2026-10-22).** Nothing in any level is
+affected; no player-facing text has been changed. Decide scope (below) before touching code.
+
+**The issue.** The barc classifier (github.com/sandialabs/barcs; `src/barc.py` lines 77–87 and
+252–253, `src/symmetryTransform.py`) assumes flux-negation symmetry F, and for elements whose two
+states are flux-neutral it defines F to **exchange the two states** as well as negate every
+fluxon. The ICRC ’22 paper (`../docs/ICRC22-BARCS.pdf`, in its list of symmetries) states this as an
+*initial assumption about the state encoding* ("we initially assume that the state encoding is
+such that a flux negation transformation includes performing a state exchange"), notes that
+implementable BARCS devices appear to need F unless it is explicitly broken (e.g. by trapped
+flux), and its Fig. 5 already names the two variants: a Polarized Controlled Flipping Diode
+"differs from regular unpolarized CFD behavior just in that the role of the two states is
+interchanged for negatively-polarized fluxons". The picture: a neutral state is a complementary +/− pair of flux
+quanta in two internal loops, and the two states differ by which loop holds which, so negating
+all flux swaps them. Hence, for every transition
+`(+, port p, state s) → (+, q, s')` there must be `(−, p, S(s)) → (−, q, S(s'))`: a negative
+fluxon sees the two states' roles exchanged, with the same port routing. (This is why the memo's
+flux-neutral element names carry the "Polarized" prefix.) barc therefore enumerates only the
+positive-fluxon sector of each neutral element.
+
+The game's flux-neutral two-state elements are instead **polarity-blind** (the paper's
+"unpolarized" variants): a negative fluxon routes exactly like a positive one in the same state. That violates barc's F, so as complete
+(two-polarity) device functions they are **not in barc's catalog** — only their positive-fluxon
+halves are. `node test/audit-flux-negation.mjs` lists every two-state element:
+
+| Element | Obeys barc's F? | Positive-fluxon half in barc's 3-port neutral catalog | Used in |
+|---|---|---|---|
+| STS | no | class 31 = memo #3d PTSB (barc fn #121/#577) | w4l7, sandbox |
+| UTR | no | class 43 = memo #1 PNTR | w4l7, sandbox |
+| TCB | no | class 15 = memo #3a PTCB | w2l1, w4l7, sandbox |
+| TSG (chip) | no | 5-port composite (TCB + rotaries); not in the 3-port catalog | w2l2–w2l6, sandbox |
+| FD | no | 2-port element (ICRC ’22 Fig. 5; barc's 2-port neutral study, not checked) | w1l4, w1l5, sandbox |
+| RM1, RM2, BSR, RPF, CB | yes | flux-polarized states (F negates the stored flux) | the bipolar levels |
+
+Every level that uses the five polarity-blind elements launches positive fluxons only, so making
+them obey F would change behavior **only in the sandbox**. TCB/FD/TSG date from the 2017 ABRC
+model, where pulses had no polarity; their negative-fluxon behavior in the game was an arbitrary
+extension. The research repo's `atlas/_game_elements_vs_barc.mjs` re-derives the STS/UTR/TCB
+rows above from the live `js/elements.js`: each element's positive table matches its barc class
+exactly and has the same self-symmetry group in D×S×R3 (STS and class 31:
+{I, D·S, D·E(2,3), S·E(2,3)}, the memo's "DS·DR_C"), but no relabeling of the polarity-blind
+version is F-symmetric (the STS and UTR differ from barc on all 6 negative-fluxon rows, the TCB
+on 4). Context: `../research/WORKLOG.md`, 2026-10-22.
+
+**Proposed resolution (Michael, 2026-10-22 — tabled, scope undecided).** Make the STS obey F,
+i.e. become PTSB: positive-fluxon behavior unchanged; a negative fluxon sees U and D exchanged
+(from S it exits the arm naming the *other* state; at that arm it returns to S; at the arm naming
+the current state it reflects). In each state the F-symmetric STS routes exactly like the
+reversible separator `RPS` with its "+" arm on the state-named port, then toggles — so give its
+symbol **"+" and "−" on the U and D arms**, in the separator's arm colors (`COL.plus` cyan,
+`COL.minus` orange), swapping on every toggle, and drop the dashed "reflect" arm (for a negative
+fluxon that arm is the live path).
+
+**Open decisions.**
+1. Scope: STS only; STS + UTR (the two catalog-derived elements); or all five (STS, UTR, TCB,
+   TSG, FD) for full consistency with barc.
+2. UTR symbol if included: recolor its two arcs — bold = the sense a "+" rotates now (cyan),
+   faint = the sense a "−" rotates now (orange), the `PR3` idiom; the same arcs still read as
+   "the sense it toggles to". Does the name "Unconditional" still fit the F-symmetric version?
+3. Polarity cues in single-polarity levels (World 1–2 beginners never see a "−"): show them
+   everywhere, or only in levels where both polarities can occur?
+4. Follow-through for whichever scope: element blurbs (the STS blurb's "one of the 45 open
+   flux-neutral (3,2) behaviors" should name class 31/PTSB), the 🔍 inspector (updates itself
+   from `transition`), an F-symmetry check in `test/run-tests.mjs` (today it checks only the
+   positive-fluxon rows), CLAUDE.md's element notes, the `threeports` notebook page; and,
+   research side, notes on atlas classes 31/43/15 naming the game twins (not yet on the public
+   atlas pages).
+
 ## Element design — revisit the switch-gate (SG/TSG) symbol port ordering (added 2026-06-20)
 
 Michael's observation: the toggling SG chip/block's I/O port ordering **on the symbol**
