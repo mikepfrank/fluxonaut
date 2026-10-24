@@ -177,8 +177,9 @@ follow-up inline over spawning a subagent.
   whereas barc/ICRC ’22 make flux negation also exchange a flux-neutral element's states — so as
   two-polarity devices they are not in barc's catalog (their positive-fluxon halves are: STS =
   class 31 PTSB, UTR = 43 PNTR, TCB = 15 PTCB). Don't change their negative-fluxon behavior or
-  symbols ad hoc: scope is undecided — see TODO.md "Element semantics — flux-negation symmetry"
-  and `node test/audit-flux-negation.mjs`.
+  symbols ad hoc: work from **`PLAN-flux-negation.md`** (options, derived definitions, icons,
+  teaching text, checklist, open decisions; considerations added 2026-10-24); see also TODO.md
+  "Element semantics — flux-negation symmetry" and `node test/audit-flux-negation.mjs`.
 - **Research side-thread (2026-07-04, gated):** a real physics investigation grew out of the
   W3·L1 Twist review — polarity as Z₂ ribbon holonomy + an integer fluxoid ledger on circuit
   homology. Working memo in `../notes/fluxon-topology-conservation.md`; protocol and next steps

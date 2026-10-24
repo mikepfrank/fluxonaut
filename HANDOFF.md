@@ -82,10 +82,18 @@ carries a dated changelog; this file is the higher-level *how we work + where th
   only their positive-fluxon halves are (STS = class 31 / PTSB, UTR = class 43 / PNTR, TCB =
   class 15 / PTCB). No level is affected (all their levels are positive-only); only the sandbox
   would change. Michael's proposed fix — make the STS obey F (= PTSB) and mark its U/D arms with
-  "+"/"−" in the separator colors — is **tabled; scope undecided** (STS only / STS+UTR / all
-  five). Full write-up, audit table and open decisions: **TODO.md**, "Element semantics —
-  flux-negation symmetry". Audit: `node test/audit-flux-negation.mjs`. Not yet reflected in any
-  player-facing text or in the public atlas pages.
+  "+"/"−" in the separator colors — is **tabled**. On 2026-10-24 he added his considerations:
+  - The game's original convention shows these unipolar devices without polarity.
+  - Leaving − inputs undefined (an error) is possible.
+  - Completing them consistently with F is better.
+  - That would call for teaching text on the physics of flux-negation symmetry, and for
+    iconography covering all of these devices.
+  Everything is gathered in the planning document **`PLAN-flux-negation.md`**: options, derived
+  definitions (verified against `elements.js`), display and icon proposals, draft teaching text,
+  a checklist, and the decisions for Michael. TODO.md ("Element semantics — flux-negation
+  symmetry") holds the issue and the audit table; run `node test/audit-flux-negation.mjs` to
+  reproduce the audit. No game code changed; not yet in any player-facing text or the public
+  atlas pages.
 
 - **IR (Inverting Reflector) teaching level** — 2026-07-08: Michael rediscovered that `IREFLECTOR`
   has been in the sandbox palette all along (elements.js, wedge + orange ±); its blurb now cites

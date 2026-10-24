@@ -61,8 +61,9 @@ addressing BARC-memo p. 44's "(TO DO)"). Key sources: `../docs/BARC-memo-2024.pd
 
 ## Element semantics — flux-negation symmetry of the two-state "neutral" elements (added 2026-10-22, TABLED)
 
-**Status: documented, deliberately tabled by Michael (2026-10-22).** Nothing in any level is
-affected; no player-facing text has been changed. Decide scope (below) before touching code.
+**Status: documented, deliberately tabled by Michael (2026-10-22; considerations added
+2026-10-24).** Nothing in any level is affected; no game code or player-facing text has been
+changed. Work from `PLAN-flux-negation.md` (below) before touching code.
 
 **The issue.** The barc classifier (github.com/sandialabs/barcs; `src/barc.py` lines 77–87 and
 252–253, `src/symmetryTransform.py`) assumes flux-negation symmetry F, and for elements whose two
@@ -92,7 +93,7 @@ halves are. `node test/audit-flux-negation.mjs` lists every two-state element:
 | UTR | no | class 43 = memo #1 PNTR | w4l7, sandbox |
 | TCB | no | class 15 = memo #3a PTCB | w2l1, w4l7, sandbox |
 | TSG (chip) | no | 5-port composite (TCB + rotaries); not in the 3-port catalog | w2l2–w2l6, sandbox |
-| FD | no | 2-port element (ICRC ’22 Fig. 5; barc's 2-port neutral study, not checked) | w1l4, w1l5, sandbox |
+| FD | no | 2-port neutral group #2 (ICRC ’22 Fig. 5's Flipping Diode) | w1l4, w1l5, sandbox |
 | RM1, RM2, BSR, RPF, CB | yes | flux-polarized states (F negates the stored flux) | the bipolar levels |
 
 Every level that uses the five polarity-blind elements launches positive fluxons only, so making
@@ -105,29 +106,25 @@ exactly and has the same self-symmetry group in D×S×R3 (STS and class 31:
 version is F-symmetric (the STS and UTR differ from barc on all 6 negative-fluxon rows, the TCB
 on 4). Context: `../research/WORKLOG.md`, 2026-10-22.
 
-**Proposed resolution (Michael, 2026-10-22 — tabled, scope undecided).** Make the STS obey F,
-i.e. become PTSB: positive-fluxon behavior unchanged; a negative fluxon sees U and D exchanged
-(from S it exits the arm naming the *other* state; at that arm it returns to S; at the arm naming
-the current state it reflects). In each state the F-symmetric STS routes exactly like the
-reversible separator `RPS` with its "+" arm on the state-named port, then toggles — so give its
-symbol **"+" and "−" on the U and D arms**, in the separator's arm colors (`COL.plus` cyan,
-`COL.minus` orange), swapping on every toggle, and drop the dashed "reflect" arm (for a negative
-fluxon that arm is the live path).
-
-**Open decisions.**
-1. Scope: STS only; STS + UTR (the two catalog-derived elements); or all five (STS, UTR, TCB,
-   TSG, FD) for full consistency with barc.
-2. UTR symbol if included: recolor its two arcs — bold = the sense a "+" rotates now (cyan),
-   faint = the sense a "−" rotates now (orange), the `PR3` idiom; the same arcs still read as
-   "the sense it toggles to". Does the name "Unconditional" still fit the F-symmetric version?
-3. Polarity cues in single-polarity levels (World 1–2 beginners never see a "−"): show them
-   everywhere, or only in levels where both polarities can occur?
-4. Follow-through for whichever scope: element blurbs (the STS blurb's "one of the 45 open
-   flux-neutral (3,2) behaviors" should name class 31/PTSB), the 🔍 inspector (updates itself
-   from `transition`), an F-symmetry check in `test/run-tests.mjs` (today it checks only the
-   positive-fluxon rows), CLAUDE.md's element notes, the `threeports` notebook page; and,
-   research side, notes on atlas classes 31/43/15 naming the game twins (not yet on the public
-   atlas pages).
+**Plan: [`PLAN-flux-negation.md`](PLAN-flux-negation.md)** (2026-10-24) — the options, derived
+definitions, display/icon proposals, draft teaching text, implementation checklist and decisions.
+In brief:
+- **Michael's 2026-10-22 proposal** for the STS: make it obey F (become PTSB), and mark its U/D arms
+  "+"/"−" in the separator colors. In each state the F-symmetric STS routes like the reversible
+  separator `RPS` with its "+" arm on the state-named port.
+- **His 2026-10-24 considerations:**
+  - The game's original convention shows these unipolar devices' tables without polarity
+    (+ behavior only).
+  - One option is to leave − inputs **undefined** and stop the run with an error; the engine
+    already faults when a transition returns `null`.
+  - Since players may still send − fluxons in later levels or the sandbox, it is better to
+    **complete the definitions consistently with F**.
+  - If so, the game's explanatory text should present the **physical motivation** for flux-negation
+    symmetry.
+  - The **iconography of all these unipolar devices** (not just the STS) needs thought, if their −
+    behavior is to be suggested visually.
+- **Scope** would then be all five elements plus the DUP/RDUP chips (w2l6, sandbox), which
+  package a switch-gate circuit.
 
 ## Element design — revisit the switch-gate (SG/TSG) symbol port ordering (added 2026-06-20)
 
