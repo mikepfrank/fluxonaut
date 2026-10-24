@@ -125,6 +125,11 @@ In brief:
     behavior is to be suggested visually.
 - **Scope** would then be all five elements plus the DUP/RDUP chips (w2l6, sandbox), which
   package a switch-gate circuit.
+- **His 2026-10-25 observation (an option, not a decision):** some elements could stay
+  deliberately *non*-flux-negation-symmetric. Such an element is not in barc's catalog and would
+  need trapped flux or a bias to build, so the game would say so wherever it first appears after
+  polarity is introduced. The UTR's name already declares polarity-blind semantics, and its
+  symmetric twin is the memo's PNTR. This is option D in the plan.
 
 ## Element design — revisit the switch-gate (SG/TSG) symbol port ordering (added 2026-06-20)
 

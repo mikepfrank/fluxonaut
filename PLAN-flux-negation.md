@@ -1,6 +1,7 @@
 # Plan: negative-fluxon behavior of the game's "unipolar" elements
 
-**Status: planning only — TABLED by Michael (2026-10-22, considerations added 2026-10-24).**
+**Status: planning only — TABLED by Michael (2026-10-22; considerations added 2026-10-24 and
+2026-10-25).**
 No game code has changed. This document collects the issue, the options, derived definitions,
 display and iconography ideas, the teaching text, and an implementation checklist, so the work
 can start cleanly when Michael picks it up. Short pointers live in `TODO.md`, `HANDOFF.md` and
@@ -75,9 +76,35 @@ is a draft for his review.
   − behavior by the rule in §1, so every element is consistent with barc's catalog and the
   sandbox works with both polarities.
 - **C. B, plus display rules** so single-polarity levels look exactly as they do now (§5).
+- **D. Per element: keep some deliberately *not* flux-negation symmetric** (Michael's observation,
+  2026-10-25 — an option, not a decision). Extend an element to − inputs polarity-blind (or in any
+  other non-F-symmetric way) and say so in the game's teaching text. Such an element is not in
+  barc's catalog, and building it would need something the flux-negation transformation (acting
+  on the I/O fluxons and the dynamic stored states) does not flip: trapped flux or a constant
+  bias. For some declared semantics this is the point. The **UTR's name declares exactly the
+  polarity-blind semantics** ("unconditional": the same rotation sense for either polarity), and
+  its flux-negation-symmetric twin already has a name, the memo's **PNTR**.
+  - *Why trapped flux or bias is then unavoidable, within barc's two-state framework.* These
+    elements toggle without changing the fluxon's polarity, so by flux conservation their states
+    hold no net flux. Exact flux-negation symmetry must map each state to a state. Leaving both
+    states unchanged would make each equal to its own negative (no flux in any loop), and two
+    such states could not be told apart, so the symmetry must exchange them: barc's convention.
+    A polarity-blind version therefore needs the symmetry broken. (Reasoning for Michael to
+    confirm.)
+  - *Precedent in the game.* PS, PFG, PR3 and rPS already break flux-negation symmetry on purpose,
+    each standing for a hidden power supply or trapped flux; a polarity-blind UTR (already
+    aspirational) would join them.
+  - *Naming rule from the memo and ICRC '22.* "Polarized X" is the symmetric twin and plain "X"
+    the polarity-blind one (PCFD vs "unpolarized CFD"; PNTR vs UTR; PTCB vs TCB; PTSB vs STS). The
+    sandbox could eventually offer both versions of an element.
+  - *Pedagogy rule.* Point it out wherever such an element is first referenced after polarity is
+    introduced (World 3 on). For the UTR that is w4l7 (World 4, positive-only), via the
+    `threeports` page or the inspector caption, plus the sandbox.
 
-Recommendation: **C** — B's behavior everywhere, with polarity cues shown only where a − fluxon
-can occur.
+Recommendation: **C** for elements whose declared meaning is about routing and state (FD, TCB,
+TSG, DUP/RDUP, STS), with **D available element by element** where the declared semantics
+are polarity-independent by design (the UTR is the clear candidate). Polarity cues are shown only
+where a − fluxon can occur.
 
 ## 4. Derived definitions under F (option B)
 
@@ -155,6 +182,13 @@ Where it could go (any combination):
    are exchanged (flux-negation symmetry)".
 4. Element blurbs (the STS blurb's "one of the 45 open flux-neutral (3,2) behaviors" would become
    "barc class 31, the memo's PTSB"; similarly UTR → class 43 PNTR, TCB → class 15 PTCB).
+5. For any element kept non-flux-negation-symmetric (option D): a note, at its first appearance
+   after polarity is introduced, that it breaks flux-negation symmetry and so would need trapped
+   flux or a bias to build, and where relevant that its symmetric twin is in the catalog. Draft:
+
+   > **Not mirror-symmetric.** This element treats fluxons and antifluxons alike. That breaks
+   > flux-negation symmetry, so no circuit without a hidden bias (trapped flux or a bias current)
+   > can behave this way. Its mirror-respecting twin, the memo's PNTR, is in the BARCS catalog.
 
 Draft paragraph (for Michael's review):
 
@@ -189,9 +223,12 @@ Draft paragraph (for Michael's review):
 
 ## 8. Decisions for Michael
 
-1. Option A, B or C (§3). Leaning: B/C.
-2. Scope: all five elements plus DUP/RDUP (recommended for consistency), or a subset.
+1. Option A, B, C or D (§3), possibly differing per element. Leaning: C, with D for the UTR.
+2. Scope: which elements get the symmetric definitions (all five plus DUP/RDUP, or a subset),
+   and which, if any, stay deliberately non-symmetric with a note.
 3. Polarity-display test (§5): unify on "bipolar level or sandbox"?
 4. Icons: approve the principle; review mockups.
 5. Teaching text: where (§6) and wording (draft above).
-6. Names: does "Unconditional Toggle Rotary" still fit once a − fluxon rotates the other way?
+6. Names: under option D the UTR keeps its name, which already declares its polarity-blind
+   semantics; under B/C its symmetric version is the memo's PNTR, so it would be renamed (or both
+   offered). The same "Polarized X" rule could name any other symmetric twins.
