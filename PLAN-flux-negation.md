@@ -93,7 +93,11 @@ is a draft for his review.
     confirm.)
   - *Precedent in the game.* PS, PFG, PR3 and rPS already break flux-negation symmetry on purpose,
     each standing for a hidden power supply or trapped flux; a polarity-blind UTR (already
-    aspirational) would join them.
+    aspirational) would join them. (For the rPS this is forced, not chosen: no separator can obey
+    the symmetry and separate correctly in every state. An obeying one exists only as a
+    state-controlled separator whose mirror state is reversed, for example one in which a
+    mismatched arm arrival crosses to the other arm and flips the state. Lemma and exhaustive
+    search: `../research/atlas/_rps_fsym_search.mjs`, `../research/WORKLOG.md` 2026-10-25.)
   - *Naming rule from the memo and ICRC '22.* "Polarized X" is the symmetric twin and plain "X"
     the polarity-blind one (PCFD vs "unpolarized CFD"; PNTR vs UTR; PTCB vs TCB; PTSB vs STS). The
     sandbox could eventually offer both versions of an element.
