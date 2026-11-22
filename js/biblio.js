@@ -28,6 +28,7 @@
     `[JJ 2025] M. P. Frank and S. B. Kaplan, "A Universal Circuit Element for Ballistic Asynchronous Reversible Computing in Superconductors", US Committee for Superconducting Electronics (USC4SCE) Josephson Junction Workshop, Santa Fe, NM, Apr. 6th–10th, 2025. https://tinyurl.com/Frank-Kaplan-JJ25`,
     `[CB Pat.] R. M. Lewis, M. P. Frank, and S. B. Kaplan, "BALLISTIC SUPERCONDUCTING CIRCUIT FOR ASYNCHRONOUS REVERSIBLE LOGIC ELEMENT", US Patent No. 12,620,993, May 2026.`,
     `[FKL 2026] M. P. Frank, S. B. Kaplan, and R. M. Lewis, title TBD, draft manuscript on polarized controlled barrier (CB), 2026.`,
+    `[UTD 2026] M. P. Frank, "The Ballistic Asynchronous Reversible Computing (BARC) Model: Superconducting Implementations & Relevance to Quantum Technologies," invited talk, Quantum Information Science Seminar series, UT Dallas Quantum Center, Richardson, TX, USA, Oct. 23, 2026. Video: https://www.youtube.com/watch?v=JISHUJusIZA · Slides: https://drive.google.com/file/d/1TapUoYEOrprfL-I_Qe6wKDYGicK31DRZ/view`,
     `[MPF&Grok] Conversation with Grok 3 about some game design ideas: https://x.com/i/grok/share/86376cb25f9548978c2449738d636a11.`,
     `[MPF@SNL] Archived mirror of Mike's research webpage from Sandia (2015-2024): https://tinyurl.com/MPF-SNL-mirror`,
   ];
